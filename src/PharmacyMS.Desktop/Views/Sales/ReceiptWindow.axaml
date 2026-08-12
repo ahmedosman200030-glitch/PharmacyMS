@@ -1,0 +1,128 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+        xmlns:svc="clr-namespace:PharmacyMS.Application.Interfaces.Services;assembly=PharmacyMS.Application"
+        x:Class="PharmacyMS.Desktop.Views.Sales.ReceiptWindow"
+        Title="Receipt"
+        Width="420" Height="700"
+        WindowStartupLocation="CenterOwner"
+        Background="#F1F5F9">
+
+  <DockPanel>
+    <!-- Action bar -->
+    <Border DockPanel.Dock="Bottom" Background="White" Padding="12" BoxShadow="0 -1 4 0 #22000000">
+      <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
+        <Button x:Name="PrintButton" Content="🖨 Print" Height="40" Width="120"
+                Background="#0F2A43" Foreground="White" CornerRadius="8" FontSize="14"/>
+        <Button x:Name="SaveButton" Content="💾 Save" Height="40" Width="120"
+                Background="#3B82F6" Foreground="White" CornerRadius="8" FontSize="14"/>
+        <Button x:Name="CloseButton" Content="✖ Close" Height="40" Width="100"
+                Background="#E2E8F0" Foreground="#334155" CornerRadius="8" FontSize="14"/>
+      </StackPanel>
+    </Border>
+
+    <!-- Receipt scroll area -->
+    <ScrollViewer>
+      <Border Background="White" Margin="20" CornerRadius="8" Padding="24"
+              BoxShadow="0 2 8 0 #33000000">
+        <StackPanel Spacing="0">
+
+          <!-- Logo -->
+          <Image x:Name="LogoImage" Height="64" Margin="0,0,0,8" IsVisible="False"
+                 HorizontalAlignment="Center" Stretch="Uniform"/>
+
+          <!-- Pharmacy name -->
+          <TextBlock x:Name="PharmacyNameText" FontSize="20" FontWeight="Bold"
+                     Foreground="#0F172A" HorizontalAlignment="Center" TextAlignment="Center"/>
+
+          <!-- Address / Phone -->
+          <TextBlock x:Name="AddressText" FontSize="12" Foreground="#64748B"
+                     HorizontalAlignment="Center" TextAlignment="Center" Margin="0,2,0,0"/>
+          <TextBlock x:Name="PhoneText" FontSize="12" Foreground="#64748B"
+                     HorizontalAlignment="Center" TextAlignment="Center"/>
+
+          <!-- Divider -->
+          <Border Height="1" Background="#E2E8F0" Margin="0,12"/>
+
+          <!-- Invoice meta -->
+          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Invoice:" FontSize="12" Foreground="#64748B" Width="80"/>
+            <TextBlock Grid.Row="0" Grid.Column="1" x:Name="InvoiceText" FontSize="12" FontWeight="Bold" Foreground="#0F172A"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Date:" FontSize="12" Foreground="#64748B"/>
+            <TextBlock Grid.Row="1" Grid.Column="1" x:Name="DateText" FontSize="12" Foreground="#334155"/>
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Cashier:" FontSize="12" Foreground="#64748B"/>
+            <TextBlock Grid.Row="2" Grid.Column="1" x:Name="CashierText" FontSize="12" Foreground="#334155"/>
+            <TextBlock Grid.Row="3" Grid.Column="0" Text="Customer:" FontSize="12" Foreground="#64748B"/>
+            <TextBlock Grid.Row="3" Grid.Column="1" x:Name="CustomerText" FontSize="12" Foreground="#334155"/>
+          </Grid>
+
+          <Border Height="1" Background="#E2E8F0" Margin="0,10"/>
+
+          <!-- Column headers -->
+          <Grid ColumnDefinitions="*,40,70,80">
+            <TextBlock Grid.Column="0" Text="Item" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
+            <TextBlock Grid.Column="1" Text="Qty" FontSize="11" FontWeight="Bold" Foreground="#64748B" TextAlignment="Center"/>
+            <TextBlock Grid.Column="2" Text="Price" FontSize="11" FontWeight="Bold" Foreground="#64748B" TextAlignment="Right"/>
+            <TextBlock Grid.Column="3" Text="Total" FontSize="11" FontWeight="Bold" Foreground="#64748B" TextAlignment="Right"/>
+          </Grid>
+          <Border Height="1" Background="#E2E8F0" Margin="0,4"/>
+
+          <!-- Line items -->
+          <ItemsControl x:Name="ItemsList">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="svc:ReceiptLine">
+                <Grid ColumnDefinitions="*,40,70,80" Margin="0,3">
+                  <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="12" Foreground="#334155" TextWrapping="Wrap"/>
+                  <TextBlock Grid.Column="1" Text="{Binding Quantity}" FontSize="12" Foreground="#334155" TextAlignment="Center"/>
+                  <TextBlock Grid.Column="2" Text="{Binding UnitPrice, StringFormat={}{0:F2}}" FontSize="12" Foreground="#334155" TextAlignment="Right"/>
+                  <TextBlock Grid.Column="3" Text="{Binding LineTotal, StringFormat={}{0:F2}}" FontSize="12" Foreground="#334155" TextAlignment="Right"/>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+
+          <Border Height="1" Background="#E2E8F0" Margin="0,8"/>
+
+          <!-- Totals -->
+          <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+            <TextBlock Text="Subtotal" FontSize="12" Foreground="#64748B"/>
+            <TextBlock Grid.Column="1" x:Name="SubtotalText" FontSize="12" Foreground="#334155"/>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto" Margin="0,2" x:Name="DiscountRow">
+            <TextBlock Text="Discount" FontSize="12" Foreground="#EF4444"/>
+            <TextBlock Grid.Column="1" x:Name="DiscountText" FontSize="12" Foreground="#EF4444"/>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+            <TextBlock x:Name="TaxLabel" Text="Tax" FontSize="12" Foreground="#64748B"/>
+            <TextBlock Grid.Column="1" x:Name="TaxText" FontSize="12" Foreground="#334155"/>
+          </Grid>
+          <Border Height="1" Background="#0F172A" Margin="0,6"/>
+          <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+            <TextBlock Text="TOTAL" FontSize="14" FontWeight="Bold" Foreground="#0F172A"/>
+            <TextBlock Grid.Column="1" x:Name="TotalText" FontSize="14" FontWeight="Bold" Foreground="#0F172A"/>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+            <TextBlock x:Name="PaymentLabel" Text="Payment" FontSize="12" Foreground="#64748B"/>
+            <TextBlock Grid.Column="1" x:Name="PaidText" FontSize="12" Foreground="#334155"/>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+            <TextBlock Text="Change" FontSize="12" Foreground="#22C55E" FontWeight="Bold"/>
+            <TextBlock Grid.Column="1" x:Name="ChangeText" FontSize="12" Foreground="#22C55E" FontWeight="Bold"/>
+          </Grid>
+
+          <Border Height="1" Background="#E2E8F0" Margin="0,12"/>
+
+          <!-- QR Code -->
+          <Image x:Name="QrImage" Height="100" Width="100"
+                 HorizontalAlignment="Center" Margin="0,0,0,8"/>
+
+          <!-- Footer -->
+          <TextBlock x:Name="FooterText" FontSize="12" Foreground="#64748B"
+                     HorizontalAlignment="Center" TextAlignment="Center"
+                     TextWrapping="Wrap" Margin="0,4,0,8"/>
+
+        </StackPanel>
+      </Border>
+    </ScrollViewer>
+  </DockPanel>
+</Window>

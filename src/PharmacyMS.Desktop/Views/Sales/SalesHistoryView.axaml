@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+        xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+        x:Class="PharmacyMS.Desktop.Views.Sales.SalesHistoryView"
+        x:DataType="vm:SalesHistoryViewModel"
+        Background="#F1F5F9">
+  <DockPanel Margin="14">
+
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,140,20,140,Auto,Auto" Margin="0,0,0,10">
+      <TextBox Grid.Column="0" x:Name="InvoiceSearchBox" Height="40" PlaceholderText="Search by invoice number..."/>
+      <DatePicker Grid.Column="1" x:Name="FromDatePicker" Margin="10,0,0,0"/>
+      <TextBlock Grid.Column="2" Text="to" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#64748B"/>
+      <DatePicker Grid.Column="3" x:Name="ToDatePicker" Margin="10,0,0,0"/>
+      <Button Grid.Column="4" x:Name="FilterButton" Content="Filter by Date" Height="40" Margin="10,0,0,0" Background="#0F2A43" Foreground="White" CornerRadius="6" Padding="14,0"/>
+      <Button Grid.Column="5" x:Name="ViewAllButton" Content="View All" Height="40" Margin="10,0,0,0" Background="#22C55E" Foreground="White" CornerRadius="6" Padding="14,0"/>
+    </Grid>
+
+    <Border Background="White" CornerRadius="10" Padding="10" BoxShadow="0 1 4 0 #22000000">
+      <DockPanel>
+        <TextBlock DockPanel.Dock="Top" Text="Sales History" FontSize="16" FontWeight="Bold" Foreground="#0F172A" Margin="4,0,0,10"/>
+        <DataGrid x:Name="SalesGrid" x:DataType="ent:Sale" AutoGenerateColumns="False" IsReadOnly="True"
+                  GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
+                  RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Invoice #" Binding="{Binding InvoiceNumber}" Width="160"/>
+            <DataGridTextColumn Header="Date" Binding="{Binding CreatedAt}" Width="150"/>
+            <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" Width="160"/>
+            <DataGridTextColumn Header="Payment" Binding="{Binding PaymentMethod}" Width="110"/>
+            <DataGridTextColumn Header="Total" Binding="{Binding TotalAmount}" Width="100"/>
+            <DataGridTemplateColumn Header="" Width="140">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="ent:Sale">
+                  <Button x:Name="ReprintBtn" Content="Reprint" Height="28" Padding="10,0" Background="#0F2A43" Foreground="White" CornerRadius="6"/>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+      </DockPanel>
+    </Border>
+  </DockPanel>
+</UserControl>

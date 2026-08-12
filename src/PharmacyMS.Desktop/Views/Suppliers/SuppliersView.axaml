@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+        xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+        x:Class="PharmacyMS.Desktop.Views.Suppliers.SuppliersView"
+        x:DataType="vm:SuppliersViewModel"
+        Background="#F1F5F9">
+  <DockPanel Margin="20">
+    <TextBlock DockPanel.Dock="Top" Text="Suppliers" FontSize="22" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,16"/>
+    <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+      <TextBox x:Name="NameBox" Width="180" Height="34" PlaceholderText="Supplier name" Margin="0,0,8,8"/>
+      <TextBox x:Name="ContactBox" Width="150" Height="34" PlaceholderText="Contact person" Margin="0,0,8,8"/>
+      <TextBox x:Name="PhoneBox" Width="130" Height="34" PlaceholderText="Phone" Margin="0,0,8,8"/>
+      <TextBox x:Name="EmailBox" Width="170" Height="34" PlaceholderText="Email" Margin="0,0,8,8"/>
+      <Button x:Name="AddButton" Content="Add" Height="34" Margin="0,0,8,8" Background="#22C55E" Foreground="White" CornerRadius="6" Padding="14,4"/>
+      <Button x:Name="DeleteButton" Content="Delete Selected" Height="34" Margin="0,0,0,8" Background="#EF4444" Foreground="White" CornerRadius="6" Padding="14,4"/>
+    </WrapPanel>
+    <Border Background="White" CornerRadius="10" Padding="4" BoxShadow="0 1 4 0 #22000000">
+      <DataGrid x:Name="Grid" x:DataType="ent:Supplier" AutoGenerateColumns="False" IsReadOnly="True"
+                GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
+                RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="180"/>
+          <DataGridTextColumn Header="Contact" Binding="{Binding ContactPerson}" Width="150"/>
+          <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="130"/>
+          <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="200"/>
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+  </DockPanel>
+</UserControl>

@@ -1,0 +1,147 @@
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace PharmacyMS.Desktop;
+
+public partial class App : Avalonia.Application
+{
+    public static IServiceProvider Services { get; set; } = null!;
+
+    public override void Initialize() => AvaloniaXamlLoader.Load(this);
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.MainWindow = new Views.Shell.MainWindow();
+        }
+        base.OnFrameworkInitializationCompleted();
+    }
+
+    public static void SetTheme(string theme)
+    {
+        var app = (App)Current!;
+        var styles = app.Styles;
+        if (styles.Count > 1) styles.RemoveAt(1);
+
+        var uri = theme == "Dark"
+            ? new Uri("avares://PharmacyMS.Desktop/Themes/Dark.axaml")
+            : new Uri("avares://PharmacyMS.Desktop/Themes/Light.axaml");
+
+        styles.Add(new Avalonia.Markup.Xaml.Styling.StyleInclude(
+            new Uri("avares://PharmacyMS.Desktop/"))
+        {
+            Source = uri
+        });
+    }
+}using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
+using PharmacyMS.Desktop.ViewModels;
+using PharmacyMS.Desktop.Views;
+
+namespace PharmacyMS.Desktop;
+
+public partial class App : Application
+{
+    public override void Initialize()
+    {
+        AvaloniaXamlLoader.Load(this);
+    }
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.MainWindow = new MainWindow
+            {
+                DataContext = new MainViewModel(),
+            };
+        }
+
+        base.OnFrameworkInitializationCompleted();
+    }
+}
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace PharmacyMS.Desktop;
+
+public partial class App : Avalonia.Application
+{
+    public static IServiceProvider Services { get; set; } = null!;
+
+    public override void Initialize() => AvaloniaXamlLoader.Load(this);
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.MainWindow = new Views.Shell.MainWindow();
+        }
+        base.OnFrameworkInitializationCompleted();
+    }
+
+    public static void SetTheme(string theme)
+    {
+        var app = (App)Current!;
+        var styles = app.Styles;
+        if (styles.Count > 1) styles.RemoveAt(1);
+
+        var uri = theme == "Dark"
+            ? new Uri("avares://PharmacyMS.Desktop/Themes/Dark.axaml")
+            : new Uri("avares://PharmacyMS.Desktop/Themes/Light.axaml");
+
+        styles.Add(new Avalonia.Markup.Xaml.Styling.StyleInclude(
+            new Uri("avares://PharmacyMS.Desktop/"))
+        {
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.DependencyInjection;
+
+namespace PharmacyMS.Desktop;
+
+public partial class App : Avalonia.Application
+{
+    public static IServiceProvider Services { get; set; } = null!;
+
+    public override void Initialize() => AvaloniaXamlLoader.Load(this);
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.MainWindow = new Views.Shell.MainWindow();
+        }
+        base.OnFrameworkInitializationCompleted();
+    }
+
+    public static void SetTheme(string theme)
+    {
+        var app = (App)Current!;
+        var styles = app.Styles;
+        if (styles.Count > 1) styles.RemoveAt(1);
+
+        var uri = theme == "Dark"
+            ? new Uri("avares://PharmacyMS.Desktop/Themes/Dark.axaml")
+            : new Uri("avares://PharmacyMS.Desktop/Themes/Light.axaml");
+
+        styles.Add(new Avalonia.Markup.Xaml.Styling.StyleInclude(
+            new Uri("avares://PharmacyMS.Desktop/"))
+        {
+            Source = uri
+        });
+    }
+}
+            Source = uri
+        });
+    }
+}
+
+nano src/PharmacyMS.Desktop/App.axaml.cs
+

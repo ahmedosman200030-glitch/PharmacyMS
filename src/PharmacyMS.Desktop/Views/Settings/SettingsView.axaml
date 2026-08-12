@@ -1,0 +1,367 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+        x:Class="PharmacyMS.Desktop.Views.Settings.SettingsView"
+        x:DataType="vm:SettingsViewModel"
+        Background="#F1F5F9">
+
+  <Grid RowDefinitions="Auto,*" Margin="24">
+
+    <!-- Header -->
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,18">
+      <StackPanel Grid.Column="0" Spacing="2">
+        <TextBlock Text="Settings" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+        <TextBlock Text="Manage your pharmacy system preferences and configurations" FontSize="12" Foreground="#64748B"/>
+      </StackPanel>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+        <TextBlock x:Name="ErrorText" Foreground="#EF4444" FontSize="12" VerticalAlignment="Center" IsVisible="False"/>
+        <TextBlock x:Name="SuccessText" Text="Saved." Foreground="#22C55E" FontSize="12" VerticalAlignment="Center" IsVisible="False"/>
+        <Button x:Name="SaveButton" Content="Save Settings" Height="40" Padding="18,0"
+                Background="#DC2626" Foreground="White" CornerRadius="8" FontWeight="SemiBold"/>
+      </StackPanel>
+    </Grid>
+
+    <!-- Body: sidebar + content -->
+    <Grid Grid.Row="1" ColumnDefinitions="280,*">
+
+      <!-- Sidebar -->
+      <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="10"
+              BoxShadow="0 1 4 0 #22000000" Margin="0,0,16,0" VerticalAlignment="Top">
+        <StackPanel Spacing="4">
+
+          <Button x:Name="NavGeneral" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="⚙️" FontSize="16"/>
+              <StackPanel Spacing="1">
+                <TextBlock Text="General" FontSize="13" FontWeight="SemiBold"/>
+                <TextBlock Text="App name, logo, currency" FontSize="10.5" Foreground="#94A3B8"/>
+              </StackPanel>
+            </StackPanel>
+          </Button>
+
+          <Button x:Name="NavPharmacy" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="🏥" FontSize="16"/>
+              <StackPanel Spacing="1">
+                <TextBlock Text="Pharmacy Information" FontSize="13" FontWeight="SemiBold"/>
+                <TextBlock Text="Name, contact, address" FontSize="10.5" Foreground="#94A3B8"/>
+              </StackPanel>
+            </StackPanel>
+          </Button>
+
+          <Button x:Name="NavTax" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="🧾" FontSize="16"/>
+              <StackPanel Spacing="1">
+                <TextBlock Text="Tax &amp; Invoicing" FontSize="13" FontWeight="SemiBold"/>
+                <TextBlock Text="VAT, invoice prefix, footer" FontSize="10.5" Foreground="#94A3B8"/>
+              </StackPanel>
+            </StackPanel>
+          </Button>
+
+          <Button x:Name="NavSecurity" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="🔒" FontSize="16"/>
+              <StackPanel Spacing="1">
+                <TextBlock Text="Security" FontSize="13" FontWeight="SemiBold"/>
+                <TextBlock Text="Change your password" FontSize="10.5" Foreground="#94A3B8"/>
+              </StackPanel>
+            </StackPanel>
+          </Button>
+
+          <Button x:Name="NavDatabase" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="🗄️" FontSize="16"/>
+              <StackPanel Spacing="1">
+                <TextBlock Text="Database" FontSize="13" FontWeight="SemiBold"/>
+                <TextBlock Text="Backup &amp; restore" FontSize="10.5" Foreground="#94A3B8"/>
+              </StackPanel>
+            </StackPanel>
+          </Button>
+
+          <Button x:Name="NavSounds" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="🔊" FontSize="16"/>
+              <StackPanel Spacing="1">
+                <TextBlock Text="Sound Effects" FontSize="13" FontWeight="SemiBold"/>
+                <TextBlock Text="Notifications &amp; volume" FontSize="10.5" Foreground="#94A3B8"/>
+              </StackPanel>
+            </StackPanel>
+          </Button>
+
+          <Button x:Name="NavAbout" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="ℹ️" FontSize="16"/>
+              <StackPanel Spacing="1">
+                <TextBlock Text="About" FontSize="13" FontWeight="SemiBold"/>
+                <TextBlock Text="Version info" FontSize="10.5" Foreground="#94A3B8"/>
+              </StackPanel>
+            </StackPanel>
+          </Button>
+
+        </StackPanel>
+      </Border>
+
+      <!-- Content -->
+      <ScrollViewer Grid.Column="1">
+        <StackPanel Spacing="18" MaxWidth="800" HorizontalAlignment="Left">
+
+          <!-- General -->
+          <Border x:Name="PanelGeneral" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000" IsVisible="False">
+            <StackPanel Spacing="16">
+              <TextBlock Text="General" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+
+              <Grid ColumnDefinitions="220,*" ColumnSpacing="24">
+                <StackPanel Grid.Column="0" Spacing="10">
+                  <TextBlock Text="App Logo" FontSize="13" FontWeight="SemiBold" Foreground="#334155"/>
+                  <Border Width="200" Height="140" Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8">
+                    <Image x:Name="LogoPreview" Stretch="Uniform" Margin="10"/>
+                  </Border>
+                  <Button x:Name="UploadLogoButton" Content="Upload Logo" Height="34"
+                          Background="#3B82F6" Foreground="White" CornerRadius="6" Padding="14,4" HorizontalAlignment="Left"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Spacing="14">
+                  <TextBlock Text="App Details" FontSize="13" FontWeight="SemiBold" Foreground="#334155"/>
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                    <StackPanel Grid.Column="0" Spacing="6">
+                      <TextBlock Text="App Name" FontSize="12" Foreground="#64748B"/>
+                      <TextBox x:Name="AppNameBox" Height="38"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Spacing="6">
+                      <TextBlock Text="Currency Symbol" FontSize="12" Foreground="#64748B"/>
+                      <TextBox x:Name="CurrencySymbolBox" Height="38"/>
+                    </StackPanel>
+                  </Grid>
+                </StackPanel>
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <!-- Pharmacy Info -->
+          <Border x:Name="PanelPharmacy" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000" IsVisible="True">
+            <StackPanel Spacing="18">
+              <StackPanel Spacing="2">
+                <TextBlock Text="Pharmacy Information" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+                <TextBlock Text="This appears on the header and footer of your PDF/Excel reports." FontSize="11" Foreground="#94A3B8"/>
+              </StackPanel>
+
+              <StackPanel Spacing="12">
+                <TextBlock Text="Pharmacy Details" FontSize="13" FontWeight="SemiBold" Foreground="#334155"/>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto" RowSpacing="14">
+                  <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+                    <TextBlock Text="Pharmacy Name" FontSize="12" Foreground="#64748B"/>
+                    <TextBox x:Name="PharmacyNameBox" Height="38"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
+                    <TextBlock Text="Website" FontSize="12" Foreground="#64748B"/>
+                    <TextBox x:Name="WebsiteBox" Height="38"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
+                    <TextBlock Text="Address" FontSize="12" Foreground="#64748B"/>
+                    <TextBox x:Name="AddressBox" Height="38"/>
+                  </StackPanel>
+                </Grid>
+              </StackPanel>
+
+              <Separator Background="#F1F5F9"/>
+
+              <StackPanel Spacing="12">
+                <TextBlock Text="Contact Information" FontSize="13" FontWeight="SemiBold" Foreground="#334155"/>
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto" RowSpacing="14">
+                  <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+                    <TextBlock Text="Phone Number" FontSize="12" Foreground="#64748B"/>
+                    <TextBox x:Name="PhoneNumberBox" Height="38"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
+                    <TextBlock Text="Mobile Number" FontSize="12" Foreground="#64748B"/>
+                    <TextBox x:Name="MobileNumberBox" Height="38"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
+                    <TextBlock Text="Email Address" FontSize="12" Foreground="#64748B"/>
+                    <TextBox x:Name="EmailBox" Height="38"/>
+                  </StackPanel>
+                </Grid>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <!-- Tax & Invoicing -->
+          <Border x:Name="PanelTax" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000" IsVisible="False">
+            <StackPanel Spacing="16">
+              <TextBlock Text="Tax &amp; Invoicing" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto" RowSpacing="14">
+                <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+                  <TextBlock Text="Tax / VAT Rate (%)" FontSize="12" Foreground="#64748B"/>
+                  <TextBox x:Name="TaxRateBox" Height="38"/>
+                  <TextBlock Text="Enter as a percentage, e.g. 15 for 15%." FontSize="11" Foreground="#94A3B8"/>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
+                  <TextBlock Text="Invoice Number Prefix" FontSize="12" Foreground="#64748B"/>
+                  <TextBox x:Name="InvoicePrefixBox" Height="38"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
+                  <TextBlock Text="Default Reorder Level" FontSize="12" Foreground="#64748B"/>
+                  <TextBox x:Name="ReorderLevelBox" Height="38"/>
+                  <TextBlock Text="Used as the default when adding a new medicine." FontSize="11" Foreground="#94A3B8"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
+                  <TextBlock Text="Receipt Footer" FontSize="12" Foreground="#64748B"/>
+                  <TextBox x:Name="ReceiptFooterBox" Height="38"/>
+                </StackPanel>
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <!-- Security -->
+          <Border x:Name="PanelSecurity" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000" IsVisible="False">
+            <StackPanel Spacing="16">
+              <TextBlock Text="Security" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+              <Border Background="#F8FAFC" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="Password" FontSize="13" FontWeight="SemiBold" Foreground="#334155"/>
+                  <TextBlock Text="Update your own login password." FontSize="12" Foreground="#64748B"/>
+                  <Button x:Name="ChangePasswordButton" Content="Change Password" Height="38" Width="200"
+                          Background="#0F2A43" Foreground="White" CornerRadius="6" HorizontalAlignment="Left"/>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </Border>
+
+          <!-- Database -->
+          <Border x:Name="PanelDatabase" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000" IsVisible="False">
+            <StackPanel Spacing="16">
+              <TextBlock Text="Database" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+
+              <Border Background="#F8FAFC" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="10">
+                  <Grid ColumnDefinitions="120,*">
+                    <TextBlock Grid.Column="0" Text="Location" FontSize="12" Foreground="#64748B"/>
+                    <TextBlock Grid.Column="1" x:Name="DbPathText" Text="" FontSize="12" Foreground="#334155" TextWrapping="Wrap"/>
+                  </Grid>
+                  <Grid ColumnDefinitions="120,*">
+                    <TextBlock Grid.Column="0" Text="Size" FontSize="12" Foreground="#64748B"/>
+                    <TextBlock Grid.Column="1" x:Name="DbSizeText" Text="" FontSize="12" Foreground="#334155"/>
+                  </Grid>
+                  <Grid ColumnDefinitions="120,*">
+                    <TextBlock Grid.Column="0" Text="Last Modified" FontSize="12" Foreground="#64748B"/>
+                    <TextBlock Grid.Column="1" x:Name="DbModifiedText" Text="" FontSize="12" Foreground="#334155"/>
+                  </Grid>
+                </StackPanel>
+              </Border>
+
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button x:Name="BackupButton" Content="Backup Now" Height="38"
+                        Background="#22C55E" Foreground="White" CornerRadius="6" Padding="16,4"/>
+                <Button x:Name="RestoreButton" Content="Restore From File" Height="38"
+                        Background="#F59E0B" Foreground="White" CornerRadius="6" Padding="16,4"/>
+              </StackPanel>
+              <TextBlock x:Name="DbStatusText" FontSize="12" Foreground="#22C55E" IsVisible="False" TextWrapping="Wrap"/>
+            </StackPanel>
+          </Border>
+
+          <!-- Sound Effects -->
+          <Border x:Name="PanelSounds" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000" IsVisible="False">
+            <StackPanel Spacing="16">
+              <TextBlock Text="Sound Effects" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+
+              <CheckBox x:Name="EnableSystemSoundsCheck" Content="Enable System Sounds" FontSize="13"/>
+
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <StackPanel Grid.Column="0" Spacing="8">
+                  <TextBlock Text="Sounds to Play" FontSize="12" Foreground="#64748B"/>
+                  <Button x:Name="SoundChecklistToggle" HorizontalContentAlignment="Stretch" Height="38"
+                          Background="#F8FAFC" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="6">
+                    <Grid ColumnDefinitions="*,Auto">
+                      <TextBlock x:Name="SoundChecklistSummaryText" Grid.Column="0"
+                                 Text="5 of 5 sounds enabled" FontSize="13" Foreground="#334155"
+                                 VerticalAlignment="Center"/>
+                      <TextBlock Grid.Column="1" Text="▾" FontSize="12" Foreground="#94A3B8"
+                                 VerticalAlignment="Center"/>
+                    </Grid>
+                  </Button>
+
+                  <Popup x:Name="SoundChecklistPopup" PlacementTarget="{Binding #SoundChecklistToggle}"
+                         Placement="BottomEdgeAlignedLeft" IsLightDismissEnabled="True" Width="320">
+                    <Border Background="White" CornerRadius="8" Padding="12" BoxShadow="0 4 16 0 #33000000"
+                            BorderBrush="#E2E8F0" BorderThickness="1">
+                      <StackPanel Spacing="8">
+                        <CheckBox x:Name="TransactionSuccessCheck" Content="Transaction Success Sound" FontSize="13"/>
+                        <CheckBox x:Name="ErrorSoundCheck" Content="Error Notification Sound" FontSize="13"/>
+                        <CheckBox x:Name="WarningSoundCheck" Content="Warning Notification Sound" FontSize="13"/>
+                        <CheckBox x:Name="ReceiptPrintCheck" Content="Receipt Print Sound" FontSize="13"/>
+                        <CheckBox x:Name="BackupCompleteCheck" Content="Backup Complete Sound" FontSize="13"/>
+                        <Separator Margin="0,4"/>
+                        <Button x:Name="SelectAllSoundsButton" Content="Select All" FontSize="12"
+                                Background="Transparent" Foreground="#3B82F6" HorizontalAlignment="Left" Padding="0"/>
+                      </StackPanel>
+                    </Border>
+                  </Popup>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Spacing="8">
+                  <TextBlock Text="Volume" FontSize="12" Foreground="#64748B"/>
+                  <Grid ColumnDefinitions="*,50">
+                    <Slider x:Name="VolumeSlider" Grid.Column="0" Minimum="0" Maximum="100" TickFrequency="5"/>
+                    <TextBlock x:Name="VolumeValueText" Grid.Column="1" Text="80%" FontSize="12"
+                               Foreground="#334155" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+                  </Grid>
+                </StackPanel>
+              </Grid>
+
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <ComboBox x:Name="TestSoundCombo" Width="220" Height="36"/>
+                <Button x:Name="TestSoundButton" Content="Test Sound" Height="36"
+                        Background="#0F2A43" Foreground="White" CornerRadius="6" Padding="14,4"/>
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
+          <!-- About -->
+          <Border x:Name="PanelAbout" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000" IsVisible="False">
+            <StackPanel Spacing="16">
+              <TextBlock Text="About" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+              <Border Background="#F8FAFC" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="8">
+                  <Grid ColumnDefinitions="140,*">
+                    <TextBlock Grid.Column="0" Text="Application" FontSize="12" Foreground="#64748B"/>
+                    <TextBlock Grid.Column="1" Text="PharmacyMS Desktop" FontSize="12" Foreground="#334155"/>
+                  </Grid>
+                  <Grid ColumnDefinitions="140,*">
+                    <TextBlock Grid.Column="0" Text="Version" FontSize="12" Foreground="#64748B"/>
+                    <TextBlock Grid.Column="1" Text="1.0.0 (.NET 10, Avalonia)" FontSize="12" Foreground="#334155"/>
+                  </Grid>
+                  <Grid ColumnDefinitions="140,*">
+                    <TextBlock Grid.Column="0" Text="Author" FontSize="12" Foreground="#64748B"/>
+                    <TextBlock Grid.Column="1" Text="Ahmed Osman" FontSize="12" Foreground="#334155"/>
+                  </Grid>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </Border>
+
+        </StackPanel>
+      </ScrollViewer>
+
+    </Grid>
+  </Grid>
+
+  <UserControl.Styles>
+    <Style Selector="Button.navitem">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="#334155"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Padding" Value="12,10"/>
+      <Setter Property="Margin" Value="0"/>
+    </Style>
+    <Style Selector="Button.navitem:pointerover">
+      <Setter Property="Background" Value="#F8FAFC"/>
+    </Style>
+    <Style Selector="Button.navitem.active">
+      <Setter Property="Background" Value="#FEF2F2"/>
+      <Setter Property="Foreground" Value="#DC2626"/>
+    </Style>
+  </UserControl.Styles>
+
+</UserControl>

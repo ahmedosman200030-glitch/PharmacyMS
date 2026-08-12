@@ -1,0 +1,44 @@
+using System.Collections.ObjectModel;
+using PharmacyMS.Application.Interfaces.Repositories;
+using PharmacyMS.Domain.Entities;
+
+namespace PharmacyMS.Desktop.ViewModels;
+
+public class CustomersViewModel
+{
+    private readonly ICustomerRepository _repository;
+
+    public ObservableCollection<Customer> Customers { get; } = new();
+
+    public CustomersViewModel(ICustomerRepository repository)
+    {
+        _repository = repository;
+    }
+
+    public async Task LoadAsync()
+    {
+        Customers.Clear();
+        var items = await _repository.GetAllAsync();
+        foreach (var c in items)
+            Customers.Add(c);
+    }
+
+    public async Task<int> AddAsync(Customer customer)
+    {
+        var id = await _repository.CreateAsync(customer);
+        customer.Id = id;
+        Customers.Add(customer);
+        return id;
+    }
+
+    public async Task UpdateAsync(Customer customer)
+    {
+        await _repository.UpdateAsync(customer);
+    }
+
+    public async Task DeleteAsync(Customer customer)
+    {
+        await _repository.DeleteAsync(customer.Id);
+        Customers.Remove(customer);
+    }
+}

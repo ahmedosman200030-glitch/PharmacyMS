@@ -1,0 +1,82 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+        xmlns:dto="clr-namespace:PharmacyMS.Application.DTOs;assembly=PharmacyMS.Application"
+        x:Class="PharmacyMS.Desktop.Views.Reports.ReportsView"
+        x:DataType="vm:ReportsViewModel"
+        Background="#F1F5F9">
+  <DockPanel Margin="20">
+    <TextBlock DockPanel.Dock="Top" Text="Reports" FontSize="22" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,16"/>
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12" Margin="0,0,0,16">
+      <TextBlock Text="From:" Foreground="#64748B" VerticalAlignment="Center"/>
+      <TextBox x:Name="FromBox" Width="130" Height="32" Text=""/>
+      <TextBlock Text="To:" Foreground="#64748B" VerticalAlignment="Center"/>
+      <TextBox x:Name="ToBox" Width="130" Height="32" Text=""/>
+      <Button x:Name="RunButton" Content="Run Report" Height="32" Background="#0F2A43" Foreground="White" CornerRadius="6" Padding="14,4"/>
+      <Button x:Name="ExportExcelButton" Content="⬇ Excel" Height="32" Background="#16A34A" Foreground="White" CornerRadius="6" Padding="14,4"/>
+      <Button x:Name="ExportPdfButton" Content="⬇ PDF" Height="32" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="14,4"/>
+    </StackPanel>
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="16" Margin="0,0,0,20">
+      <Border Background="White" CornerRadius="10" Padding="16" Width="210" BoxShadow="0 1 4 0 #22000000">
+        <StackPanel>
+          <TextBlock x:Name="RevenueText" Text="$0.00" FontSize="24" FontWeight="Bold" Foreground="#22C55E"/>
+          <TextBlock Text="Total Revenue" FontSize="12" Foreground="#64748B"/>
+        </StackPanel>
+      </Border>
+      <Border Background="White" CornerRadius="10" Padding="16" Width="210" BoxShadow="0 1 4 0 #22000000">
+        <StackPanel>
+          <TextBlock x:Name="CostText" Text="$0.00" FontSize="24" FontWeight="Bold" Foreground="#EF4444"/>
+          <TextBlock Text="Purchase Cost" FontSize="12" Foreground="#64748B"/>
+        </StackPanel>
+      </Border>
+      <Border Background="White" CornerRadius="10" Padding="16" Width="210" BoxShadow="0 1 4 0 #22000000">
+        <StackPanel>
+          <TextBlock x:Name="ProfitText" Text="$0.00" FontSize="24" FontWeight="Bold" Foreground="#F59E0B"/>
+          <TextBlock Text="Gross Profit" FontSize="12" Foreground="#64748B"/>
+        </StackPanel>
+      </Border>
+      <Border Background="White" CornerRadius="10" Padding="16" Width="180" BoxShadow="0 1 4 0 #22000000">
+        <StackPanel>
+          <TextBlock x:Name="TxText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
+          <TextBlock Text="Transactions" FontSize="12" Foreground="#64748B"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+    <TextBlock DockPanel.Dock="Top" Text="Top Selling Medicines" FontSize="16" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,8"/>
+    <Border DockPanel.Dock="Top" Background="White" CornerRadius="10" Padding="4" BoxShadow="0 1 4 0 #22000000" Margin="0,0,0,20">
+      <DataGrid x:Name="TopGrid" x:DataType="dto:TopSellingMedicine" AutoGenerateColumns="False" IsReadOnly="True"
+                GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
+                RowBackground="White" HorizontalGridLinesBrush="#E2E8F0" MaxHeight="220">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="250"/>
+          <DataGridTextColumn Header="Qty Sold" Binding="{Binding QuantitySold}" Width="120"/>
+          <DataGridTextColumn Header="Revenue" Binding="{Binding Revenue}" Width="140"/>
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12" Margin="0,0,0,12">
+      <TextBlock Text="Monthly Stock Reconciliation" FontSize="16" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
+      <Panel Width="12"/>
+      <TextBlock Text="Month:" Foreground="#64748B" VerticalAlignment="Center"/>
+      <TextBox x:Name="ReconMonthBox" Width="100" Height="32" Watermark="yyyy-MM"/>
+      <Button x:Name="ReconRunButton" Content="Generate" Height="32" Background="#0F2A43" Foreground="White" CornerRadius="6" Padding="14,4"/>
+      <Button x:Name="ReconExportButton" Content="⬇ Excel" Height="32" Background="#16A34A" Foreground="White" CornerRadius="6" Padding="14,4"/>
+      <Button x:Name="ReconExportPdfButton" Content="⬇ PDF" Height="32" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="14,4"/>
+    </StackPanel>
+    <Border Background="White" CornerRadius="10" Padding="4" BoxShadow="0 1 4 0 #22000000">
+      <DataGrid x:Name="ReconGrid" x:DataType="dto:MonthlyStockReconciliationRow" AutoGenerateColumns="False" IsReadOnly="True"
+                GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
+                RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="220"/>
+          <DataGridTextColumn Header="Opening Stock" Binding="{Binding OpeningStock}" Width="130"/>
+          <DataGridTextColumn Header="Received" Binding="{Binding Received}" Width="110"/>
+          <DataGridTextColumn Header="Dispensed" Binding="{Binding Dispensed}" Width="110"/>
+          <DataGridTextColumn Header="Adjustments" Binding="{Binding Adjustments}" Width="120"/>
+          <DataGridTextColumn Header="Closing Stock" Binding="{Binding ClosingStock}" Width="130"/>
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+  </DockPanel>
+</UserControl>

@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+             xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+             x:Class="PharmacyMS.Desktop.Views.Purchases.PurchaseHistoryView"
+             x:DataType="vm:PurchaseHistoryViewModel">
+  <Border Background="White" CornerRadius="10" Margin="24" Padding="20">
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Top" Text="Purchase History" FontSize="18" FontWeight="Bold"
+                 Foreground="#0F172A" Margin="0,0,0,14"/>
+      <DataGrid x:Name="Grid"
+                x:DataType="ent:Purchase"
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+                GridLinesVisibility="Horizontal">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Date" Binding="{Binding CreatedAt}" Width="160"/>
+          <DataGridTextColumn Header="Supplier" Binding="{Binding SupplierName}" Width="220"/>
+          <DataGridTextColumn Header="Invoice #" Binding="{Binding InvoiceNumber}" Width="140"/>
+          <DataGridTextColumn Header="Total" Binding="{Binding TotalAmount}" Width="120"/>
+        </DataGrid.Columns>
+      </DataGrid>
+    </DockPanel>
+  </Border>
+</UserControl>

@@ -1,0 +1,151 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+        xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+        x:Class="PharmacyMS.Desktop.Views.Sales.PosView"
+        x:DataType="vm:PosViewModel"
+        Background="#F1F5F9">
+  <DockPanel Margin="14">
+
+    <!-- Top: search + customer + prescription -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,220,Auto" Margin="0,0,0,10">
+      <TextBox Grid.Column="0" x:Name="SearchBox" Height="40" PlaceholderText="🔍  Search medicine / scan barcode..."/>
+      <ComboBox Grid.Column="1" x:Name="CustomerCombo" Height="40" Margin="10,0,0,0"/>
+      <CheckBox Grid.Column="2" x:Name="PrescriptionCheck" Content="Prescription" Margin="12,0,0,0" VerticalAlignment="Center"/>
+    </Grid>
+
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
+      <CheckBox x:Name="CreditSaleCheck" Content="Partial / Credit Sale" VerticalAlignment="Center"/>
+      <TextBox x:Name="CreditCustomerNameBox" Width="260" Height="34" PlaceholderText="Customer name (required for credit)" IsVisible="False"/>
+    </StackPanel>
+
+    <!-- Bottom: quick actions -->
+    <Border DockPanel.Dock="Bottom" Background="White" CornerRadius="10" Padding="10" Margin="0,10,0,0" BoxShadow="0 1 4 0 #22000000">
+      <StackPanel Spacing="8">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button x:Name="NotesButton" Content="📝 Notes" Height="36" Padding="12,0" Background="#E2E8F0" Foreground="#334155" CornerRadius="6"/>
+          <Button x:Name="HoldSaleButton" Content="⏸ Hold Sale" Height="36" Padding="12,0" Background="#F59E0B" Foreground="White" CornerRadius="6"/>
+          <Button x:Name="RecallSaleButton" Content="↩ Resume" Height="36" Padding="12,0" Background="#3B82F6" Foreground="White" CornerRadius="6"/>
+          <Button x:Name="RemoveItemButton" Content="🗑 Remove Item" Height="36" Padding="12,0" Background="#E2E8F0" Foreground="#334155" CornerRadius="6"/>
+          <Button x:Name="ClearCartButton" Content="✖ Clear" Height="36" Padding="12,0" Background="#EF4444" Foreground="White" CornerRadius="6"/>
+          <Button x:Name="CalculatorButton" Content="🧮 Calculator" Height="36" Padding="12,0" Background="#E2E8F0" Foreground="#334155" CornerRadius="6"/>
+          <Button x:Name="PrintReceiptButton" Content="🖨 Print Receipt" Height="36" Padding="12,0" Background="#0F2A43" Foreground="White" CornerRadius="6"/>
+          <Button x:Name="CompleteSaleButton" Content="✅ Complete Sale" Height="36" Padding="14,0" Background="#22C55E" Foreground="White" CornerRadius="6" FontWeight="Bold"/>
+        </StackPanel>
+        <TextBox x:Name="NotesBox" Height="34" PlaceholderText="Add a note for this sale..." IsVisible="False"/>
+        <TextBlock x:Name="StatusText" FontSize="12" Foreground="#EF4444"/>
+      </StackPanel>
+    </Border>
+
+    <!-- Main 3-column area -->
+    <Grid ColumnDefinitions="160,*,300">
+
+      <!-- LEFT: category sidebar -->
+      <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="10" Margin="0,0,10,0" BoxShadow="0 1 4 0 #22000000">
+        <StackPanel x:Name="CategoryPanel" Spacing="6"/>
+      </Border>
+
+      <!-- CENTER: catalog + cart -->
+      <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="10" Margin="0,0,10,0" BoxShadow="0 1 4 0 #22000000">
+        <DockPanel>
+          <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" Margin="4,10,0,0">
+            <TextBox x:Name="QtyBox" Width="60" Text="1" Height="34" PlaceholderText="Qty"/>
+            <Button x:Name="AddToCartButton" Content="Add Selected to Cart" Height="34" Background="#22C55E" Foreground="White" CornerRadius="6" Padding="12,0"/>
+          </StackPanel>
+
+          <Grid RowDefinitions="*,*">
+            <DockPanel Grid.Row="0" Margin="0,0,0,8">
+              <TextBlock DockPanel.Dock="Top" Text="Available Medicines" FontSize="13" FontWeight="Bold" Foreground="#0F172A" Margin="4,0,0,6"/>
+              <DataGrid x:Name="MedicineGrid" x:DataType="ent:Medicine" AutoGenerateColumns="False" IsReadOnly="True"
+                        GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
+                        RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+                <DataGrid.Columns>
+                  <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="190"/>
+                  <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="110"/>
+                  <DataGridTextColumn Header="Price" Binding="{Binding UnitPrice}" Width="70"/>
+                  <DataGridTextColumn Header="Stock" Binding="{Binding QuantityInStock}" Width="70"/>
+                </DataGrid.Columns>
+              </DataGrid>
+            </DockPanel>
+
+            <DockPanel Grid.Row="1">
+              <TextBlock DockPanel.Dock="Top" Text="Shopping Cart" FontSize="13" FontWeight="Bold" Foreground="#0F172A" Margin="4,0,0,6"/>
+              <DataGrid x:Name="CartGrid" x:DataType="vm:CartLine" AutoGenerateColumns="False" IsReadOnly="True"
+                        GridLinesVisibility="Horizontal" Background="#F8FAFC" Foreground="#334155"
+                        RowBackground="#F8FAFC" HorizontalGridLinesBrush="#E2E8F0">
+                <DataGrid.Columns>
+                  <DataGridTextColumn Header="Medicine" Binding="{Binding Name}" Width="120"/>
+                  <DataGridTextColumn Header="Batch" Binding="{Binding Batch}" Width="75"/>
+                  <DataGridTemplateColumn Header="Qty" Width="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="vm:CartLine">
+                        <StackPanel Orientation="Horizontal" Spacing="3">
+                          <Button x:Name="DecBtn" Content="−" Width="22" Height="22" Padding="0" Background="#E2E8F0" CornerRadius="4"/>
+                          <TextBlock Text="{Binding Quantity}" VerticalAlignment="Center" Width="18" TextAlignment="Center"/>
+                          <Button x:Name="IncBtn" Content="+" Width="22" Height="22" Padding="0" Background="#E2E8F0" CornerRadius="4"/>
+                        </StackPanel>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <DataGridTextColumn Header="Price" Binding="{Binding UnitPrice}" Width="60"/>
+                  <DataGridTemplateColumn Header="Disc %" Width="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="vm:CartLine">
+                        <StackPanel Orientation="Horizontal" Spacing="3">
+                          <Button x:Name="DiscDownBtn" Content="−" Width="20" Height="20" Padding="0" Background="#E2E8F0" CornerRadius="4"/>
+                          <TextBlock Text="{Binding DiscountPercent}" VerticalAlignment="Center" Width="26" TextAlignment="Center" FontSize="11"/>
+                          <Button x:Name="DiscUpBtn" Content="+" Width="20" Height="20" Padding="0" Background="#E2E8F0" CornerRadius="4"/>
+                        </StackPanel>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                  <DataGridTextColumn Header="Total" Binding="{Binding LineTotal}" Width="70"/>
+                  <DataGridTemplateColumn Header="" Width="30">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="vm:CartLine">
+                        <Button x:Name="RemoveBtn" Content="🗑" Width="24" Height="24" Padding="0" Background="Transparent"/>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
+                </DataGrid.Columns>
+              </DataGrid>
+            </DockPanel>
+          </Grid>
+        </DockPanel>
+      </Border>
+
+      <!-- RIGHT: payment -->
+      <Border Grid.Column="2" Background="White" CornerRadius="10" Padding="16" BoxShadow="0 1 4 0 #22000000">
+        <StackPanel Spacing="6">
+          <TextBlock Text="Payment" FontSize="16" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,6"/>
+
+          <Border Background="#0F2A43" CornerRadius="8" Padding="14">
+            <StackPanel>
+              <TextBlock Text="GRAND TOTAL" FontSize="11" Foreground="#94A3B8" FontWeight="Bold"/>
+              <TextBlock x:Name="TotalText" Text="$0.00" FontSize="26" FontWeight="Bold" Foreground="White"/>
+            </StackPanel>
+          </Border>
+
+          <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0"><TextBlock Text="Subtotal" Foreground="#64748B" FontSize="13"/><TextBlock Grid.Column="1" x:Name="SubtotalText" Text="$0.00" FontSize="13" Foreground="#334155"/></Grid>
+          <Grid ColumnDefinitions="*,Auto"><TextBlock Text="Discount" Foreground="#64748B" FontSize="13"/><TextBlock Grid.Column="1" x:Name="DiscountText" Text="$0.00" FontSize="13" Foreground="#EF4444"/></Grid>
+          <Grid ColumnDefinitions="*,Auto"><TextBlock Text="Tax" Foreground="#64748B" FontSize="13"/><TextBlock Grid.Column="1" x:Name="TaxText" Text="$0.00" FontSize="13" Foreground="#334155"/></Grid>
+
+          <Border Height="1" Background="#E2E8F0" Margin="0,6"/>
+
+          <TextBlock Text="Payment Method" FontSize="12" Foreground="#64748B" FontWeight="Bold"/>
+          <RadioButton x:Name="PayCash" Content="Cash" GroupName="PayMethod" IsChecked="True"/>
+          <RadioButton x:Name="PayCard" Content="Card" GroupName="PayMethod"/>
+          <RadioButton x:Name="PayMobile" Content="Mobile Money" GroupName="PayMethod"/>
+          <RadioButton x:Name="PayInsurance" Content="Insurance" GroupName="PayMethod"/>
+
+          <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+            <TextBlock Text="Amount Paid" Foreground="#64748B" FontSize="13" VerticalAlignment="Center"/>
+            <TextBox Grid.Column="1" x:Name="AmountReceivedBox" Width="110" Height="30" Text="0" HorizontalContentAlignment="Right"/>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto"><TextBlock Text="Change" FontWeight="Bold" Foreground="#22C55E" FontSize="14"/><TextBlock Grid.Column="1" x:Name="ChangeText" Text="$0.00" FontWeight="Bold" FontSize="14" Foreground="#22C55E"/></Grid>
+        </StackPanel>
+      </Border>
+
+    </Grid>
+  </DockPanel>
+</UserControl>

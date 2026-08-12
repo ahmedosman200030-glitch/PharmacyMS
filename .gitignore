@@ -1,0 +1,14 @@
+bin/
+obj/
+.DS_Store
+publish/
+installer/
+installer-mac/
+dist/
+*.db
+*.dmg
+*.app/
+icon.iconset/
+sound effect/
+PharmacyMS-Windows.zip
+0

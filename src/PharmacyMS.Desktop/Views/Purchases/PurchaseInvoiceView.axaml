@@ -1,0 +1,118 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+             xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+             x:Class="PharmacyMS.Desktop.Views.Purchases.PurchaseInvoiceView"
+             x:DataType="vm:PurchaseInvoiceViewModel">
+  <DockPanel Margin="24">
+
+    <!-- Stat cards -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,*,*,*" Margin="0,0,0,16">
+      <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="16" Margin="0,0,8,0">
+        <StackPanel Spacing="4">
+          <TextBlock Text="Total Invoices" FontSize="13" Foreground="#64748B"/>
+          <TextBlock x:Name="TotalInvoicesText" FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="16" Margin="8,0">
+        <StackPanel Spacing="4">
+          <TextBlock Text="Total Amount" FontSize="13" Foreground="#64748B"/>
+          <TextBlock x:Name="TotalAmountText" FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="2" Background="White" CornerRadius="10" Padding="16" Margin="8,0">
+        <StackPanel Spacing="4">
+          <TextBlock Text="Paid Amount" FontSize="13" Foreground="#64748B"/>
+          <TextBlock x:Name="PaidAmountText" FontSize="22" FontWeight="Bold" Foreground="#1D9E75"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="3" Background="White" CornerRadius="10" Padding="16" Margin="8,0,0,0">
+        <StackPanel Spacing="4">
+          <TextBlock Text="Due Amount" FontSize="13" Foreground="#64748B"/>
+          <TextBlock x:Name="DueAmountText" FontSize="22" FontWeight="Bold" Foreground="#DC2626"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <Grid ColumnDefinitions="440,*">
+
+      <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="16" Margin="0,0,12,0">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Top" Text="Purchase Invoices" FontSize="16" FontWeight="Bold"
+                     Foreground="#0F172A" Margin="0,0,0,10"/>
+          <TextBox x:Name="SearchBox" DockPanel.Dock="Top" PlaceholderText="Search invoice # or supplier..."
+                    Height="32" Margin="0,0,0,10"/>
+          <DataGrid x:Name="ListGrid"
+                    x:DataType="ent:Purchase"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    GridLinesVisibility="Horizontal">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Invoice" Binding="{Binding InvoiceNumber}" Width="110"/>
+              <DataGridTextColumn Header="Supplier" Binding="{Binding SupplierName}" Width="150"/>
+              <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="80"/>
+              <DataGridTemplateColumn Header="" Width="50">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate x:DataType="ent:Purchase">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                      <Button Classes="viewBtn" Content="&#128065;" ToolTip.Tip="View invoice"
+                              Padding="4,2" Background="Transparent" BorderThickness="0"
+                              Foreground="#1D9E75" FontSize="15"/>
+                    </StackPanel>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+            </DataGrid.Columns>
+          </DataGrid>
+        </DockPanel>
+      </Border>
+
+      <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="24">
+       <Panel>
+        <StackPanel x:Name="EmptyState" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center"
+                    IsVisible="True">
+          <TextBlock Text="Select a purchase to view its invoice" Foreground="#64748B" FontSize="14"
+                     HorizontalAlignment="Center"/>
+        </StackPanel>
+
+        <DockPanel x:Name="DetailPanel" IsVisible="False">
+          <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,16">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock x:Name="InvoiceTitleText" FontSize="20" FontWeight="Bold" Foreground="#0F172A"/>
+              <TextBlock x:Name="InvoiceSupplierText" FontSize="14" Foreground="#334155"/>
+              <TextBlock x:Name="InvoiceDateText" FontSize="13" Foreground="#64748B"/>
+              <TextBlock x:Name="InvoiceNumberText" FontSize="13" Foreground="#64748B"/>
+              <TextBlock x:Name="InvoiceStatusText" FontSize="13" FontWeight="Bold"/>
+            </StackPanel>
+            <Button x:Name="RecordPaymentButton" Grid.Column="1" Content="Record Payment"
+                    Height="36" Padding="14,0" VerticalAlignment="Top"
+                    Background="#1D9E75" Foreground="White" CornerRadius="6"/>
+          </Grid>
+
+          <StackPanel DockPanel.Dock="Bottom" Margin="0,16,0,0" HorizontalAlignment="Right" Spacing="2">
+            <TextBlock x:Name="InvoiceTotalText" FontSize="14" Foreground="#334155" HorizontalAlignment="Right"/>
+            <TextBlock x:Name="InvoicePaidText" FontSize="14" Foreground="#1D9E75" HorizontalAlignment="Right"/>
+            <TextBlock x:Name="InvoiceDueText" FontSize="16" FontWeight="Bold" Foreground="#DC2626" HorizontalAlignment="Right"/>
+          </StackPanel>
+
+          <DataGrid x:Name="ItemsGrid"
+                    x:DataType="ent:PurchaseItem"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    GridLinesVisibility="Horizontal">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="200"/>
+              <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}" Width="60"/>
+              <DataGridTextColumn Header="Unit Cost" Binding="{Binding UnitCost}" Width="90"/>
+              <DataGridTextColumn Header="Batch" Binding="{Binding BatchNumber}" Width="110"/>
+              <DataGridTextColumn Header="Expiry" Binding="{Binding ExpiryDate}" Width="110"/>
+              <DataGridTextColumn Header="Line Total" Binding="{Binding LineTotal}" Width="100"/>
+            </DataGrid.Columns>
+          </DataGrid>
+        </DockPanel>
+       </Panel>
+      </Border>
+
+    </Grid>
+  </DockPanel>
+</UserControl>

@@ -1,0 +1,37 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Brand palette: Teal & Navy -->
+  <Color x:Key="BrandPrimaryColor">#0F2A43</Color>
+  <Color x:Key="BrandPrimaryDarkColor">#0A1E30</Color>
+  <Color x:Key="BrandPrimaryLightColor">#1B9C85</Color>
+  <Color x:Key="BrandOnPrimaryColor">#FFFFFF</Color>
+
+  <Color x:Key="BrandBackgroundColor">#F1F5F9</Color>
+  <Color x:Key="BrandSurfaceColor">#FFFFFF</Color>
+  <Color x:Key="BrandBorderColor">#E2E8F0</Color>
+
+  <Color x:Key="BrandTextPrimaryColor">#0F172A</Color>
+  <Color x:Key="BrandTextSecondaryColor">#64748B</Color>
+
+  <Color x:Key="BrandDangerColor">#EF4444</Color>
+  <Color x:Key="BrandSuccessColor">#22C55E</Color>
+  <Color x:Key="BrandWarningColor">#F59E0B</Color>
+
+  <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource BrandPrimaryColor}"/>
+  <SolidColorBrush x:Key="BrandPrimaryDarkBrush" Color="{StaticResource BrandPrimaryDarkColor}"/>
+  <SolidColorBrush x:Key="BrandPrimaryLightBrush" Color="{StaticResource BrandPrimaryLightColor}"/>
+  <SolidColorBrush x:Key="BrandOnPrimaryBrush" Color="{StaticResource BrandOnPrimaryColor}"/>
+
+  <SolidColorBrush x:Key="BrandBackgroundBrush" Color="{StaticResource BrandBackgroundColor}"/>
+  <SolidColorBrush x:Key="BrandSurfaceBrush" Color="{StaticResource BrandSurfaceColor}"/>
+  <SolidColorBrush x:Key="BrandBorderBrush" Color="{StaticResource BrandBorderColor}"/>
+
+  <SolidColorBrush x:Key="BrandTextPrimaryBrush" Color="{StaticResource BrandTextPrimaryColor}"/>
+  <SolidColorBrush x:Key="BrandTextSecondaryBrush" Color="{StaticResource BrandTextSecondaryColor}"/>
+
+  <SolidColorBrush x:Key="BrandDangerBrush" Color="{StaticResource BrandDangerColor}"/>
+  <SolidColorBrush x:Key="BrandSuccessBrush" Color="{StaticResource BrandSuccessColor}"/>
+  <SolidColorBrush x:Key="BrandWarningBrush" Color="{StaticResource BrandWarningColor}"/>
+
+</ResourceDictionary>

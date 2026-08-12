@@ -1,0 +1,330 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:PharmacyMS.Desktop.ViewModels"
+    x:Class="PharmacyMS.Desktop.Views.Dashboard.DashboardView">
+
+    <UserControl.Styles>
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="Padding" Value="16"/>
+            <Setter Property="BoxShadow" Value="0 1 6 0 #14000000"/>
+        </Style>
+        <Style Selector="Border.stat-icon">
+            <Setter Property="Width" Value="48"/>
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="CornerRadius" Value="12"/>
+        </Style>
+        <Style Selector="TextBlock.stat-label">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#6B7280"/>
+        </Style>
+        <Style Selector="TextBlock.stat-value">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#111827"/>
+        </Style>
+        <Style Selector="TextBlock.panel-title">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#111827"/>
+        </Style>
+        <Style Selector="TextBlock.view-all">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Foreground" Value="#EF4444"/>
+        </Style>
+        <Style Selector="ListBox.plain">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="ListBoxItem.plain">
+            <Setter Property="Padding" Value="0,2"/>
+        </Style>
+        <Style Selector="ListBoxItem.plain:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="ListBoxItem.plain:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="Border.row-icon">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Background" Value="#F3F4F6"/>
+        </Style>
+        <Style Selector="Border.level-pill">
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="9,3"/>
+        </Style>
+    </UserControl.Styles>
+
+    <ScrollViewer Background="#F8FAFC">
+        <StackPanel Margin="24" Spacing="20">
+
+            <!-- Title + date -->
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Dashboard" FontSize="26" FontWeight="Bold" Foreground="#111827"/>
+                    <TextBlock x:Name="WelcomeText" FontSize="13" Foreground="#6B7280" Margin="0,2,0,0"/>
+                </StackPanel>
+                <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="14,9" VerticalAlignment="Center" BoxShadow="0 1 6 0 #14000000">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="&#128197;" FontSize="14" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TodayDateText" FontSize="13" FontWeight="Medium" Foreground="#374151" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Stat cards -->
+            <Grid ColumnDefinitions="*,*,*,*">
+                <Border Grid.Column="0" Classes="card" Margin="0,0,10,0">
+                    <StackPanel Orientation="Horizontal" Spacing="14">
+                        <Border Classes="stat-icon" Background="#EF4444">
+                            <Viewbox Width="26" Height="26">
+                              <Canvas Width="24" Height="24">
+                                <Path Stroke="White" StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                      Data="M6,2 L3,6 L3,20 C3,21.1 3.9,22 5,22 L19,22 C20.1,22 21,21.1 21,20 L21,6 L18,2 Z M3,6 L21,6 M16,10 C16,12.2 14.2,14 12,14 C9.8,14 8,12.2 8,10"/>
+                              </Canvas>
+                            </Viewbox>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Classes="stat-label" Text="Total Sales"/>
+                            <TextBlock x:Name="RevenueText" Classes="stat-value"/>
+                            <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,3,0,0">
+                                <TextBlock x:Name="RevenueTrendText" FontSize="11" FontWeight="Bold"/>
+                                <TextBlock Text="vs yesterday" FontSize="11" Foreground="#9CA3AF"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="card" Margin="0,0,10,0">
+                    <StackPanel Orientation="Horizontal" Spacing="14">
+                        <Border Classes="stat-icon" Background="#22C55E">
+                            <Viewbox Width="26" Height="26">
+                              <Canvas Width="24" Height="24">
+                                <Path Stroke="White" StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                      Data="M2,12 L6,12 L8,6 L11,18 L14,9 L16,14 L18,12 L22,12"/>
+                              </Canvas>
+                            </Viewbox>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Classes="stat-label" Text="Total Profit"/>
+                            <TextBlock x:Name="ProfitText" Classes="stat-value"/>
+                            <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,3,0,0">
+                                <TextBlock x:Name="ProfitTrendText" FontSize="11" FontWeight="Bold"/>
+                                <TextBlock Text="vs yesterday" FontSize="11" Foreground="#9CA3AF"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Classes="card" Margin="0,0,10,0">
+                    <StackPanel Orientation="Horizontal" Spacing="14">
+                        <Border Classes="stat-icon" Background="#3B82F6">
+                            <Viewbox Width="26" Height="26">
+                              <Canvas Width="24" Height="24">
+                                <Path Stroke="White" StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                      Data="M21,16 L12,21 L3,16 L3,8 L12,3 L21,8 Z M3,8 L12,13 L21,8 M12,21 L12,13"/>
+                              </Canvas>
+                            </Viewbox>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Classes="stat-label" Text="Total Transactions"/>
+                            <TextBlock x:Name="TransactionsText" Classes="stat-value"/>
+                            <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,3,0,0">
+                                <TextBlock x:Name="TransactionsTrendText" FontSize="11" FontWeight="Bold"/>
+                                <TextBlock Text="vs yesterday" FontSize="11" Foreground="#9CA3AF"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="3" Classes="card">
+                    <StackPanel Orientation="Horizontal" Spacing="14">
+                        <Border Classes="stat-icon" Background="#A855F7">
+                            <Viewbox Width="26" Height="26">
+                              <Canvas Width="24" Height="24">
+                                <Path Stroke="White" StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                      Data="M17,21 L17,19 C17,16.8 15.2,15 13,15 L5,15 C2.8,15 1,16.8 1,19 L1,21 M9,11 C11.2,11 13,9.2 13,7 C13,4.8 11.2,3 9,3 C6.8,3 5,4.8 5,7 C5,9.2 6.8,11 9,11 Z M23,21 L23,19 C23,17.1 21.7,15.5 20,15.1 M16,3.1 C17.7,3.5 19,5.1 19,7 C19,8.9 17.7,10.5 16,10.9"/>
+                              </Canvas>
+                            </Viewbox>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Classes="stat-label" Text="New Customers"/>
+                            <TextBlock x:Name="NewCustomersText" Classes="stat-value"/>
+                            <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,3,0,0">
+                                <TextBlock x:Name="NewCustomersTrendText" FontSize="11" FontWeight="Bold"/>
+                                <TextBlock Text="vs yesterday" FontSize="11" Foreground="#9CA3AF"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Sales overview + low stock alert -->
+            <Grid ColumnDefinitions="2*,1*">
+                <Border Grid.Column="0" Classes="card" Margin="0,0,10,0">
+                    <StackPanel>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+                            <TextBlock Grid.Column="0" Classes="panel-title" Text="Sales Overview" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1" x:Name="ChartRangeCombo" Width="150" SelectedIndex="0">
+                                <ComboBoxItem Content="Last 7 Days"/>
+                                <ComboBoxItem Content="Last 4 Weeks"/>
+                                <ComboBoxItem Content="Last 6 Months"/>
+                            </ComboBox>
+                        </Grid>
+                        <Grid ColumnDefinitions="46,*">
+                            <Canvas Grid.Column="0" x:Name="YAxisCanvas" Height="200"/>
+                            <Grid Grid.Column="1" RowDefinitions="200,Auto">
+                                <Canvas Grid.Row="0" x:Name="SalesChartCanvas" ClipToBounds="False" Background="Transparent"/>
+                                <Canvas Grid.Row="1" x:Name="XAxisCanvas" Height="22" Margin="0,6,0,0"/>
+                            </Grid>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card">
+                    <StackPanel>
+                        <TextBlock Classes="panel-title" Text="Low Stock Alert" Margin="0,0,0,6"/>
+                        <ListBox x:Name="LowStockList" Classes="plain">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:LowStockRow">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0">
+                                        <!-- Medicine image -->
+                                        <Border Grid.Column="0" Width="36" Height="36" CornerRadius="8"
+                                                Background="{Binding FallbackColor}" Margin="0,0,10,0"
+                                                ClipToBounds="True">
+                                            <Panel>
+                                                <TextBlock Text="💊" FontSize="14"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                           IsVisible="{Binding !HasImage}"/>
+                                                <Image Source="{Binding MedicineImage}"
+                                                       Stretch="Uniform" Width="32" Height="32"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       IsVisible="{Binding HasImage}"/>
+                                            </Panel>
+                                        </Border>
+                                        <!-- Name + remaining -->
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                                            <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="Medium"
+                                                       Foreground="#111827" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding RemainingText}" FontSize="10"
+                                                       Foreground="#9CA3AF"/>
+                                        </StackPanel>
+                                        <!-- Status badge -->
+                                        <Border Grid.Column="2" CornerRadius="8" Padding="7,3"
+                                                Background="{Binding StatusBgColor}" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding StatusText}" FontSize="9" FontWeight="Bold"
+                                                       Foreground="{Binding StatusTextColor}"/>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Payment methods + top medicines + recent transactions -->
+            <Grid ColumnDefinitions="*,*,*">
+                <Border Grid.Column="0" Classes="card" Margin="0,0,10,0">
+                    <StackPanel>
+                        <TextBlock Classes="panel-title" Text="Sales by Payment Method" Margin="0,0,0,14"/>
+                        <Grid ColumnDefinitions="Auto,*">
+                            <Canvas Grid.Column="0" x:Name="PaymentDonutCanvas" Width="180" Height="180">
+                                <TextBlock x:Name="PaymentTotalText" FontSize="15" FontWeight="Bold" Foreground="#111827"
+                                           Canvas.Left="40" Canvas.Top="78" Width="100" TextAlignment="Center"/>
+                                <TextBlock Text="Total" FontSize="10" Foreground="#9CA3AF"
+                                           Canvas.Left="40" Canvas.Top="100" Width="100" TextAlignment="Center"/>
+                            </Canvas>
+                            <ItemsControl Grid.Column="1" x:Name="PaymentLegendList" Margin="18,0,0,0" VerticalAlignment="Center">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:PaymentMethodSlice">
+                                        <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,4">
+                                            <Ellipse Grid.Column="0" Width="8" Height="8" Fill="{Binding Color}" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="11" Foreground="#6B7280" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding AmountText}" FontSize="11" FontWeight="Bold" Foreground="#111827" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card" Margin="0,0,10,0">
+                    <StackPanel>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+                            <TextBlock Grid.Column="0" Classes="panel-title" Text="Top Selling Medicines" Margin="0,0,0,4"/>
+                            <TextBlock Grid.Column="1" Classes="view-all" Text="View all"/>
+                        </Grid>
+                        <ListBox x:Name="TopMedicinesList" Classes="plain">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:TopMedicineRow">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,1">
+                                        <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8"
+                                                Background="{Binding FallbackColor}" Margin="0,0,8,0"
+                                                ClipToBounds="True">
+                                            <Panel>
+                                                <TextBlock Text="{Binding FallbackEmoji}" FontSize="14"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                           IsVisible="{Binding !HasImage}"/>
+                                                <Image Source="{Binding MedicineImage}"
+                                                       Stretch="Uniform" Width="28" Height="28"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       IsVisible="{Binding HasImage}"/>
+                                            </Panel>
+                                        </Border>
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" FontWeight="Medium"
+                                                   Foreground="#111827" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                        <Border Grid.Column="2" Background="#FEF2F2" CornerRadius="6"
+                                                Padding="5,2" VerticalAlignment="Center" MinWidth="36">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding QuantitySold}" FontSize="11" FontWeight="Bold"
+                                                           Foreground="#EF4444" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="QTY" FontSize="8" Foreground="#EF4444"
+                                                           HorizontalAlignment="Center" FontWeight="Medium"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Classes="card">
+                    <StackPanel>
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+                            <TextBlock Grid.Column="0" Classes="panel-title" Text="Recent Transactions"/>
+                            <TextBlock Grid.Column="1" Classes="view-all" Text="View all"/>
+                        </Grid>
+                        <ListBox x:Name="RecentTransactionsList" Classes="plain">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:RecentTransactionRow">
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8"
+                                                Background="#DCFCE7" Margin="0,0,10,0">
+                                            <TextBlock Text="&#128196;" FontSize="14" Foreground="#16A34A"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding InvoiceNumber}" FontSize="13" FontWeight="Medium" Foreground="#111827"/>
+                                            <TextBlock Text="{Binding CustomerName}" FontSize="11" Foreground="#9CA3AF"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding AmountText}" FontSize="13" FontWeight="Bold" Foreground="#111827" HorizontalAlignment="Right"/>
+                                            <TextBlock Text="{Binding TimeText}" FontSize="11" FontWeight="SemiBold" Foreground="#16A34A" HorizontalAlignment="Right"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

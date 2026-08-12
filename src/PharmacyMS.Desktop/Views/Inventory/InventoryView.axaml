@@ -1,0 +1,112 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+        x:Class="PharmacyMS.Desktop.Views.Inventory.InventoryView"
+        x:DataType="vm:InventoryViewModel"
+        Background="#F1F5F9">
+  <DockPanel Margin="20">
+
+    <!-- Header -->
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,14">
+      <TextBlock Text="Inventory" FontSize="22" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
+      <Button x:Name="AddButton" Content="+ Add Medicine" Margin="20,0,0,0" Background="#22C55E" Foreground="White" CornerRadius="6" Padding="14,6"/>
+      <Button x:Name="EditButton" Content="Edit Selected" Background="#3B82F6" Foreground="White" CornerRadius="6" Padding="14,6"/>
+      <Button x:Name="DeleteButton" Content="Delete Selected" Background="#EF4444" Foreground="White" CornerRadius="6" Padding="14,6"/>
+      <Button x:Name="RestockButton" Content="Restock" Background="#0F2A43" Foreground="White" CornerRadius="6" Padding="14,6"/>
+      <Button x:Name="AdjustStockButton" Content="Adjust Stock" Background="#0F2A43" Foreground="White" CornerRadius="6" Padding="14,6"/>
+      <Button x:Name="ImportExcelButton" Content="📥 Import Excel" Background="#8B5CF6" Foreground="White" CornerRadius="6" Padding="14,6" HorizontalAlignment="Right"/>
+      <Button x:Name="ExportButton" Content="📤 Export Excel" Background="#3B82F6" Foreground="White" CornerRadius="6" Padding="14,6"/>
+    </StackPanel>
+
+    <!-- Summary bar -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,*,*,*,*,*" Margin="0,0,0,14">
+      <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="12" Margin="0,0,6,0" BoxShadow="0 1 4 0 #22000000">
+        <StackPanel>
+          <TextBlock x:Name="TotalSkusText" Text="0" FontSize="20" FontWeight="Bold" Foreground="#0F172A"/>
+          <TextBlock Text="Total SKUs" FontSize="11" Foreground="#64748B"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="12" Margin="6,0,6,0" BoxShadow="0 1 4 0 #22000000">
+        <StackPanel>
+          <TextBlock x:Name="StockValueText" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="#3B82F6"/>
+          <TextBlock Text="Stock Value (cost)" FontSize="11" Foreground="#64748B"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="2" Background="White" CornerRadius="10" Padding="12" Margin="6,0,6,0" BoxShadow="0 1 4 0 #22000000">
+        <StackPanel>
+          <TextBlock x:Name="RetailValueText" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="#22C55E"/>
+          <TextBlock Text="Retail Value" FontSize="11" Foreground="#64748B"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="3" Background="White" CornerRadius="10" Padding="12" Margin="6,0,6,0" BoxShadow="0 1 4 0 #22000000" Cursor="Hand">
+        <Button x:Name="LowStockChip" Background="Transparent" Padding="0" HorizontalContentAlignment="Stretch">
+          <StackPanel>
+            <TextBlock x:Name="LowStockCountText" Text="0" FontSize="20" FontWeight="Bold" Foreground="#F59E0B"/>
+            <TextBlock Text="Low Stock" FontSize="11" Foreground="#64748B"/>
+          </StackPanel>
+        </Button>
+      </Border>
+      <Border Grid.Column="4" Background="White" CornerRadius="10" Padding="12" Margin="6,0,6,0" BoxShadow="0 1 4 0 #22000000">
+        <Button x:Name="OutOfStockChip" Background="Transparent" Padding="0" HorizontalContentAlignment="Stretch">
+          <StackPanel>
+            <TextBlock x:Name="OutOfStockCountText" Text="0" FontSize="20" FontWeight="Bold" Foreground="#EF4444"/>
+            <TextBlock Text="Out of Stock" FontSize="11" Foreground="#64748B"/>
+          </StackPanel>
+        </Button>
+      </Border>
+      <Border Grid.Column="5" Background="White" CornerRadius="10" Padding="12" Margin="6,0,0,0" BoxShadow="0 1 4 0 #22000000">
+        <Button x:Name="ExpiringChip" Background="Transparent" Padding="0" HorizontalContentAlignment="Stretch">
+          <StackPanel>
+            <TextBlock x:Name="ExpiringCountText" Text="0" FontSize="20" FontWeight="Bold" Foreground="#8B5CF6"/>
+            <TextBlock Text="Expiring (30d)" FontSize="11" Foreground="#64748B"/>
+          </StackPanel>
+        </Button>
+      </Border>
+    </Grid>
+
+    <!-- Search + filters -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,180,180,Auto" Margin="0,0,0,12">
+      <TextBox Grid.Column="0" x:Name="SearchBox" Height="38" PlaceholderText="🔍  Search by name, generic name, or batch..."/>
+      <ComboBox Grid.Column="1" x:Name="CategoryCombo" Height="38" Margin="10,0,0,0"/>
+      <ComboBox Grid.Column="2" x:Name="SupplierCombo" Height="38" Margin="10,0,0,0"/>
+      <Button Grid.Column="3" x:Name="ClearFiltersButton" Content="Clear Filters" Height="38" Margin="10,0,0,0"
+              Background="#E2E8F0" Foreground="#334155" CornerRadius="6" Padding="12,0"/>
+    </Grid>
+
+    <!-- Grid -->
+    <Border Background="White" CornerRadius="10" Padding="4" BoxShadow="0 1 4 0 #22000000">
+      <DataGrid x:Name="Grid" x:DataType="vm:MedicineRow" AutoGenerateColumns="False" IsReadOnly="True"
+                GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
+                RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="160"/>
+          <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="110"/>
+          <DataGridTextColumn Header="Supplier" Binding="{Binding Supplier}" Width="130"/>
+          <DataGridTextColumn Header="Cost" Binding="{Binding CostPrice}" Width="70"/>
+          <DataGridTextColumn Header="Price" Binding="{Binding UnitPrice}" Width="70"/>
+          <DataGridTextColumn Header="Margin %" Binding="{Binding MarginPercent}" Width="80"/>
+          <DataGridTextColumn Header="Stock" Binding="{Binding QuantityInStock}" Width="60"/>
+          <DataGridTextColumn Header="Reorder At" Binding="{Binding ReorderLevel}" Width="90"/>
+          <DataGridTextColumn Header="Batch" Binding="{Binding BatchNumber}" Width="100"/>
+          <DataGridTemplateColumn Header="Expiry" Width="140">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate x:DataType="vm:MedicineRow">
+                <TextBlock Text="{Binding ExpiryDisplay}" Foreground="{Binding ExpiryColor}" VerticalAlignment="Center" Margin="6,0"/>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+          <DataGridTemplateColumn Header="Status" Width="110">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate x:DataType="vm:MedicineRow">
+                <Border Background="{Binding StatusColor}" CornerRadius="4" Padding="8,3" HorizontalAlignment="Left" Margin="6,0">
+                  <TextBlock Text="{Binding StatusLabel}" FontSize="10" Foreground="White" FontWeight="Bold"/>
+                </Border>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+
+  </DockPanel>
+</UserControl>

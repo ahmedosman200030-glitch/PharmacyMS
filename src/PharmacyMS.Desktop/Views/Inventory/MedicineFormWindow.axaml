@@ -1,0 +1,123 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PharmacyMS.Desktop.Views.Inventory.MedicineFormWindow"
+        Title="Medicine"
+        Width="600" Height="720"
+        MinWidth="480" MinHeight="500"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="#F1F5F9">
+
+  <DockPanel>
+
+    <!-- Header -->
+    <Border DockPanel.Dock="Top" Background="#0F2A43" Padding="24,20">
+      <TextBlock x:Name="HeaderText" Text="Add Medicine" FontSize="20" FontWeight="Bold" Foreground="White"/>
+    </Border>
+
+    <!-- Sticky footer -->
+    <Border DockPanel.Dock="Bottom" Background="White" Padding="20" BoxShadow="0 -1 4 0 #22000000">
+      <StackPanel Spacing="8">
+        <TextBlock x:Name="ErrorText" Foreground="#EF4444" FontSize="12" IsVisible="False" TextWrapping="Wrap"/>
+        <Grid ColumnDefinitions="*,140">
+          <Button Grid.Column="0" x:Name="CancelButton" Content="Cancel" Height="42" Margin="0,0,10,0"
+                  Background="#E2E8F0" Foreground="#334155" CornerRadius="8"
+                  HorizontalContentAlignment="Center"/>
+          <Button Grid.Column="1" x:Name="SaveButton" Content="Save" Height="42"
+                  Background="#22C55E" Foreground="White" CornerRadius="8"
+                  HorizontalContentAlignment="Center" FontWeight="Bold"/>
+        </Grid>
+      </StackPanel>
+    </Border>
+
+    <!-- Scrollable form -->
+    <ScrollViewer>
+      <StackPanel Margin="24" Spacing="16">
+
+        <!-- Basic info -->
+        <Border Background="White" CornerRadius="10" Padding="20" BoxShadow="0 1 4 0 #22000000">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Basic Information" FontSize="14" FontWeight="Bold" Foreground="#0F172A"/>
+
+            <TextBlock Text="Name *" FontSize="12" Foreground="#64748B"/>
+            <TextBox x:Name="NameBox" Height="38" PlaceholderText="e.g. Paracetamol 500mg"/>
+
+            <Grid ColumnDefinitions="*,*">
+              <StackPanel Grid.Column="0" Margin="0,0,8,0" Spacing="6">
+                <TextBlock Text="Generic Name" FontSize="12" Foreground="#64748B"/>
+                <TextBox x:Name="GenericNameBox" Height="38"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1" Margin="8,0,0,0" Spacing="6">
+                <TextBlock Text="Category" FontSize="12" Foreground="#64748B"/>
+                <TextBox x:Name="CategoryBox" Height="38"/>
+              </StackPanel>
+            </Grid>
+
+            <Grid ColumnDefinitions="*,*">
+              <StackPanel Grid.Column="0" Margin="0,0,8,0" Spacing="6">
+                <TextBlock Text="Manufacturer" FontSize="12" Foreground="#64748B"/>
+                <TextBox x:Name="ManufacturerBox" Height="38"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1" Margin="8,0,0,0" Spacing="6">
+                <TextBlock Text="Supplier" FontSize="12" Foreground="#64748B"/>
+                <TextBox x:Name="SupplierBox" Height="38"/>
+              </StackPanel>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <!-- Pricing -->
+        <Border Background="White" CornerRadius="10" Padding="20" BoxShadow="0 1 4 0 #22000000">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Pricing" FontSize="14" FontWeight="Bold" Foreground="#0F172A"/>
+            <Grid ColumnDefinitions="*,*">
+              <StackPanel Grid.Column="0" Margin="0,0,8,0" Spacing="6">
+                <TextBlock Text="Unit Price (Selling) *" FontSize="12" Foreground="#64748B"/>
+                <TextBox x:Name="UnitPriceBox" Height="38"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1" Margin="8,0,0,0" Spacing="6">
+                <TextBlock Text="Cost Price (Purchase)" FontSize="12" Foreground="#64748B"/>
+                <TextBox x:Name="CostPriceBox" Height="38"/>
+              </StackPanel>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <!-- Stock -->
+        <Border Background="White" CornerRadius="10" Padding="20" BoxShadow="0 1 4 0 #22000000">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Stock" FontSize="14" FontWeight="Bold" Foreground="#0F172A"/>
+            <Grid ColumnDefinitions="*,*">
+              <StackPanel Grid.Column="0" Margin="0,0,8,0" Spacing="6">
+                <TextBlock Text="Quantity In Stock *" FontSize="12" Foreground="#64748B"/>
+                <TextBox x:Name="QuantityBox" Height="38"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1" Margin="8,0,0,0" Spacing="6">
+                <TextBlock Text="Reorder Level" FontSize="12" Foreground="#64748B"/>
+                <TextBox x:Name="ReorderLevelBox" Height="38" Text="10"/>
+              </StackPanel>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+        <!-- Batch & Expiry -->
+        <Border Background="White" CornerRadius="10" Padding="20" BoxShadow="0 1 4 0 #22000000">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Batch &amp; Expiry" FontSize="14" FontWeight="Bold" Foreground="#0F172A"/>
+            <Grid ColumnDefinitions="*,*">
+              <StackPanel Grid.Column="0" Margin="0,0,8,0" Spacing="6">
+                <TextBlock Text="Batch Number" FontSize="12" Foreground="#64748B"/>
+                <TextBox x:Name="BatchNumberBox" Height="38"/>
+              </StackPanel>
+              <StackPanel Grid.Column="1" Margin="8,0,0,0" Spacing="6">
+                <TextBlock Text="Expiry Date" FontSize="12" Foreground="#64748B"/>
+                <TextBox x:Name="ExpiryDateBox" Height="38" PlaceholderText="yyyy-mm-dd"/>
+              </StackPanel>
+            </Grid>
+          </StackPanel>
+        </Border>
+
+      </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</Window>

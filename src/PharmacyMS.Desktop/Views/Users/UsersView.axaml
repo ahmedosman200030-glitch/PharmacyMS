@@ -1,0 +1,227 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels;assembly=PharmacyMS.Desktop"
+             xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+             xmlns:conv="clr-namespace:PharmacyMS.Desktop.Views.Users"
+             x:Class="PharmacyMS.Desktop.Views.Users.UsersView"
+             x:DataType="vm:UsersViewModel"
+             Background="#F8FAFC">
+
+  <UserControl.Resources>
+    <conv:RoleBrushConverter x:Key="RoleBrush"/>
+    <conv:ActiveBrushConverter x:Key="ActiveBrush2"/>
+    <conv:ActiveTextConverter x:Key="ActiveText"/>
+    <conv:InitialsConverter x:Key="Initials"/>
+  </UserControl.Resources>
+
+  <UserControl.Styles>
+    <Style Selector="DataGrid">
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    <Style Selector="DataGridColumnHeader">
+      <Setter Property="Background" Value="#F1F5F9"/>
+      <Setter Property="Foreground" Value="#64748B"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="Padding" Value="14,12"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style Selector="DataGridRow">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="MinHeight" Value="56"/>
+    </Style>
+    <Style Selector="DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="#F1F5F9"/>
+    </Style>
+    <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="#1B9C8533"/>
+    </Style>
+    <Style Selector="DataGridCell">
+      <Setter Property="Foreground" Value="#0F172A"/>
+      <Setter Property="Padding" Value="14,0"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style Selector="TextBox">
+      <Setter Property="Background" Value="#FFFFFF"/>
+      <Setter Property="Foreground" Value="#0F172A"/>
+      <Setter Property="BorderBrush" Value="#CBD5E1"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Padding" Value="10,0"/>
+      <Setter Property="CaretBrush" Value="#0F172A"/>
+    </Style>
+    <Style Selector="ComboBox">
+      <Setter Property="Background" Value="#FFFFFF"/>
+      <Setter Property="Foreground" Value="#0F172A"/>
+      <Setter Property="BorderBrush" Value="#CBD5E1"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="8"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Panel ClipToBounds="True">
+
+    <!-- ===== Page content ===== -->
+    <DockPanel Margin="24">
+      <StackPanel DockPanel.Dock="Top" Spacing="16" Margin="0,0,0,18">
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <TextBlock Text="Users" FontSize="24" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
+          <TextBlock x:Name="SubtitleText" Text="Manage staff accounts and access" FontSize="13" Foreground="#64748B" VerticalAlignment="Center"/>
+          <Panel Width="1" HorizontalAlignment="Stretch"/>
+          <Button x:Name="AddButton" Content="＋ Add User" Background="#1B9C85" Foreground="White" CornerRadius="8" Padding="16,10" FontWeight="SemiBold"/>
+        </StackPanel>
+
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+          <TextBox x:Name="SearchBox" Grid.Column="0" Height="40" Watermark="Search by name or username..." MaxWidth="360" HorizontalAlignment="Left"/>
+          <Border Grid.Column="1" Background="#FFFFFF" CornerRadius="8" Padding="14,8" Margin="10,0,0,0" BorderBrush="#E2E8F0" BorderThickness="1">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="Total" Foreground="#64748B" FontSize="12" VerticalAlignment="Center"/>
+              <TextBlock x:Name="TotalCountText" Text="0" Foreground="#0F172A" FontWeight="Bold" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Column="2" Background="#FFFFFF" CornerRadius="8" Padding="14,8" Margin="10,0,0,0" BorderBrush="#E2E8F0" BorderThickness="1">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Ellipse Width="8" Height="8" Fill="#22C55E" VerticalAlignment="Center"/>
+              <TextBlock x:Name="ActiveCountText" Text="0 Active" Foreground="#0F172A" FontWeight="SemiBold" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Column="3" Background="#FFFFFF" CornerRadius="8" Padding="14,8" Margin="10,0,0,0" BorderBrush="#E2E8F0" BorderThickness="1">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Ellipse Width="8" Height="8" Fill="#EF4444" VerticalAlignment="Center"/>
+              <TextBlock x:Name="InactiveCountText" Text="0 Inactive" Foreground="#0F172A" FontWeight="SemiBold" VerticalAlignment="Center"/>
+            </StackPanel>
+          </Border>
+        </Grid>
+
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Button x:Name="EditButton" Content="Edit Selected" Background="#FFFFFF" Foreground="#334155" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="8" Padding="14,8"/>
+          <Button x:Name="DeactivateButton" Content="Deactivate Selected" Background="#FFFFFF" Foreground="#EF4444" BorderBrush="#FCA5A5" BorderThickness="1" CornerRadius="8" Padding="14,8" IsEnabled="False"/>
+        </StackPanel>
+      </StackPanel>
+
+      <Border Background="#FFFFFF" CornerRadius="14" Padding="2" BorderBrush="#E2E8F0" BorderThickness="1">
+        <DataGrid x:Name="Grid" x:DataType="ent:User" AutoGenerateColumns="False" IsReadOnly="True"
+                  GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#E2E8F0">
+          <DataGrid.Columns>
+            <DataGridTemplateColumn Header="User" Width="220">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="ent:User">
+                  <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                    <Border Width="34" Height="34" CornerRadius="17" Background="#1B9C8533">
+                      <TextBlock Text="{Binding FullName, Converter={StaticResource Initials}}" Foreground="#1B9C85" FontWeight="Bold" FontSize="12"
+                                 HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                      <TextBlock Text="{Binding FullName}" Foreground="#0F172A" FontWeight="SemiBold" FontSize="13"/>
+                      <TextBlock Text="{Binding Username}" Foreground="#64748B" FontSize="11"/>
+                    </StackPanel>
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+
+            <DataGridTemplateColumn Header="Role" Width="130">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="ent:User">
+                  <Border Background="{Binding Role, Converter={StaticResource RoleBrush}}" Opacity="0.9" CornerRadius="6" Padding="10,4" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Role}" Foreground="White" FontSize="11" FontWeight="SemiBold"/>
+                  </Border>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+
+            <DataGridTemplateColumn Header="Status" Width="110">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="ent:User">
+                  <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Ellipse Width="8" Height="8" Fill="{Binding IsActive, Converter={StaticResource ActiveBrush2}}"/>
+                    <TextBlock Text="{Binding IsActive, Converter={StaticResource ActiveText}}" Foreground="#475569" FontSize="12"/>
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+
+            <DataGridTextColumn Header="Last Login" Binding="{Binding LastLogin}" Width="180" Foreground="#64748B"/>
+          </DataGrid.Columns>
+        </DataGrid>
+      </Border>
+    </DockPanel>
+
+    <!-- ===== Scrim ===== -->
+    <Border x:Name="Scrim" Background="#000000" Opacity="0" IsHitTestVisible="False">
+      <Border.Transitions>
+        <Transitions>
+          <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+        </Transitions>
+      </Border.Transitions>
+    </Border>
+
+    <!-- ===== Slide-in panel ===== -->
+    <Border x:Name="SidePanel" Width="400" HorizontalAlignment="Right"
+            Background="#FFFFFF" BorderBrush="#E2E8F0" BorderThickness="1,0,0,0"
+            Margin="400,0,0,0">
+      <Border.Transitions>
+        <Transitions>
+          <ThicknessTransition Property="Margin" Duration="0:0:0.28"/>
+        </Transitions>
+      </Border.Transitions>
+
+      <DockPanel Margin="24">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,24">
+          <TextBlock x:Name="PanelTitleText" Text="Add User" FontSize="18" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
+          <Panel Width="1" HorizontalAlignment="Stretch"/>
+          <Button x:Name="CloseButton" Content="✕" Background="Transparent" Foreground="#64748B" BorderThickness="0" Padding="8" FontSize="14"/>
+        </StackPanel>
+
+        <TextBlock x:Name="ErrorTextBottom" DockPanel.Dock="Bottom" IsVisible="False"/>
+
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="10" Margin="0,16,0,0">
+          <Button x:Name="SaveButton" Content="Save" Height="42" Width="150"
+                  Background="#1B9C85" Foreground="White" CornerRadius="8" FontWeight="SemiBold"
+                  HorizontalContentAlignment="Center"/>
+          <Button x:Name="CancelButton" Content="Cancel" Height="42" Width="120"
+                  Background="Transparent" Foreground="#334155" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="8"
+                  HorizontalContentAlignment="Center"/>
+        </StackPanel>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="10">
+          <TextBlock Text="Username" Foreground="#64748B" FontSize="12"/>
+          <TextBox x:Name="UsernameBox" Height="40" Background="#F8FAFC" Foreground="#0F172A" BorderBrush="#CBD5E1"/>
+
+          <TextBlock Text="Full Name" Foreground="#64748B" FontSize="12" Margin="0,6,0,0"/>
+          <TextBox x:Name="FullNameBox" Height="40" Background="#F8FAFC" Foreground="#0F172A" BorderBrush="#CBD5E1"/>
+
+          <TextBlock Text="Password" Foreground="#64748B" FontSize="12" Margin="0,6,0,0"/>
+          <TextBox x:Name="PasswordBox" Height="40" PasswordChar="●" Watermark="Leave blank to keep current" Background="#F8FAFC" Foreground="#0F172A" BorderBrush="#CBD5E1"/>
+
+          <TextBlock Text="Role" Foreground="#64748B" FontSize="12" Margin="0,6,0,0"/>
+          <ComboBox x:Name="RoleBox" Height="40" HorizontalAlignment="Stretch" Background="#F8FAFC" Foreground="#0F172A" BorderBrush="#CBD5E1">
+            <ComboBoxItem Content="Admin"/>
+            <ComboBoxItem Content="Pharmacist"/>
+            <ComboBoxItem Content="Cashier"/>
+          </ComboBox>
+
+          <TextBlock Text="Permissions" Foreground="#64748B" FontSize="12" Margin="0,6,0,0"/>
+          <StackPanel x:Name="PermissionsPanel" Spacing="6">
+            <CheckBox x:Name="PermManageUsers" Content="Manage Users" Foreground="#0F172A"/>
+            <CheckBox x:Name="PermManageMedicines" Content="Manage Medicines" Foreground="#0F172A"/>
+            <CheckBox x:Name="PermManageSales" Content="Manage Sales" Foreground="#0F172A"/>
+            <CheckBox x:Name="PermManagePurchases" Content="Manage Purchases" Foreground="#0F172A"/>
+            <CheckBox x:Name="PermViewReports" Content="View Reports" Foreground="#0F172A"/>
+            <CheckBox x:Name="PermManageCustomers" Content="Manage Customers" Foreground="#0F172A"/>
+            <CheckBox x:Name="PermManageCategories" Content="Manage Categories" Foreground="#0F172A"/>
+            <CheckBox x:Name="PermManageSuppliers" Content="Manage Suppliers" Foreground="#0F172A"/>
+            <CheckBox x:Name="PermAdjustStock" Content="Adjust Stock" Foreground="#0F172A"/>
+            <CheckBox x:Name="PermManageSettings" Content="Manage Settings" Foreground="#0F172A"/>
+            <CheckBox x:Name="PermBackupRestore" Content="Backup / Restore" Foreground="#0F172A"/>
+          </StackPanel>
+
+          <TextBlock x:Name="ErrorText" Foreground="#F87171" FontSize="12" IsVisible="False" Margin="0,4,0,0" TextWrapping="Wrap"/>
+
+        </StackPanel>
+        </ScrollViewer>
+      </DockPanel>
+    </Border>
+  </Panel>
+</UserControl>

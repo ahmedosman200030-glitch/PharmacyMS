@@ -1,0 +1,75 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+        xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+        x:Class="PharmacyMS.Desktop.Views.Inventory.StockAdjustmentWindow"
+        x:DataType="vm:StockAdjustmentViewModel"
+        Title="Stock Adjustment"
+        Width="1000" Height="680"
+        Background="#0F172A">
+
+  <Grid ColumnDefinitions="380,*" Margin="20">
+
+    <!-- Adjustment form -->
+    <Border Grid.Column="0" Background="#1E293B" CornerRadius="10" Padding="16" Margin="0,0,16,0">
+      <StackPanel Spacing="10">
+        <TextBlock Text="Adjust Stock" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,0,0,6"/>
+
+        <TextBlock Text="Medicine" Foreground="#94A3B8" FontSize="12"/>
+        <ComboBox x:Name="MedicineBox" Height="36" HorizontalAlignment="Stretch"
+                  ItemsSource="{Binding AvailableMedicines}" DisplayMemberBinding="{Binding Name}"/>
+
+        <TextBlock x:Name="CurrentStockText" Text="Current stock: —" Foreground="#64748B" FontSize="12"/>
+
+        <TextBlock Text="Adjustment Type" Foreground="#94A3B8" FontSize="12"/>
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <RadioButton x:Name="AddRadio" Content="Add (+)" GroupName="AdjType" IsChecked="True" Foreground="White"/>
+          <RadioButton x:Name="RemoveRadio" Content="Remove (-)" GroupName="AdjType" Foreground="White"/>
+        </StackPanel>
+
+        <TextBlock Text="Quantity" Foreground="#94A3B8" FontSize="12"/>
+        <TextBox x:Name="QtyBox" Height="36"/>
+
+        <TextBlock Text="Reason" Foreground="#94A3B8" FontSize="12"/>
+        <ComboBox x:Name="ReasonBox" Height="36" HorizontalAlignment="Stretch">
+          <ComboBoxItem Content="Damaged / broken"/>
+          <ComboBoxItem Content="Expired — write off"/>
+          <ComboBoxItem Content="Stock count correction"/>
+          <ComboBoxItem Content="Theft / loss"/>
+          <ComboBoxItem Content="Returned to supplier"/>
+          <ComboBoxItem Content="Other"/>
+        </ComboBox>
+
+        <TextBlock x:Name="NotesLabel" Text="Notes (optional, appended to reason)" Foreground="#94A3B8" FontSize="12"/>
+        <TextBox x:Name="NotesBox" Height="60" AcceptsReturn="True" TextWrapping="Wrap"/>
+
+        <TextBlock x:Name="ErrorText" Foreground="#F09595" FontSize="12" IsVisible="False" TextWrapping="Wrap"/>
+
+        <Button x:Name="SubmitButton" Content="Submit Adjustment" Height="42" Margin="0,8,0,0"
+                Background="#1D9E75" Foreground="White" CornerRadius="8"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+      </StackPanel>
+    </Border>
+
+    <!-- Recent adjustments log -->
+    <DockPanel Grid.Column="1">
+      <TextBlock DockPanel.Dock="Top" Text="Recent Adjustments" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
+      <DataGrid x:Name="HistoryGrid"
+                x:DataType="ent:StockAdjustment"
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+                GridLinesVisibility="Horizontal"
+                Background="#1E293B"
+                Foreground="White">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Date" Binding="{Binding CreatedAt}" Width="150"/>
+          <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="180"/>
+          <DataGridTextColumn Header="Change" Binding="{Binding QuantityChange}" Width="80"/>
+          <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="220"/>
+          <DataGridTextColumn Header="By" Binding="{Binding AdjustedByName}" Width="130"/>
+        </DataGrid.Columns>
+      </DataGrid>
+    </DockPanel>
+
+  </Grid>
+</Window>

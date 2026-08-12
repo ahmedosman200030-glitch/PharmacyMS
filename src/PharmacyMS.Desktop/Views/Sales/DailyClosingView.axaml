@@ -1,0 +1,83 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+        xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+        x:Class="PharmacyMS.Desktop.Views.Sales.DailyClosingView"
+        x:DataType="vm:DailyClosingViewModel"
+        Background="#F1F5F9">
+  <ScrollViewer>
+  <StackPanel Margin="14" Spacing="14">
+
+    <TextBlock x:Name="StatusText" FontSize="12" Foreground="#22C55E"/>
+
+    <Border Background="White" CornerRadius="10" Padding="16" BoxShadow="0 1 4 0 #22000000">
+      <StackPanel Spacing="12">
+        <TextBlock Text="Today's Sales by Payment Method" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+
+        <Grid ColumnDefinitions="*,*,*,*" >
+          <Border Grid.Column="0" Background="#0F2A43" CornerRadius="8" Padding="12" Margin="0,0,6,0">
+            <StackPanel>
+              <TextBlock Text="CASH (count this)" FontSize="10" Foreground="#22C55E" FontWeight="Bold"/>
+              <TextBlock x:Name="CashSalesText" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="White"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Column="1" Background="#1E293B" CornerRadius="8" Padding="12" Margin="6,0">
+            <StackPanel>
+              <TextBlock Text="CARD" FontSize="10" Foreground="#94A3B8" FontWeight="Bold"/>
+              <TextBlock x:Name="CardSalesText" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="White"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Column="2" Background="#1E293B" CornerRadius="8" Padding="12" Margin="6,0">
+            <StackPanel>
+              <TextBlock Text="MOBILE MONEY" FontSize="10" Foreground="#94A3B8" FontWeight="Bold"/>
+              <TextBlock x:Name="MobileSalesText" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="White"/>
+            </StackPanel>
+          </Border>
+          <Border Grid.Column="3" Background="#1E293B" CornerRadius="8" Padding="12" Margin="6,0,0,0">
+            <StackPanel>
+              <TextBlock Text="INSURANCE" FontSize="10" Foreground="#94A3B8" FontWeight="Bold"/>
+              <TextBlock x:Name="InsuranceSalesText" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="White"/>
+            </StackPanel>
+          </Border>
+        </Grid>
+      </StackPanel>
+    </Border>
+
+    <Border x:Name="ClosingFormBorder" Background="White" CornerRadius="10" Padding="16" BoxShadow="0 1 4 0 #22000000">
+      <StackPanel Spacing="10">
+        <TextBlock Text="Close Register" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+        <TextBlock Text="Count the cash drawer and enter the actual amount:" FontSize="12" Foreground="#64748B"/>
+        <TextBox x:Name="ActualCashBox" Width="200" Height="38" PlaceholderText="Actual cash counted"/>
+        <TextBlock x:Name="DifferenceText" FontSize="14" FontWeight="Bold"/>
+        <TextBox x:Name="NotesBox" Height="34" PlaceholderText="Notes (optional — e.g. reason for shortage)"/>
+        <Button x:Name="CloseRegisterButton" Content="Close Register" Height="38" Width="160" Background="#22C55E" Foreground="White" CornerRadius="6" FontWeight="Bold"/>
+      </StackPanel>
+    </Border>
+
+    <Border x:Name="AlreadyClosedBorder" Background="#FEF3C7" CornerRadius="10" Padding="16" IsVisible="False">
+      <TextBlock Text="The register has already been closed for today." Foreground="#92400E" FontWeight="Bold"/>
+    </Border>
+
+    <Border Background="White" CornerRadius="10" Padding="10" BoxShadow="0 1 4 0 #22000000">
+      <DockPanel>
+        <TextBlock DockPanel.Dock="Top" Text="Closing History" FontSize="16" FontWeight="Bold" Foreground="#0F172A" Margin="4,0,0,10"/>
+        <DataGrid x:Name="HistoryGrid" AutoGenerateColumns="False" IsReadOnly="True"
+                  CanUserSortColumns="False" SelectionMode="Single"
+                  GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
+                  RowBackground="White"
+                  HorizontalGridLinesBrush="#E2E8F0" MinHeight="200" Height="260">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Date" Binding="{ReflectionBinding ClosingDate}" Width="120"/>
+            <DataGridTextColumn Header="Cash Sales" Binding="{ReflectionBinding CashSales, StringFormat=\{0:F2\}}" Width="100"/>
+            <DataGridTextColumn Header="Expected" Binding="{ReflectionBinding ExpectedCash, StringFormat=\{0:F2\}}" Width="100"/>
+            <DataGridTextColumn Header="Counted" Binding="{ReflectionBinding ActualCash, StringFormat=\{0:F2\}}" Width="100"/>
+            <DataGridTextColumn Header="Difference" Binding="{ReflectionBinding Difference, StringFormat=\{0:F2\}}" Width="100"/>
+            <DataGridTextColumn Header="Closed By" Binding="{ReflectionBinding ClosedByUserName}" Width="*"/>
+          </DataGrid.Columns>
+        </DataGrid>
+      </DockPanel>
+    </Border>
+
+  </StackPanel>
+  </ScrollViewer>
+</UserControl>

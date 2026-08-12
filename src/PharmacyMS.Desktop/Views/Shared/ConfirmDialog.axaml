@@ -1,0 +1,14 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PharmacyMS.Desktop.Views.Shared.ConfirmDialog"
+        Width="380" Height="180" WindowStartupLocation="CenterOwner"
+        CanResize="False" Background="White"
+        Title="Confirm">
+  <StackPanel Margin="20" Spacing="16">
+    <TextBlock x:Name="MessageText" TextWrapping="Wrap" FontSize="14" Foreground="#0F172A"/>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button x:Name="NoButton" Content="No" Width="90" Height="34" Background="#E2E8F0" Foreground="#334155" CornerRadius="6"/>
+      <Button x:Name="YesButton" Content="Yes" Width="90" Height="34" Background="#22C55E" Foreground="White" CornerRadius="6"/>
+    </StackPanel>
+  </StackPanel>
+</Window>

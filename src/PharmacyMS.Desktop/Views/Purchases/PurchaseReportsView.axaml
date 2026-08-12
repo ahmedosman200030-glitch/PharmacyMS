@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+             xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+             x:Class="PharmacyMS.Desktop.Views.Purchases.PurchaseReportsView"
+             x:DataType="vm:PurchaseReportsViewModel">
+  <DockPanel Margin="24">
+
+    <Border DockPanel.Dock="Top" Background="White" CornerRadius="10" Padding="20" Margin="0,0,0,16">
+      <StackPanel Spacing="4">
+        <TextBlock Text="Total Purchase Spend" FontSize="14" Foreground="#64748B"/>
+        <TextBlock x:Name="TotalSpendText" FontSize="26" FontWeight="Bold" Foreground="#0F172A"/>
+      </StackPanel>
+    </Border>
+
+    <Grid ColumnDefinitions="*,*">
+
+      <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="20" Margin="0,0,8,0">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Top" Text="Spend by Supplier" FontSize="16" FontWeight="Bold"
+                     Foreground="#0F172A" Margin="0,0,0,12"/>
+          <DataGrid x:Name="SupplierGrid"
+                    x:DataType="ent:SupplierSpend"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    GridLinesVisibility="Horizontal">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Supplier" Binding="{Binding SupplierName}" Width="*"/>
+              <DataGridTextColumn Header="Total" Binding="{Binding Total}" Width="120"/>
+            </DataGrid.Columns>
+          </DataGrid>
+        </DockPanel>
+      </Border>
+
+      <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="20" Margin="8,0,0,0">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Top" Text="Spend by Medicine" FontSize="16" FontWeight="Bold"
+                     Foreground="#0F172A" Margin="0,0,0,12"/>
+          <DataGrid x:Name="MedicineGrid"
+                    x:DataType="ent:MedicineSpend"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    GridLinesVisibility="Horizontal">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="*"/>
+              <DataGridTextColumn Header="Total" Binding="{Binding Total}" Width="120"/>
+            </DataGrid.Columns>
+          </DataGrid>
+        </DockPanel>
+      </Border>
+
+    </Grid>
+  </DockPanel>
+</UserControl>

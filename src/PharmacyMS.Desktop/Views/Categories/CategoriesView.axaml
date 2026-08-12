@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+        xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+        x:Class="PharmacyMS.Desktop.Views.Categories.CategoriesView"
+        x:DataType="vm:CategoriesViewModel"
+        Background="#F1F5F9">
+  <DockPanel Margin="20">
+    <TextBlock DockPanel.Dock="Top" Text="Categories" FontSize="22" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,16"/>
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,16">
+      <TextBox x:Name="NameBox" Width="200" Height="34" PlaceholderText="Category name"/>
+      <TextBox x:Name="DescBox" Width="280" Height="34" PlaceholderText="Description"/>
+      <Button x:Name="AddButton" Content="Add" Height="34" Background="#22C55E" Foreground="White" CornerRadius="6" Padding="14,4"/>
+      <Button x:Name="DeleteButton" Content="Delete Selected" Height="34" Background="#EF4444" Foreground="White" CornerRadius="6" Padding="14,4"/>
+    </StackPanel>
+    <Border Background="White" CornerRadius="10" Padding="4" BoxShadow="0 1 4 0 #22000000">
+      <DataGrid x:Name="Grid" x:DataType="ent:Category" AutoGenerateColumns="False" IsReadOnly="True"
+                GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
+                RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="220"/>
+          <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="360"/>
+        </DataGrid.Columns>
+      </DataGrid>
+    </Border>
+  </DockPanel>
+</UserControl>
