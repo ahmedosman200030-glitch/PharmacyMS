@@ -4,13 +4,13 @@ using PharmacyMS.Infrastructure.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 var connStr = Environment.GetEnvironmentVariable("PHARMACYMS_CONNECTION_STRING")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("PHARMACYMS_CONNECTION_STRING not set");
 
 builder.Services.AddInfrastructure(connStr);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Allow desktop app to connect
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -19,7 +19,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Initialize database on startup
 var initializer = app.Services.GetRequiredService<DatabaseInitializer>();
 await initializer.InitializeAsync();
 
