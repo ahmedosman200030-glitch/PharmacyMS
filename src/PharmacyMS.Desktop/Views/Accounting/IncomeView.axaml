@@ -1,0 +1,173 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+             xmlns:controls="clr-namespace:PharmacyMS.Desktop.Controls"
+             x:Class="PharmacyMS.Desktop.Views.Accounting.IncomeView"
+             x:DataType="vm:IncomeViewModel"
+             Background="#F1F5F9">
+
+  <UserControl.Styles>
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="White"/>
+      <Setter Property="CornerRadius" Value="16"/>
+      <Setter Property="Padding" Value="16"/>
+      <Setter Property="BoxShadow" Value="0 1 6 0 #14000000"/>
+    </Style>
+    <Style Selector="Border.stat-icon">
+      <Setter Property="Width" Value="48"/>
+      <Setter Property="Height" Value="48"/>
+      <Setter Property="CornerRadius" Value="12"/>
+    </Style>
+    <Style Selector="TextBlock.stat-label">
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="Foreground" Value="#6B7280"/>
+    </Style>
+    <Style Selector="TextBlock.stat-value">
+      <Setter Property="FontSize" Value="24"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Foreground" Value="#111827"/>
+    </Style>
+  </UserControl.Styles>
+  <ScrollViewer>
+  <StackPanel Margin="24" Spacing="16">
+
+    <Grid ColumnDefinitions="*,Auto">
+      <StackPanel Grid.Column="0">
+        <TextBlock Text="Income" Classes="stat-value" Foreground="#0F172A"/>
+        <TextBlock Text="Manage all income transactions" FontSize="13" Foreground="#64748B" Margin="0,4,0,0"/>
+      </StackPanel>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <controls:DateRangePicker x:Name="RangePicker"/>
+        <Button x:Name="RefreshButton" Content="🔄 Refresh" Background="#2563EB" Foreground="White" CornerRadius="8" Padding="12,6" FontSize="13"/>
+        <Button x:Name="AddIncomeBtn" Content="+ Add Income" Background="#2563EB" Foreground="White" CornerRadius="8" Padding="12,6" FontSize="13"
+                ToolTip.Tip="Income is generated from Sales (POS) and Customer Payments. Record one there and it will appear here."/>
+      </StackPanel>
+    </Grid>
+
+    <!-- Stat cards -->
+    <Grid ColumnDefinitions="*,*,*,*">
+      <Border Grid.Column="0" Classes="card" Margin="0,0,10,0">
+        <StackPanel Spacing="8" HorizontalAlignment="Center">
+          <Border Classes="stat-icon" Background="#EFF6FF" HorizontalAlignment="Center">
+            <Path Data="M12 4 L12 20 M12 4 L6 10 M12 4 L18 10" Stroke="#3B82F6" StrokeThickness="2.2"
+                  StrokeLineCap="Round" StrokeJoin="Round" Width="20" Height="20" Stretch="Uniform"/>
+          </Border>
+          <TextBlock Text="TOTAL INCOME" Classes="stat-label" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="TotalIncomeText" Text="$0.00" Classes="stat-value" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="TotalIncomePeriodText" Text="" FontSize="11" Foreground="#3B82F6" HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="1" Classes="card" Margin="0,0,10,0">
+        <StackPanel Spacing="8" HorizontalAlignment="Center">
+          <Border Classes="stat-icon" Background="#F0FDF4" HorizontalAlignment="Center">
+            <Ellipse Width="20" Height="20" Stroke="#10B981" StrokeThickness="2"/>
+          </Border>
+          <TextBlock Text="CASH SALES" Classes="stat-label" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="CashSalesText" Text="$0.00" Classes="stat-value" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="CashSalesPeriodText" Text="" FontSize="11" Foreground="#10B981" HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="2" Classes="card" Margin="0,0,10,0">
+        <StackPanel Spacing="8" HorizontalAlignment="Center">
+          <Border Classes="stat-icon" Background="#FFF7ED" HorizontalAlignment="Center">
+            <Path Data="M8 12 A4 4 0 1 0 8 4 A4 4 0 1 0 8 12 Z M2 20 C2 16 5 14 8 14 C11 14 14 16 14 20"
+                  Stroke="#F59E0B" StrokeThickness="1.8" StrokeLineCap="Round" StrokeJoin="Round"
+                  Width="18" Height="18" Stretch="Uniform"/>
+          </Border>
+          <TextBlock Text="CUSTOMER PAYMENTS" Classes="stat-label" HorizontalAlignment="Center" TextAlignment="Center"/>
+          <TextBlock x:Name="CustomerPaymentsText" Text="$0.00" Classes="stat-value" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="CustomerPaymentsPeriodText" Text="" FontSize="11" Foreground="#F59E0B" HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="3" Classes="card" Padding="16">
+        <StackPanel Spacing="8" HorizontalAlignment="Center">
+          <Border Classes="stat-icon" Background="#F5F3FF" HorizontalAlignment="Center">
+            <Path Data="M4 6 L16 6 M4 10 L16 10 M4 14 L12 14" Stroke="#8B5CF6" StrokeThickness="2"
+                  StrokeLineCap="Round" Width="18" Height="18" Stretch="Uniform"/>
+          </Border>
+          <TextBlock Text="TRANSACTIONS" Classes="stat-label" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="TxnCountText" Text="0" Classes="stat-value" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="TxnCountPeriodText" Text="" FontSize="11" Foreground="#8B5CF6" HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- Filter chips + search -->
+    <Border Classes="card" Padding="12">
+      <DockPanel>
+        <StackPanel Orientation="Horizontal" Spacing="8">
+          <Button x:Name="AllFilterBtn" Content="All Income" CornerRadius="8" Padding="12,6" FontSize="13"/>
+          <Button x:Name="CashFilterBtn" Content="Cash Sales" CornerRadius="8" Padding="12,6" FontSize="13"/>
+          <Button x:Name="PaymentFilterBtn" Content="Customer Payments" CornerRadius="8" Padding="12,6" FontSize="13"/>
+        </StackPanel>
+        <TextBox x:Name="SearchBox" DockPanel.Dock="Right" Width="220" Watermark="Search income..."/>
+      </DockPanel>
+    </Border>
+
+    <!-- Table -->
+    <Border Classes="card" Padding="16">
+      <StackPanel Spacing="10">
+        <DataGrid x:Name="IncomeGrid" HeadersVisibility="Column"
+                  x:DataType="vm:IncomeRow" AutoGenerateColumns="False" IsReadOnly="True"
+                  GridLinesVisibility="Horizontal">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=yyyy-MM-dd}" Width="110"/>
+            <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="170"/>
+            <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+            <DataGridTextColumn Header="Reference" Binding="{Binding Reference}" Width="110"/>
+            <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat=$\{0:F2\}}" Width="100"/>
+            <DataGridTextColumn Header="Payment Method" Binding="{Binding PaymentMethod}" Width="160"/>
+            <DataGridTextColumn Header="Received By" Binding="{Binding ReceivedBy}" Width="110"/>
+          </DataGrid.Columns>
+        </DataGrid>
+
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock x:Name="PagingSummaryText" Text="" Foreground="#64748B" FontSize="12" VerticalAlignment="Center"/>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+            <Button x:Name="PrevPageBtn" Content="‹ Prev" Padding="10,4"/>
+            <TextBlock x:Name="PageLabelText" Text="Page 1 of 1" VerticalAlignment="Center" Foreground="#334155"/>
+            <Button x:Name="NextPageBtn" Content="Next ›" Padding="10,4"/>
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+    </Border>
+
+    <!-- Charts row -->
+    <Grid ColumnDefinitions="*,*,*">
+      <Border Grid.Column="0" Classes="card" Margin="0,0,10,0">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Top" Text="Income by Type" FontSize="14" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,0,0,10"/>
+          <Canvas x:Name="DonutCanvas" Height="160"/>
+        </DockPanel>
+      </Border>
+      <Border Grid.Column="1" Classes="card" Margin="0,0,10,0">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Top" Text="Income Trend" FontSize="14" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,0,0,10"/>
+          <Canvas x:Name="TrendCanvas" Height="160"/>
+        </DockPanel>
+      </Border>
+      <Border Grid.Column="2" Classes="card" Padding="16">
+        <StackPanel Spacing="10">
+          <TextBlock Text="Top Income Sources" FontSize="14" FontWeight="SemiBold" Foreground="#0F172A"/>
+          <Grid ColumnDefinitions="*,Auto,Auto">
+            <TextBlock Text="Cash Sales" Foreground="#334155" FontSize="13"/>
+            <TextBlock x:Name="TopCashText" Grid.Column="1" Text="$0.00" FontSize="13" FontWeight="SemiBold" Margin="10,0" Foreground="#10B981"/>
+            <TextBlock x:Name="TopCashPctText" Grid.Column="2" Text="0%" FontSize="12" Foreground="#64748B"/>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto,Auto">
+            <TextBlock Text="Customer Payments" Foreground="#334155" FontSize="13"/>
+            <TextBlock x:Name="TopPaymentsText" Grid.Column="1" Text="$0.00" FontSize="13" FontWeight="SemiBold" Margin="10,0" Foreground="#F59E0B"/>
+            <TextBlock x:Name="TopPaymentsPctText" Grid.Column="2" Text="0%" FontSize="12" Foreground="#64748B"/>
+          </Grid>
+          <Separator/>
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Text="Total" FontWeight="Bold" Foreground="#0F172A"/>
+            <TextBlock x:Name="TopTotalText" Grid.Column="1" Text="$0.00" FontWeight="Bold" Foreground="#0F172A"/>
+          </Grid>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+  </StackPanel>
+  </ScrollViewer>
+</UserControl>

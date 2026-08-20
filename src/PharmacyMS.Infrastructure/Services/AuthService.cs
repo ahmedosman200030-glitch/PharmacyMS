@@ -19,15 +19,10 @@ public class AuthService : IAuthService
 
     public async Task<User?> LoginAsync(string username, string password)
     {
-        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
-            return null;
-
+        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password)) return null;
         var user = await _userRepository.GetByUsernameAsync(username.Trim());
         if (user == null) return null;
-
-        bool valid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
-        if (!valid) return null;
-
+        if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash)) return null;
         await _userRepository.UpdateLastLoginAsync(user.Id);
         return user;
     }
@@ -36,14 +31,10 @@ public class AuthService : IAuthService
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return false;
-
-        if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash))
-            return false;
-
+        if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash)) return false;
         var newHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
         using var conn = _context.CreateConnection();
-        await conn.ExecuteAsync(
-            "UPDATE Users SET PasswordHash = @Hash, UpdatedAt = datetime('now') WHERE Id = @Id",
+        await conn.ExecuteAsync("UPDATE Users SET PasswordHash=@Hash, UpdatedAt=datetime('now') WHERE Id=@Id",
             new { Hash = newHash, Id = userId });
         return true;
     }
@@ -57,12 +48,8 @@ public class AuthService : IAuthService
     public async Task<bool> ResetPasswordWithSecurityAnswerAsync(string username, string answer, string newPassword)
     {
         var user = await _userRepository.GetByUsernameAsync(username.Trim());
-        if (user == null || string.IsNullOrWhiteSpace(user.SecurityAnswerHash))
-            return false;
-
-        if (!BCrypt.Net.BCrypt.Verify(answer.Trim().ToLowerInvariant(), user.SecurityAnswerHash))
-            return false;
-
+        if (user == null || string.IsNullOrWhiteSpace(user.SecurityAnswerHash)) return false;
+        if (!BCrypt.Net.BCrypt.Verify(answer.Trim().ToLowerInvariant(), user.SecurityAnswerHash)) return false;
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
         await _userRepository.UpdateAsync(user);
         return true;
@@ -72,7 +59,6 @@ public class AuthService : IAuthService
     {
         var user = await _userRepository.GetByIdAsync(userId);
         if (user == null) return;
-
         user.SecurityQuestion = question;
         user.SecurityAnswerHash = BCrypt.Net.BCrypt.HashPassword(answer.Trim().ToLowerInvariant());
         await _userRepository.UpdateAsync(user);

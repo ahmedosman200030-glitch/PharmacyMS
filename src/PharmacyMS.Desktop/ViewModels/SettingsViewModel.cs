@@ -28,6 +28,14 @@ public class SettingsViewModel
     public Task<int> LoadDefaultReorderLevelAsync() => _settingsService.GetDefaultReorderLevelAsync();
     public Task SaveDefaultReorderLevelAsync(int level) => _settingsService.SetDefaultReorderLevelAsync(level);
 
+    public Task<decimal> LoadSlshExchangeRateAsync() => _settingsService.GetSlshExchangeRateAsync();
+    public Task SaveSlshExchangeRateAsync(decimal rate) => _settingsService.SetSlshExchangeRateAsync(rate);
+
+    public Task<string> LoadLanguageAsync() => _settingsService.GetLanguageAsync();
+    public Task SaveLanguageAsync(string lang) => _settingsService.SetLanguageAsync(lang);
+
+    public Task<string?> LoadLicenseKeyAsync() => _settingsService.GetLicenseKeyAsync();
+
     public DatabaseInfo GetDatabaseInfo() => _backupService.GetDatabaseInfo();
     public Task<string> BackupAsync(string? destinationPath = null) => _backupService.BackupAsync(destinationPath);
     public Task RestoreAsync(string backupFilePath) => _backupService.RestoreAsync(backupFilePath);

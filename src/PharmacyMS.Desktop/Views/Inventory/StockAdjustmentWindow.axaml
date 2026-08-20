@@ -5,71 +5,167 @@
         x:Class="PharmacyMS.Desktop.Views.Inventory.StockAdjustmentWindow"
         x:DataType="vm:StockAdjustmentViewModel"
         Title="Stock Adjustment"
-        Width="1000" Height="680"
-        Background="#0F172A">
+        Width="1040" Height="700"
+        Background="#F4F6FA">
 
-  <Grid ColumnDefinitions="380,*" Margin="20">
+  <Window.Styles>
 
-    <!-- Adjustment form -->
-    <Border Grid.Column="0" Background="#1E293B" CornerRadius="10" Padding="16" Margin="0,0,16,0">
-      <StackPanel Spacing="10">
-        <TextBlock Text="Adjust Stock" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,0,0,6"/>
+    <Style Selector="TextBlock.eyebrow">
+      <Setter Property="Foreground" Value="#6B7688"/>
+      <Setter Property="FontSize" Value="11"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="LetterSpacing" Value="1"/>
+      <Setter Property="Margin" Value="0,0,0,6"/>
+    </Style>
 
-        <TextBlock Text="Medicine" Foreground="#94A3B8" FontSize="12"/>
-        <ComboBox x:Name="MedicineBox" Height="36" HorizontalAlignment="Stretch"
-                  ItemsSource="{Binding AvailableMedicines}" DisplayMemberBinding="{Binding Name}"/>
+    <Style Selector="TextBox, ComboBox">
+      <Setter Property="Background" Value="White"/>
+      <Setter Property="BorderBrush" Value="#DCE1EA"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Foreground" Value="#1E2532"/>
+      <Setter Property="Padding" Value="10,8"/>
+    </Style>
+    <Style Selector="TextBox:focus, ComboBox:focus">
+      <Setter Property="BorderBrush" Value="#0D9488"/>
+    </Style>
 
-        <TextBlock x:Name="CurrentStockText" Text="Current stock: —" Foreground="#64748B" FontSize="12"/>
+    <Style Selector="RadioButton.segment">
+      <Setter Property="Background" Value="White"/>
+      <Setter Property="BorderBrush" Value="#DCE1EA"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Foreground" Value="#6B7688"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Padding" Value="0,10"/>
+      <Setter Property="HorizontalContentAlignment" Value="Center"/>
+      <Setter Property="Template">
+        <ControlTemplate>
+          <Border Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="{TemplateBinding CornerRadius}">
+            <ContentPresenter Content="{TemplateBinding Content}"
+                               Foreground="{TemplateBinding Foreground}"
+                               HorizontalAlignment="Center"/>
+          </Border>
+        </ControlTemplate>
+      </Setter>
+    </Style>
+    <Style Selector="RadioButton.segment.add:checked">
+      <Setter Property="Background" Value="#DCFCE7"/>
+      <Setter Property="BorderBrush" Value="#DC2626"/>
+      <Setter Property="Foreground" Value="#991B1B"/>
+    </Style>
+    <Style Selector="RadioButton.segment.remove:checked">
+      <Setter Property="Background" Value="#FEE2E2"/>
+      <Setter Property="BorderBrush" Value="#EF4444"/>
+      <Setter Property="Foreground" Value="#B91C1C"/>
+    </Style>
 
-        <TextBlock Text="Adjustment Type" Foreground="#94A3B8" FontSize="12"/>
-        <StackPanel Orientation="Horizontal" Spacing="8">
-          <RadioButton x:Name="AddRadio" Content="Add (+)" GroupName="AdjType" IsChecked="True" Foreground="White"/>
-          <RadioButton x:Name="RemoveRadio" Content="Remove (-)" GroupName="AdjType" Foreground="White"/>
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="#0D9488"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+      <Setter Property="CornerRadius" Value="9"/>
+    </Style>
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#0F766E"/>
+    </Style>
+
+  </Window.Styles>
+
+  <Grid ColumnDefinitions="380,*" Margin="24">
+
+    <Border Grid.Column="0" Background="White" BorderBrush="#E4E8F0" BorderThickness="1"
+            CornerRadius="14" Padding="20" Margin="0,0,18,0"
+            BoxShadow="0 1 3 0 #14000000">
+      <StackPanel Spacing="14">
+
+        <StackPanel>
+          <TextBlock Text="Adjust Stock" FontSize="20" FontWeight="Bold" Foreground="#1E2532"/>
+          <TextBlock Text="Correct counts, log damage, or record write-offs" Foreground="#6B7688" FontSize="12" Margin="0,2,0,0"/>
         </StackPanel>
 
-        <TextBlock Text="Quantity" Foreground="#94A3B8" FontSize="12"/>
-        <TextBox x:Name="QtyBox" Height="36"/>
+        <Rectangle Height="1" Fill="#E4E8F0" Margin="0,4,0,4"/>
 
-        <TextBlock Text="Reason" Foreground="#94A3B8" FontSize="12"/>
-        <ComboBox x:Name="ReasonBox" Height="36" HorizontalAlignment="Stretch">
-          <ComboBoxItem Content="Damaged / broken"/>
-          <ComboBoxItem Content="Expired — write off"/>
-          <ComboBoxItem Content="Stock count correction"/>
-          <ComboBoxItem Content="Theft / loss"/>
-          <ComboBoxItem Content="Returned to supplier"/>
-          <ComboBoxItem Content="Other"/>
-        </ComboBox>
+        <StackPanel Spacing="6">
+          <TextBlock Text="MEDICINE" Classes="eyebrow"/>
+          <ComboBox x:Name="MedicineBox" Height="38" HorizontalAlignment="Stretch"
+                    ItemsSource="{Binding AvailableMedicines}" DisplayMemberBinding="{Binding Name}"
+                    PlaceholderText="Search or select a medicine…"/>
+          <Border Background="#F1F5F9" CornerRadius="7" Padding="10,5" HorizontalAlignment="Left" Margin="0,2,0,0">
+            <TextBlock x:Name="CurrentStockText" Text="Current stock: —" Foreground="#475467" FontSize="12" FontWeight="SemiBold"/>
+          </Border>
+        </StackPanel>
 
-        <TextBlock x:Name="NotesLabel" Text="Notes (optional, appended to reason)" Foreground="#94A3B8" FontSize="12"/>
-        <TextBox x:Name="NotesBox" Height="60" AcceptsReturn="True" TextWrapping="Wrap"/>
+        <StackPanel Spacing="6">
+          <TextBlock Text="ADJUSTMENT TYPE" Classes="eyebrow"/>
+          <Grid ColumnDefinitions="*,*">
+            <RadioButton x:Name="AddRadio" Content="＋ Add" Classes="segment add" GroupName="AdjType"
+                         IsChecked="True" Grid.Column="0" Margin="0,0,4,0"/>
+            <RadioButton x:Name="RemoveRadio" Content="－ Remove" Classes="segment remove" GroupName="AdjType"
+                         Grid.Column="1" Margin="4,0,0,0"/>
+          </Grid>
+        </StackPanel>
 
-        <TextBlock x:Name="ErrorText" Foreground="#F09595" FontSize="12" IsVisible="False" TextWrapping="Wrap"/>
+        <StackPanel Spacing="6">
+          <TextBlock Text="QUANTITY" Classes="eyebrow"/>
+          <TextBox x:Name="QtyBox" Height="38" Watermark="0"/>
+        </StackPanel>
 
-        <Button x:Name="SubmitButton" Content="Submit Adjustment" Height="42" Margin="0,8,0,0"
-                Background="#1D9E75" Foreground="White" CornerRadius="8"
+        <StackPanel Spacing="6">
+          <TextBlock Text="REASON" Classes="eyebrow"/>
+          <ComboBox x:Name="ReasonBox" Height="38" HorizontalAlignment="Stretch" PlaceholderText="Select a reason…">
+            <ComboBoxItem Content="Damaged / broken"/>
+            <ComboBoxItem Content="Expired — write off"/>
+            <ComboBoxItem Content="Stock count correction"/>
+            <ComboBoxItem Content="Theft / loss"/>
+            <ComboBoxItem Content="Returned to supplier"/>
+            <ComboBoxItem Content="Other"/>
+          </ComboBox>
+        </StackPanel>
+
+        <StackPanel Spacing="6">
+          <TextBlock x:Name="NotesLabel" Text="NOTES (OPTIONAL)" Classes="eyebrow"/>
+          <TextBox x:Name="NotesBox" Height="64" AcceptsReturn="True" TextWrapping="Wrap"
+                    Watermark="Appended to the reason…"/>
+        </StackPanel>
+
+        <TextBlock x:Name="ErrorText" Foreground="#DC2626" FontSize="12" IsVisible="False" TextWrapping="Wrap"/>
+
+        <Button x:Name="SubmitButton" Content="Submit Adjustment" Classes="primary" Height="44" Margin="0,6,0,0"
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
       </StackPanel>
     </Border>
 
-    <!-- Recent adjustments log -->
-    <DockPanel Grid.Column="1">
-      <TextBlock DockPanel.Dock="Top" Text="Recent Adjustments" FontSize="18" FontWeight="Bold" Foreground="White" Margin="0,0,0,10"/>
-      <DataGrid x:Name="HistoryGrid"
-                x:DataType="ent:StockAdjustment"
-                AutoGenerateColumns="False"
-                IsReadOnly="True"
-                GridLinesVisibility="Horizontal"
-                Background="#1E293B"
-                Foreground="White">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Date" Binding="{Binding CreatedAt}" Width="150"/>
-          <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="180"/>
-          <DataGridTextColumn Header="Change" Binding="{Binding QuantityChange}" Width="80"/>
-          <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="220"/>
-          <DataGridTextColumn Header="By" Binding="{Binding AdjustedByName}" Width="130"/>
-        </DataGrid.Columns>
-      </DataGrid>
-    </DockPanel>
+    <Border Grid.Column="1" Background="White" BorderBrush="#E4E8F0" BorderThickness="1"
+            CornerRadius="14" Padding="18" BoxShadow="0 1 3 0 #14000000">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+          <TextBlock Text="Recent Adjustments" FontSize="18" FontWeight="Bold" Foreground="#1E2532"/>
+          <TextBlock Text="Last 50 changes across all medicines" Foreground="#6B7688" FontSize="12" Margin="0,2,0,0"/>
+        </StackPanel>
+
+        <DataGrid x:Name="HistoryGrid" HeadersVisibility="All" RowHeaderWidth="40"
+                  x:DataType="ent:StockAdjustment"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  GridLinesVisibility="Horizontal"
+                  HorizontalGridLinesBrush="#E4E8F0"
+                  Background="Transparent"
+                  Foreground="#1E2532"
+                  RowBackground="Transparent">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Date" Binding="{Binding CreatedAt}" Width="150"/>
+            <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="180"/>
+            <DataGridTextColumn Header="Change" Binding="{Binding QuantityChange}" Width="80"/>
+            <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="220"/>
+            <DataGridTextColumn Header="By" Binding="{Binding AdjustedByName}" Width="130"/>
+          </DataGrid.Columns>
+        </DataGrid>
+      </DockPanel>
+    </Border>
 
   </Grid>
 </Window>

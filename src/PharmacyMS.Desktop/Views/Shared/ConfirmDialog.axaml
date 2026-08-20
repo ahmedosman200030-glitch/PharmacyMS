@@ -8,7 +8,7 @@
     <TextBlock x:Name="MessageText" TextWrapping="Wrap" FontSize="14" Foreground="#0F172A"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
       <Button x:Name="NoButton" Content="No" Width="90" Height="34" Background="#E2E8F0" Foreground="#334155" CornerRadius="6"/>
-      <Button x:Name="YesButton" Content="Yes" Width="90" Height="34" Background="#22C55E" Foreground="White" CornerRadius="6"/>
+      <Button x:Name="YesButton" Content="Yes" Width="90" Height="34" Background="#DC2626" Foreground="White" CornerRadius="6"/>
     </StackPanel>
   </StackPanel>
 </Window>

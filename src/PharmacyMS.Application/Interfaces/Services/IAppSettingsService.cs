@@ -16,4 +16,13 @@ public interface IAppSettingsService
 
     Task<int> GetDefaultReorderLevelAsync();
     Task SetDefaultReorderLevelAsync(int level);
+
+    Task<decimal> GetSlshExchangeRateAsync();
+    Task SetSlshExchangeRateAsync(decimal rate);
+
+    Task<string> GetLanguageAsync();
+    Task SetLanguageAsync(string languageCode);
+
+    Task<string?> GetLicenseKeyAsync();
+    Task SetLicenseKeyAsync(string licenseKey);
 }

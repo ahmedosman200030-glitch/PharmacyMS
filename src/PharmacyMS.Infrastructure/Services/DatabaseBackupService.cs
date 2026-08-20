@@ -1,4 +1,3 @@
-using Dapper;
 using PharmacyMS.Application.Interfaces.Services;
 using PharmacyMS.Infrastructure.Data;
 
@@ -7,69 +6,63 @@ namespace PharmacyMS.Infrastructure.Services;
 public class DatabaseBackupService : IDatabaseBackupService
 {
     private readonly AppDbContext _context;
-
-    public DatabaseBackupService(AppDbContext context)
-    {
-        _context = context;
-    }
+    public DatabaseBackupService(AppDbContext context) => _context = context;
 
     public DatabaseInfo GetDatabaseInfo()
     {
-        // With PostgreSQL, there's no local file — return connection info instead
-        return new DatabaseInfo
+        if (_context.IsPostgres)
         {
-            Path = "PostgreSQL (Supabase Cloud)",
-            SizeBytes = 0,
-            LastModified = DateTime.UtcNow
-        };
-    }
-
-    public async Task<string> BackupAsync(string? destinationPath = null)
-    {
-        // Export all tables to a SQL-like CSV dump in the user's Documents folder
-        var folder = destinationPath
-            ?? Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                "PharmacyMS", "Backups");
-
-        Directory.CreateDirectory(folder);
-        var backupName = $"pharmacyms-backup-{DateTime.Now:yyyyMMdd-HHmmss}";
-        var backupDir = Path.Combine(folder, backupName);
-        Directory.CreateDirectory(backupDir);
-
-        using var conn = _context.CreateConnection();
-        await conn.OpenAsync();
-
-        var tables = new[]
-        {
-            "Users", "Medicines", "Sales", "SaleItems", "Purchases",
-            "PurchaseItems", "Customers", "Suppliers", "Categories",
-            "StockAdjustments", "DailyClosings", "Settings"
-        };
-
-        foreach (var table in tables)
-        {
-            var rows = await conn.QueryAsync($"SELECT * FROM \"{table}\"");
-            var lines = new List<string>();
-            foreach (var row in rows)
+            return new DatabaseInfo
             {
-                var dict = (IDictionary<string, object?>)row;
-                if (lines.Count == 0)
-                    lines.Add(string.Join(",", dict.Keys));
-                lines.Add(string.Join(",", dict.Values.Select(v =>
-                    v == null ? "" : $"\"{v.ToString()!.Replace("\"", "\"\"")}\"")));
-            }
-            await File.WriteAllLinesAsync(Path.Combine(backupDir, $"{table}.csv"), lines);
+                Path = _context.GetSafeDisplayString(),
+                SizeBytes = 0,
+                LastModified = DateTime.MinValue
+            };
         }
 
-        return backupDir;
+        var path = _context.GetDatabasePath();
+        var fi = new FileInfo(path);
+        return new DatabaseInfo { Path = path, SizeBytes = fi.Exists ? fi.Length : 0, LastModified = fi.Exists ? fi.LastWriteTime : DateTime.MinValue };
+    }
+
+    public Task<string> BackupAsync(string? destinationPath = null)
+    {
+        if (_context.IsPostgres)
+        {
+            throw new NotSupportedException(
+                "Local file backup isn't available for cloud (Postgres/Supabase) databases. " +
+                "Use Supabase's built-in backups instead: Dashboard → Database → Backups.");
+        }
+
+        var dbPath = _context.GetDatabasePath();
+        string destPath;
+        if (!string.IsNullOrWhiteSpace(destinationPath))
+        {
+            destPath = destinationPath;
+            var destFolder = Path.GetDirectoryName(destPath);
+            if (!string.IsNullOrEmpty(destFolder)) Directory.CreateDirectory(destFolder);
+        }
+        else
+        {
+            var folder = Path.Combine(Path.GetDirectoryName(dbPath)!, "Backups");
+            Directory.CreateDirectory(folder);
+            destPath = Path.Combine(folder, $"pharmacyms-backup-{DateTime.Now:yyyyMMdd-HHmmss}.db");
+        }
+        File.Copy(dbPath, destPath, overwrite: true);
+        return Task.FromResult(destPath);
     }
 
     public Task RestoreAsync(string backupFilePath)
     {
-        // Restore from CSV backup is complex — for now inform the user
-        throw new NotSupportedException(
-            "Restore from backup requires manual import. " +
-            "Please contact your system administrator to restore from a cloud backup.");
+        if (_context.IsPostgres)
+        {
+            throw new NotSupportedException(
+                "Restoring from a local file isn't available for cloud (Postgres/Supabase) databases. " +
+                "Use Supabase's built-in restore tools instead.");
+        }
+
+        var dbPath = _context.GetDatabasePath();
+        File.Copy(backupFilePath, dbPath, overwrite: true);
+        return Task.CompletedTask;
     }
 }

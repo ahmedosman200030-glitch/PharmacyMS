@@ -1,0 +1,59 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+        x:Class="PharmacyMS.Desktop.Views.Approvals.GoodsReceiptDetailDialog"
+        Width="640" Height="520" WindowStartupLocation="CenterOwner"
+        CanResize="False" Background="White"
+        Title="Receipt Detail">
+  <StackPanel Margin="20" Spacing="12">
+    <TextBlock Text="Stock Receiving Detail" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
+
+    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto">
+      <StackPanel Grid.Row="0" Grid.Column="0" Spacing="2" Margin="0,0,0,8">
+        <TextBlock Text="Purchase Order #" FontSize="11" Foreground="#64748B"/>
+        <TextBlock x:Name="PoNumberText" FontSize="14" Foreground="#0F172A"/>
+      </StackPanel>
+      <StackPanel Grid.Row="0" Grid.Column="1" Spacing="2" Margin="0,0,0,8">
+        <TextBlock Text="Received" FontSize="11" Foreground="#64748B"/>
+        <TextBlock x:Name="ReceivedAtText" FontSize="14" Foreground="#0F172A"/>
+      </StackPanel>
+      <StackPanel Grid.Row="1" Grid.Column="0" Spacing="2" Margin="0,0,0,8">
+        <TextBlock Text="Submitted By" FontSize="11" Foreground="#64748B"/>
+        <TextBlock x:Name="SubmittedByText" FontSize="14" Foreground="#0F172A"/>
+      </StackPanel>
+      <StackPanel Grid.Row="1" Grid.Column="1" Spacing="2" Margin="0,0,0,8">
+        <TextBlock Text="Total" FontSize="11" Foreground="#64748B"/>
+        <TextBlock x:Name="TotalText" FontSize="14" Foreground="#0F172A"/>
+      </StackPanel>
+      <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Spacing="2" Margin="0,0,0,8">
+        <TextBlock Text="Notes" FontSize="11" Foreground="#64748B"/>
+        <TextBlock x:Name="NotesText" FontSize="14" Foreground="#0F172A" TextWrapping="Wrap"/>
+      </StackPanel>
+    </Grid>
+
+    <Border x:Name="RejectionBox" Background="#FEF2F2" CornerRadius="6" Padding="10" IsVisible="False">
+      <StackPanel Spacing="2">
+        <TextBlock Text="Rejection Reason" FontSize="11" Foreground="#B91C1C" FontWeight="SemiBold"/>
+        <TextBlock x:Name="RejectionReasonText" FontSize="13" Foreground="#7F1D1D" TextWrapping="Wrap"/>
+      </StackPanel>
+    </Border>
+
+    <TextBlock Text="Items" FontSize="13" FontWeight="SemiBold" Foreground="#0F172A"/>
+    <DataGrid x:Name="ItemsGrid" HeadersVisibility="Column"
+              x:DataType="ent:GoodsReceiptItem" AutoGenerateColumns="False" IsReadOnly="True"
+              GridLinesVisibility="Horizontal" MaxHeight="220">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="*"/>
+        <DataGridTextColumn Header="Ordered" Binding="{Binding OrderedQuantity}" Width="70"/>
+        <DataGridTextColumn Header="Received" Binding="{Binding ReceivedQuantity}" Width="75"/>
+        <DataGridTextColumn Header="Batch" Binding="{Binding BatchNumber}" Width="100"/>
+        <DataGridTextColumn Header="Expiry" Binding="{Binding ExpiryDate, StringFormat='{}{0:yyyy-MM-dd}'}" Width="95"/>
+        <DataGridTextColumn Header="Unit Cost" Binding="{Binding UnitCost, StringFormat='{}${0:F2}'}" Width="85"/>
+      </DataGrid.Columns>
+    </DataGrid>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+      <Button x:Name="CloseButton" Content="Close" Width="90" Height="34" Background="#E2E8F0" Foreground="#334155" CornerRadius="6"/>
+    </StackPanel>
+  </StackPanel>
+</Window>

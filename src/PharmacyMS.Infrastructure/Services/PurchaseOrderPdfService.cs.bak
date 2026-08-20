@@ -1,0 +1,153 @@
+using PharmacyMS.Application.Interfaces.Services;
+using PharmacyMS.Domain.Entities;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
+
+namespace PharmacyMS.Infrastructure.Services;
+
+public class PurchaseOrderPdfService : IPurchaseOrderPdfService
+{
+    private readonly IBrandingService _brandingService;
+
+    public PurchaseOrderPdfService(IBrandingService brandingService)
+    {
+        _brandingService = brandingService;
+        QuestPDF.Settings.License = LicenseType.Community;
+    }
+
+    public async Task<string> GeneratePdfAsync(PurchaseOrder order, Supplier supplier)
+    {
+        var branding = await _brandingService.GetAsync();
+        var pharmacyName = !string.IsNullOrWhiteSpace(branding.PharmacyName) ? branding.PharmacyName : branding.AppName;
+
+        var folder = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "PharmacyMS", "PurchaseOrders");
+        Directory.CreateDirectory(folder);
+        var path = Path.Combine(folder, $"{order.OrderNumber}.pdf");
+
+        var document = Document.Create(container =>
+        {
+            container.Page(page =>
+            {
+                page.Size(PageSizes.A4);
+                page.Margin(36);
+                page.DefaultTextStyle(x => x.FontSize(10).FontFamily("Helvetica"));
+
+                page.Header().Column(col =>
+                {
+                    if (!string.IsNullOrWhiteSpace(branding.LogoPath) && File.Exists(branding.LogoPath))
+                    {
+                        col.Item().Height(50).Image(branding.LogoPath).FitArea();
+                        col.Item().Height(6);
+                    }
+
+                    col.Item().Text(pharmacyName).FontSize(18).Bold().FontColor(Colors.Black);
+
+                    if (!string.IsNullOrWhiteSpace(branding.Tagline))
+                        col.Item().Text(branding.Tagline).FontSize(9).Italic().FontColor(Colors.Grey.Medium);
+
+                    if (!string.IsNullOrWhiteSpace(branding.Address))
+                        col.Item().Text(branding.Address).FontSize(9).FontColor(Colors.Grey.Darken1);
+
+                    var contactParts = new List<string>();
+                    if (!string.IsNullOrWhiteSpace(branding.PhoneNumber)) contactParts.Add(branding.PhoneNumber);
+                    if (!string.IsNullOrWhiteSpace(branding.Email)) contactParts.Add(branding.Email);
+                    if (contactParts.Count > 0)
+                        col.Item().Text(string.Join("  |  ", contactParts)).FontSize(9).FontColor(Colors.Grey.Darken1);
+
+                    col.Item().PaddingTop(10).PaddingBottom(6).LineHorizontal(1).LineColor(Colors.Grey.Lighten1);
+
+                    col.Item().Text("PURCHASE ORDER").FontSize(16).Bold().FontColor(Colors.Black);
+                });
+
+                page.Content().PaddingTop(12).Column(col =>
+                {
+                    col.Item().Row(r =>
+                    {
+                        r.RelativeItem().Column(meta =>
+                        {
+                            meta.Item().Text("Supplier").FontSize(9).FontColor(Colors.Grey.Darken1);
+                            meta.Item().Text(supplier.Name).FontSize(11).Bold();
+                            if (!string.IsNullOrWhiteSpace(supplier.ContactPerson))
+                                meta.Item().Text(supplier.ContactPerson!).FontSize(9);
+                            if (!string.IsNullOrWhiteSpace(supplier.Phone))
+                                meta.Item().Text(supplier.Phone!).FontSize(9);
+                            if (!string.IsNullOrWhiteSpace(supplier.Email))
+                                meta.Item().Text(supplier.Email!).FontSize(9);
+                            if (!string.IsNullOrWhiteSpace(supplier.Address))
+                                meta.Item().Text(supplier.Address!).FontSize(9);
+                        });
+
+                        r.RelativeItem().AlignRight().Column(meta =>
+                        {
+                            meta.Item().Row(row => { row.RelativeItem().AlignRight().Text("PO Number:").FontColor(Colors.Grey.Darken1); });
+                            meta.Item().AlignRight().Text(order.OrderNumber).Bold();
+                            meta.Item().PaddingTop(4).AlignRight().Text("Date:").FontColor(Colors.Grey.Darken1);
+                            meta.Item().AlignRight().Text(order.CreatedAt == default ? DateTime.Now.ToString("dd MMM yyyy") : order.CreatedAt.ToString("dd MMM yyyy"));
+                            if (order.ExpectedDate.HasValue)
+                            {
+                                meta.Item().PaddingTop(4).AlignRight().Text("Expected:").FontColor(Colors.Grey.Darken1);
+                                meta.Item().AlignRight().Text(order.ExpectedDate.Value.ToString("dd MMM yyyy"));
+                            }
+                        });
+                    });
+
+                    col.Item().PaddingVertical(14).LineHorizontal(1).LineColor(Colors.Grey.Lighten2);
+
+                    col.Item().Table(table =>
+                    {
+                        table.ColumnsDefinition(c =>
+                        {
+                            c.RelativeColumn(4);
+                            c.RelativeColumn(1);
+                            c.RelativeColumn(1.5f);
+                            c.RelativeColumn(1.5f);
+                        });
+
+                        table.Header(h =>
+                        {
+                            h.Cell().Text("Medicine").FontSize(9).Bold().FontColor(Colors.Grey.Darken1);
+                            h.Cell().AlignCenter().Text("Qty").FontSize(9).Bold().FontColor(Colors.Grey.Darken1);
+                            h.Cell().AlignRight().Text("Unit Cost").FontSize(9).Bold().FontColor(Colors.Grey.Darken1);
+                            h.Cell().AlignRight().Text("Total").FontSize(9).Bold().FontColor(Colors.Grey.Darken1);
+                            h.Cell().ColumnSpan(4).PaddingTop(4).BorderBottom(1).BorderColor(Colors.Grey.Lighten2);
+                        });
+
+                        foreach (var item in order.Items)
+                        {
+                            table.Cell().PaddingVertical(4).Text(item.MedicineName).FontSize(10);
+                            table.Cell().PaddingVertical(4).AlignCenter().Text(item.Quantity.ToString()).FontSize(10);
+                            table.Cell().PaddingVertical(4).AlignRight().Text(item.UnitCost.ToString("F2")).FontSize(10);
+                            table.Cell().PaddingVertical(4).AlignRight().Text(item.LineTotal.ToString("F2")).FontSize(10);
+                        }
+                    });
+
+                    col.Item().PaddingVertical(10).LineHorizontal(1).LineColor(Colors.Black);
+
+                    col.Item().Row(r =>
+                    {
+                        r.RelativeItem().Text("TOTAL").FontSize(13).Bold();
+                        r.RelativeItem().AlignRight().Text(order.TotalAmount.ToString("F2")).FontSize(13).Bold();
+                    });
+
+                    if (!string.IsNullOrWhiteSpace(order.Notes))
+                    {
+                        col.Item().PaddingTop(16).Text("Notes").FontSize(9).Bold().FontColor(Colors.Grey.Darken1);
+                        col.Item().Text(order.Notes!).FontSize(9.5f);
+                    }
+                });
+
+                page.Footer().PaddingTop(10).AlignCenter().Text(text =>
+                {
+                    text.Span("Generated by ").FontSize(8).FontColor(Colors.Grey.Darken1);
+                    text.Span(pharmacyName).FontSize(8).SemiBold().FontColor(Colors.Grey.Darken1);
+                });
+            });
+        });
+
+        document.GeneratePdf(path);
+        return path;
+    }
+}

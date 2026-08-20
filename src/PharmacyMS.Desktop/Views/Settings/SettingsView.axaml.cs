@@ -1,5 +1,7 @@
 using System.Globalization;
 using Avalonia.Controls;
+using Npgsql;
+using PharmacyMS.Infrastructure.Data;
 using Avalonia.Platform.Storage;
 using PharmacyMS.Application.DTOs;
 using PharmacyMS.Application.Enums;
@@ -8,6 +10,7 @@ using PharmacyMS.Application.Interfaces.Services;
 using PharmacyMS.Desktop.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using PharmacyMS.Desktop.Views.Auth;
+using PharmacyMS.Application.Services;
 
 namespace PharmacyMS.Desktop.Views.Settings;
 
@@ -24,6 +27,7 @@ public partial class SettingsView : UserControl
 
     // Sidebar navigation
     private Dictionary<Button, Border> _navPanels = new();
+    private string _currentLangForAbout = "en";
 
     public SettingsView() { InitializeComponent(); }
     public SettingsView(
@@ -60,6 +64,8 @@ public partial class SettingsView : UserControl
         TestSoundCombo.ItemsSource = _testSoundOptions.Keys;
         TestSoundCombo.SelectedIndex = 0;
 
+        LanguageCombo.ItemsSource = new[] { "English", "Somali" };
+
         // ---- Sidebar navigation wiring ----
         _navPanels = new Dictionary<Button, Border>
         {
@@ -67,14 +73,19 @@ public partial class SettingsView : UserControl
             [NavPharmacy] = PanelPharmacy,
             [NavTax]      = PanelTax,
             [NavSecurity] = PanelSecurity,
-            [NavDatabase] = PanelDatabase,
-            [NavSounds]   = PanelSounds,
-            [NavAbout]    = PanelAbout,
+            [NavDatabase]  = PanelDatabase,
+            [NavCloudSync] = PanelCloudSync,
+            [NavSounds]    = PanelSounds,
+            [NavAbout]     = PanelAbout,
         };
 
         foreach (var navButton in _navPanels.Keys)
         {
-            navButton.Click += (_, _) => SelectSection(navButton);
+            navButton.Click += (_, _) =>
+            {
+                SelectSection(navButton);
+                if (navButton == NavCloudSync) LoadCloudSyncFields();
+            };
         }
 
         SelectSection(NavPharmacy); // default active section
@@ -86,6 +97,12 @@ public partial class SettingsView : UserControl
         BackupButton.Click += async (_, _) => await BackupAsync();
         RestoreButton.Click += async (_, _) => await RestoreAsync();
         SaveButton.Click += async (_, _) => await SaveAsync();
+
+        TestCloudConnectionButton.Click += async (_, _) => await TestCloudConnectionAsync();
+        SaveCloudSyncButton.Click += async (_, _) => await SaveCloudSyncAsync();
+        MigrateToCloudButton.Click += async (_, _) => await MigrateToCloudAsync();
+        CloudSslModeCombo.ItemsSource = new[] { "Require", "Disable", "Prefer" };
+        CloudSslModeCombo.SelectedIndex = 0;
 
         SoundChecklistToggle.Click += (_, _) => SoundChecklistPopup.IsOpen = !SoundChecklistPopup.IsOpen;
 
@@ -180,11 +197,13 @@ public partial class SettingsView : UserControl
         }
 
         PharmacyNameBox.Text = branding.PharmacyName;
+        TaglineBox.Text = branding.Tagline;
         AddressBox.Text = branding.Address;
         PhoneNumberBox.Text = branding.PhoneNumber;
         MobileNumberBox.Text = branding.MobileNumber;
         EmailBox.Text = branding.Email;
         WebsiteBox.Text = branding.Website;
+        ContactNumberBox.Text = branding.ContactNumber;
 
         var taxRate = await _vm.LoadTaxRateAsync();
         TaxRateBox.Text = (taxRate * 100).ToString(CultureInfo.InvariantCulture);
@@ -193,10 +212,34 @@ public partial class SettingsView : UserControl
         InvoicePrefixBox.Text = await _vm.LoadInvoicePrefixAsync();
         ReceiptFooterBox.Text = await _vm.LoadReceiptFooterAsync();
         ReorderLevelBox.Text = (await _vm.LoadDefaultReorderLevelAsync()).ToString();
+        SlshRateBox.Text = (await _vm.LoadSlshExchangeRateAsync()).ToString(CultureInfo.InvariantCulture);
+
+        var lang = await _vm.LoadLanguageAsync();
+        LanguageCombo.SelectedIndex = lang == "so" ? 1 : 0;
+        _currentLangForAbout = lang;
 
         LoadSoundSettings();
 
         RefreshDatabaseInfo();
+        LoadAboutInfo(_currentLangForAbout);
+    }
+
+    private async void LoadAboutInfo(string languageCode)
+    {
+        AboutLanguageText.Text = "English/Somali";
+        AboutCurrencyText.Text = CurrencySymbolBox.Text ?? "$";
+
+        var info = _vm.GetDatabaseInfo();
+        AboutDbSizeText.Text = $"{info.SizeBytes / 1024.0:F1} KB";
+
+        if (File.Exists(info.Path))
+            AboutInstallDateText.Text = File.GetCreationTime(info.Path).ToString("dd MMM yyyy");
+
+        AboutCurrentUserText.Text = SessionManager.CurrentUser?.FullName ?? "—";
+
+        var savedLicenseKey = await _vm.LoadLicenseKeyAsync();
+        var license = PharmacyMS.Desktop.Services.LicenseService.Validate(savedLicenseKey ?? "");
+        AboutLicenseExpiryText.Text = license.ExpiryDate?.ToString("dd MMM yyyy") ?? "—";
     }
 
     private void AppNameText_SetSafely(string name)
@@ -322,6 +365,12 @@ public partial class SettingsView : UserControl
             return;
         }
 
+        if (!decimal.TryParse(SlshRateBox.Text, NumberStyles.Any, CultureInfo.InvariantCulture, out var slshRate))
+        {
+            ShowError("SLSH exchange rate must be a number.");
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(AppNameBox.Text))
         {
             ShowError("App name is required.");
@@ -332,17 +381,21 @@ public partial class SettingsView : UserControl
 
         await _brandingService.SavePharmacyInfoAsync(
             PharmacyNameBox.Text?.Trim(),
+            TaglineBox.Text?.Trim(),
             AddressBox.Text?.Trim(),
             PhoneNumberBox.Text?.Trim(),
             MobileNumberBox.Text?.Trim(),
             EmailBox.Text?.Trim(),
-            WebsiteBox.Text?.Trim());
+            WebsiteBox.Text?.Trim(),
+            ContactNumberBox.Text?.Trim());
 
         await _vm.SaveTaxRateAsync(taxPercent / 100m);
         await _vm.SaveCurrencySymbolAsync(CurrencySymbolBox.Text?.Trim() ?? "$");
         await _vm.SaveInvoicePrefixAsync(InvoicePrefixBox.Text?.Trim() ?? "INV-");
         await _vm.SaveReceiptFooterAsync(ReceiptFooterBox.Text?.Trim() ?? "");
         await _vm.SaveDefaultReorderLevelAsync(reorderLevel);
+        await _vm.SaveSlshExchangeRateAsync(slshRate);
+        await _vm.SaveLanguageAsync(LanguageCombo.SelectedIndex == 1 ? "so" : "en");
 
         SaveSoundSettings();
 
@@ -367,4 +420,163 @@ public partial class SettingsView : UserControl
         DbStatusText.Text = message;
         DbStatusText.IsVisible = true;
     }
+
+    private void LoadCloudSyncFields()
+    {
+        var cfg = new DbConfigService().Load();
+        UseCloudDbCheck.IsChecked = cfg.Provider == DbProvider.Postgres;
+
+        if (!string.IsNullOrWhiteSpace(cfg.PostgresConnectionString))
+        {
+            try
+            {
+                var b = new NpgsqlConnectionStringBuilder(cfg.PostgresConnectionString);
+                CloudHostBox.Text = b.Host;
+                CloudPortBox.Text = b.Port.ToString();
+                CloudDatabaseBox.Text = b.Database;
+                CloudUsernameBox.Text = b.Username;
+                CloudPasswordBox.Text = b.Password;
+                CloudSslModeCombo.SelectedItem = b.SslMode.ToString();
+            }
+            catch
+            {
+                // malformed/legacy connection string — leave fields blank for the user to re-enter
+            }
+        }
+    }
+
+    private string BuildCloudConnectionString()
+    {
+        var builder = new NpgsqlConnectionStringBuilder
+        {
+            Host = CloudHostBox.Text,
+            Port = int.TryParse(CloudPortBox.Text, out var p) ? p : 5432,
+            Database = CloudDatabaseBox.Text,
+            Username = CloudUsernameBox.Text,
+            Password = CloudPasswordBox.Text,
+            SslMode = Enum.TryParse<SslMode>(CloudSslModeCombo.SelectedItem as string, out var sm) ? sm : SslMode.Require,
+            Timeout = 10
+        };
+        return builder.ConnectionString;
+    }
+
+    private async Task TestCloudConnectionAsync()
+    {
+        TestCloudConnectionButton.IsEnabled = false;
+        CloudSyncStatusText.IsVisible = true;
+        CloudSyncStatusText.Foreground = Avalonia.Media.Brush.Parse("#64748B");
+        CloudSyncStatusText.Text = "Testing connection...";
+
+        var host = CloudHostBox.Text?.Trim() ?? "";
+        if (host.StartsWith("db.", StringComparison.OrdinalIgnoreCase) && host.Contains(".supabase.co"))
+        {
+            CloudSyncStatusText.Foreground = Avalonia.Media.Brush.Parse("#DC2626");
+            CloudSyncStatusText.Text = "This looks like the direct-connection host, which usually won't resolve. " +
+                "Use the pooler host instead, e.g. aws-0-<region>.pooler.supabase.com " +
+                "(Supabase dashboard \u2192 Project Settings \u2192 Database \u2192 Connection pooling). " +
+                "Also set Username to postgres.<project-ref>, not just postgres.";
+            TestCloudConnectionButton.IsEnabled = true;
+            return;
+        }
+
+        var username = CloudUsernameBox.Text?.Trim() ?? "";
+        if (username == "postgres" && host.Contains(".pooler.supabase.com"))
+        {
+            CloudSyncStatusText.Foreground = Avalonia.Media.Brush.Parse("#DC2626");
+            CloudSyncStatusText.Text = "When using the pooler host, Username must be postgres.<project-ref>, not just postgres.";
+            TestCloudConnectionButton.IsEnabled = true;
+            return;
+        }
+
+        try
+        {
+            await using var conn = new NpgsqlConnection(BuildCloudConnectionString());
+            await conn.OpenAsync();
+            await using var cmd = new NpgsqlCommand("SELECT 1", conn);
+            await cmd.ExecuteScalarAsync();
+
+            CloudSyncStatusText.Foreground = Avalonia.Media.Brush.Parse("#16A34A");
+            CloudSyncStatusText.Text = "Connection successful.";
+        }
+        catch (Exception ex)
+        {
+            CloudSyncStatusText.Foreground = Avalonia.Media.Brush.Parse("#DC2626");
+            CloudSyncStatusText.Text = $"Connection failed: {ex.Message}";
+        }
+        finally
+        {
+            TestCloudConnectionButton.IsEnabled = true;
+        }
+    }
+
+    private async Task SaveCloudSyncAsync()
+    {
+        SaveCloudSyncButton.IsEnabled = false;
+        try
+        {
+            var cfg = new DbConfig
+            {
+                Provider = UseCloudDbCheck.IsChecked == true ? DbProvider.Postgres : DbProvider.Sqlite,
+                PostgresConnectionString = BuildCloudConnectionString()
+            };
+
+            new DbConfigService().Save(cfg);
+
+            CloudSyncStatusText.IsVisible = true;
+            CloudSyncStatusText.Foreground = Avalonia.Media.Brush.Parse("#16A34A");
+            CloudSyncStatusText.Text = "Saved. Restarting app...";
+
+            await Task.Delay(800);
+            RestartApp();
+        }
+        catch (Exception ex)
+        {
+            CloudSyncStatusText.IsVisible = true;
+            CloudSyncStatusText.Foreground = Avalonia.Media.Brush.Parse("#DC2626");
+            CloudSyncStatusText.Text = $"Save failed: {ex.Message}";
+        }
+        finally
+        {
+            SaveCloudSyncButton.IsEnabled = true;
+        }
+    }
+
+    private async Task MigrateToCloudAsync()
+    {
+        MigrateToCloudButton.IsEnabled = false;
+        CloudSyncStatusText.IsVisible = true;
+        CloudSyncStatusText.Foreground = Avalonia.Media.Brush.Parse("#64748B");
+        CloudSyncStatusText.Text = "Migrating local data to cloud... this may take a moment.";
+
+        try
+        {
+            var connString = BuildCloudConnectionString();
+            var migrationService = new PharmacyMS.Infrastructure.Data.CloudMigrationService();
+            var results = await migrationService.MigrateAsync(connString);
+
+            var summary = string.Join(", ", results.Select(r => $"{r.Table}: {r.RowsCopied}"));
+            CloudSyncStatusText.Foreground = Avalonia.Media.Brush.Parse("#16A34A");
+            CloudSyncStatusText.Text = $"Migration complete. {summary}";
+        }
+        catch (Exception ex)
+        {
+            CloudSyncStatusText.Foreground = Avalonia.Media.Brush.Parse("#DC2626");
+            CloudSyncStatusText.Text = $"Migration failed: {ex.Message}";
+        }
+        finally
+        {
+            MigrateToCloudButton.IsEnabled = true;
+        }
+    }
+
+    private void RestartApp()
+    {
+        var exePath = Environment.ProcessPath;
+        if (!string.IsNullOrEmpty(exePath))
+        {
+            System.Diagnostics.Process.Start(exePath);
+        }
+        Environment.Exit(0);
+    }
+
 }

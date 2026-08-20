@@ -15,6 +15,7 @@ public class CartLine : System.ComponentModel.INotifyPropertyChanged
     public int MedicineId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Batch { get; set; } = string.Empty;
+    public string Unit { get; set; } = "Box";
     public decimal UnitPrice { get; set; }
     public int MaxQuantity { get; set; }
 
@@ -154,6 +155,7 @@ public class PosViewModel
                 MedicineId = medicine.Id,
                 Name = medicine.Name,
                 Batch = medicine.BatchNumber ?? "",
+                Unit = medicine.Unit,
                 UnitPrice = medicine.UnitPrice,
                 Quantity = qty,
                 MaxQuantity = medicine.QuantityInStock,
@@ -251,6 +253,7 @@ public class PosViewModel
             {
                 MedicineId = c.MedicineId,
                 MedicineName = c.Name,
+                Unit = c.Unit,
                 UnitPrice = c.UnitPrice,
                 Quantity = c.Quantity
             }).ToList()

@@ -1,0 +1,343 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
+using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Avalonia.Controls.Templates;
+using PharmacyMS.Desktop.ViewModels;
+using PharmacyMS.Desktop.Views.Shared;
+
+namespace PharmacyMS.Desktop.Views.Accounting;
+
+public partial class PayablesView : UserControl
+{
+    private readonly PayablesViewModel _vm;
+
+    private static readonly string[] AgingColorsP = { "#10B981", "#F59E0B", "#EF4444", "#8B5CF6" };
+
+    public PayablesView() { InitializeComponent(); }
+
+    public PayablesView(PayablesViewModel vm)
+    {
+        InitializeComponent();
+        _vm = vm;
+
+        RangePicker.SetRange(_vm.FromDate, _vm.ToDate);
+
+        RefreshButton.Click += async (_, _) =>
+        {
+            _vm.FromDate = RangePicker.FromDate;
+            _vm.ToDate = RangePicker.ToDate;
+            await LoadAndRender();
+        };
+
+        AllFilterBtn.Click += (_, _) => { _vm.ActiveFilter = "All"; _vm.CurrentPage = 1; RenderTable(); UpdateFilterHighlight(); };
+        OutstandingFilterBtn.Click += (_, _) => { _vm.ActiveFilter = "Outstanding"; _vm.CurrentPage = 1; RenderTable(); UpdateFilterHighlight(); };
+        PaidFilterBtn.Click += (_, _) => { _vm.ActiveFilter = "Paid"; _vm.CurrentPage = 1; RenderTable(); UpdateFilterHighlight(); };
+
+        SearchBox.TextChanged += (_, _) => { _vm.SearchText = SearchBox.Text ?? string.Empty; _vm.CurrentPage = 1; RenderTable(); };
+
+        PrevPageBtn.Click += (_, _) => { if (_vm.CurrentPage > 1) { _vm.CurrentPage--; RenderTable(); } };
+        NextPageBtn.Click += (_, _) =>
+        {
+            var filtered = _vm.GetFilteredRows();
+            if (_vm.CurrentPage < _vm.TotalPages(filtered)) { _vm.CurrentPage++; RenderTable(); }
+        };
+
+        RowsGrid.AddHandler(Button.ClickEvent, OnPayClick, Avalonia.Interactivity.RoutingStrategies.Bubble);
+
+        AddPaymentBtn.Click += async (_, _) => await OpenPickerAndPay();
+
+        DonutCanvas.SizeChanged += (_, _) => DrawDonut();
+        TrendCanvas.SizeChanged += (_, _) => DrawTrend();
+
+        AttachedToVisualTree += async (_, _) => await LoadAndRender();
+    }
+
+    private async Task OpenPickerAndPay()
+    {
+        var outstanding = _vm.AllRows.Where(r => r.Balance > 0).OrderByDescending(r => r.Balance).ToList();
+        if (outstanding.Count == 0) return;
+
+        var owner = TopLevel.GetTopLevel(this) as Window;
+        if (owner == null) return;
+
+        var picker = new Window
+        {
+            Title = "Select Supplier",
+            Width = 380, Height = 190,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            CanResize = false,
+            Background = Brushes.White
+        };
+
+        var combo = new ComboBox
+        {
+            ItemsSource = outstanding,
+            SelectedIndex = 0,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            ItemTemplate = new FuncDataTemplate<PayableRow>((row, _) =>
+                new TextBlock { Text = $"{row?.SupplierName} — ${row?.Balance:F2} due" })
+        };
+
+        var okBtn = new Button
+        {
+            Content = "Next",
+            Background = new SolidColorBrush(Color.Parse("#3B82F6")),
+            Foreground = Brushes.White,
+            CornerRadius = new CornerRadius(6),
+            Padding = new Thickness(16, 8),
+            HorizontalAlignment = HorizontalAlignment.Right
+        };
+
+        var stack = new StackPanel { Margin = new Thickness(20), Spacing = 12 };
+        stack.Children.Add(new TextBlock { Text = "Select a supplier to pay:", FontSize = 13, Foreground = new SolidColorBrush(Color.Parse("#334155")) });
+        stack.Children.Add(combo);
+        stack.Children.Add(okBtn);
+        picker.Content = stack;
+
+        okBtn.Click += async (_, _) =>
+        {
+            if (combo.SelectedItem is PayableRow selectedRow)
+            {
+                picker.Close();
+                var amount = await PaymentDialog.ShowAsync(owner, selectedRow.SupplierName, selectedRow.Balance);
+                if (amount.HasValue)
+                {
+                    await _vm.MakePaymentAsync(selectedRow, amount.Value);
+                    await LoadAndRender();
+                }
+            }
+        };
+
+        await picker.ShowDialog(owner);
+    }
+
+    private async void OnPayClick(object? sender, RoutedEventArgs e)
+    {
+        if (e.Source is Button { Name: "PayBtn" } btn && btn.DataContext is PayableRow row)
+        {
+            var owner = TopLevel.GetTopLevel(this) as Window;
+            if (owner == null || row.Balance <= 0) return;
+            var amount = await PaymentDialog.ShowAsync(owner, row.SupplierName, row.Balance);
+            if (amount.HasValue)
+            {
+                await _vm.MakePaymentAsync(row, amount.Value);
+                await LoadAndRender();
+            }
+        }
+    }
+
+    private async Task LoadAndRender()
+    {
+        await _vm.LoadAsync();
+        RefreshStats();
+        RenderTable();
+        UpdateFilterHighlight();
+        DrawDonut();
+        DrawTrend();
+        RenderTopList();
+    }
+
+    private void RefreshStats()
+    {
+        TotalPayablesText.Text = $"${_vm.TotalPayables:F2}";
+        TotalPayablesSubText.Text = $"From {_vm.SupplierCount} Suppliers";
+        TotalPaidText.Text = $"${_vm.TotalPaidThisMonth:F2}";
+        OutstandingText.Text = $"${_vm.OutstandingAmount:F2}";
+        OutstandingSubText.Text = $"From {_vm.AllRows.Count(r => r.Balance > 0)} Suppliers";
+        AgingOver90Text.Text = $"${_vm.AgingOver90:F2}";
+    }
+
+    private void RenderTable()
+    {
+        var filtered = _vm.GetFilteredRows();
+        var page = _vm.GetPage(filtered);
+        RowsGrid.ItemsSource = page;
+
+        var totalPages = _vm.TotalPages(filtered);
+        PageLabelText.Text = $"Page {_vm.CurrentPage} of {totalPages}";
+
+        if (filtered.Count == 0)
+            PagingSummaryText.Text = "No entries";
+        else
+        {
+            var start = (_vm.CurrentPage - 1) * _vm.PageSize + 1;
+            var end = Math.Min(_vm.CurrentPage * _vm.PageSize, filtered.Count);
+            PagingSummaryText.Text = $"Showing {start} to {end} of {filtered.Count} entries";
+        }
+
+        PrevPageBtn.IsEnabled = _vm.CurrentPage > 1;
+        NextPageBtn.IsEnabled = _vm.CurrentPage < totalPages;
+    }
+
+    private void UpdateFilterHighlight()
+    {
+        var active = new SolidColorBrush(Color.Parse("#3B82F6"));
+        var inactive = new SolidColorBrush(Color.Parse("#F1F5F9"));
+        AllFilterBtn.Background = _vm.ActiveFilter == "All" ? active : inactive;
+        AllFilterBtn.Foreground = _vm.ActiveFilter == "All" ? Brushes.White : Brushes.Black;
+        OutstandingFilterBtn.Background = _vm.ActiveFilter == "Outstanding" ? active : inactive;
+        OutstandingFilterBtn.Foreground = _vm.ActiveFilter == "Outstanding" ? Brushes.White : Brushes.Black;
+        PaidFilterBtn.Background = _vm.ActiveFilter == "Paid" ? active : inactive;
+        PaidFilterBtn.Foreground = _vm.ActiveFilter == "Paid" ? Brushes.White : Brushes.Black;
+    }
+
+    private void RenderTopList()
+    {
+        TopListPanel.Children.Clear();
+        var top = _vm.AllRows.Where(r => r.Balance > 0).OrderByDescending(r => r.Balance).Take(5).ToList();
+        var maxBal = top.Count > 0 ? top.Max(r => r.Balance) : 1;
+        if (maxBal <= 0) maxBal = 1;
+
+        foreach (var row in top)
+        {
+            var item = new StackPanel { Spacing = 3 };
+            var header = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
+            header.Children.Add(new TextBlock { Text = row.SupplierName, FontSize = 12, Foreground = new SolidColorBrush(Color.Parse("#334155")) });
+            var amt = new TextBlock { Text = $"${row.Balance:F2}", FontSize = 12, FontWeight = FontWeight.SemiBold, Foreground = new SolidColorBrush(Color.Parse("#0F172A")) };
+            Grid.SetColumn(amt, 1);
+            header.Children.Add(amt);
+            item.Children.Add(header);
+
+            var barBg = new Border { Height = 6, CornerRadius = new CornerRadius(3), Background = new SolidColorBrush(Color.Parse("#F1F5F9")) };
+            var barFill = new Border
+            {
+                Height = 6, CornerRadius = new CornerRadius(3),
+                Background = new SolidColorBrush(Color.Parse("#EF4444")),
+                HorizontalAlignment = HorizontalAlignment.Left,
+                Width = 220 * (double)(row.Balance / maxBal)
+            };
+            var barContainer = new Panel();
+            barContainer.Children.Add(barBg);
+            barContainer.Children.Add(barFill);
+            item.Children.Add(barContainer);
+
+            TopListPanel.Children.Add(item);
+        }
+
+        if (top.Count == 0)
+            TopListPanel.Children.Add(new TextBlock { Text = "No outstanding balances", FontSize = 12, Foreground = Brushes.Gray });
+    }
+
+    private void DrawDonut()
+    {
+        var canvas = DonutCanvas;
+        canvas.Children.Clear();
+        double w = canvas.Bounds.Width > 0 ? canvas.Bounds.Width : 300;
+        double h = canvas.Bounds.Height > 0 ? canvas.Bounds.Height : 160;
+        double cx = w / 2 - 60, cy = h / 2, radius = Math.Min(h, w / 2) / 2 - 8, thickness = 18;
+
+        var total = _vm.AgingBuckets.Sum(b => b.Amount);
+        if (total <= 0)
+        {
+            var empty = new TextBlock { Text = "No outstanding balances", Foreground = Brushes.Gray, FontSize = 12 };
+            Canvas.SetLeft(empty, 10); Canvas.SetTop(empty, h / 2 - 8);
+            canvas.Children.Add(empty);
+            return;
+        }
+
+        double cursor = 0;
+        double legendY = cy - (_vm.AgingBuckets.Count * 24) / 2.0;
+        for (int i = 0; i < _vm.AgingBuckets.Count; i++)
+        {
+            var bucket = _vm.AgingBuckets[i];
+            double frac = (double)(bucket.Amount / total);
+            DrawArcSegment(canvas, cx, cy, radius, thickness, cursor * 360, (cursor + frac) * 360, Color.Parse(AgingColorsP[i]));
+            cursor += frac;
+            AddDonutLegendItem(canvas, w - 120, legendY + i * 24, AgingColorsP[i], bucket.Label, $"{bucket.Amount:F0} ({frac:P0})");
+        }
+    }
+
+    private static void AddDonutLegendItem(Canvas canvas, double x, double y, string colorHex, string label, string pct)
+    {
+        var dot = new Ellipse { Width = 8, Height = 8, Fill = new SolidColorBrush(Color.Parse(colorHex)) };
+        Canvas.SetLeft(dot, x); Canvas.SetTop(dot, y);
+        canvas.Children.Add(dot);
+        var tb = new TextBlock { Text = $"{label}: {pct}", FontSize = 9, Foreground = Brushes.Gray };
+        Canvas.SetLeft(tb, x + 12); Canvas.SetTop(tb, y - 3);
+        canvas.Children.Add(tb);
+    }
+
+    private static void DrawArcSegment(Canvas canvas, double cx, double cy, double radius, double thickness,
+        double startDeg, double endDeg, Color color)
+    {
+        if (endDeg - startDeg <= 0.01) return;
+        double startRad = (Math.PI / 180) * (startDeg - 90);
+        double endRad = (Math.PI / 180) * (endDeg - 90);
+
+        var outerStart = new Point(cx + radius * Math.Cos(startRad), cy + radius * Math.Sin(startRad));
+        var outerEnd = new Point(cx + radius * Math.Cos(endRad), cy + radius * Math.Sin(endRad));
+        var innerRadius = radius - thickness;
+        var innerEnd = new Point(cx + innerRadius * Math.Cos(endRad), cy + innerRadius * Math.Sin(endRad));
+        var innerStart = new Point(cx + innerRadius * Math.Cos(startRad), cy + innerRadius * Math.Sin(startRad));
+
+        bool isLargeArc = (endDeg - startDeg) > 180;
+
+        var figure = new PathFigure { StartPoint = outerStart, IsClosed = true };
+        figure.Segments.Add(new ArcSegment { Point = outerEnd, Size = new Size(radius, radius), IsLargeArc = isLargeArc, SweepDirection = SweepDirection.Clockwise });
+        figure.Segments.Add(new LineSegment { Point = innerEnd });
+        figure.Segments.Add(new ArcSegment { Point = innerStart, Size = new Size(innerRadius, innerRadius), IsLargeArc = isLargeArc, SweepDirection = SweepDirection.CounterClockwise });
+
+        var geometry = new PathGeometry();
+        geometry.Figures.Add(figure);
+
+        canvas.Children.Add(new Avalonia.Controls.Shapes.Path { Data = geometry, Fill = new SolidColorBrush(color) });
+    }
+
+    private void DrawTrend()
+    {
+        var canvas = TrendCanvas;
+        canvas.Children.Clear();
+        var pts = _vm.TrendPoints;
+        if (pts == null || pts.Count == 0) return;
+
+        double w = canvas.Bounds.Width > 0 ? canvas.Bounds.Width : 300;
+        double h = canvas.Bounds.Height > 0 ? canvas.Bounds.Height : 160;
+        double padL = 45, padR = 10, padT = 10, padB = 24;
+        double chartW = w - padL - padR;
+        double chartH = h - padT - padB;
+
+        double maxVal = pts.Count > 0 ? (double)pts.Max(p => p.Amount) : 1;
+        if (maxVal <= 0) maxVal = 1;
+
+        double xStep = pts.Count > 1 ? chartW / (pts.Count - 1) : 0;
+
+        for (int g = 0; g <= 2; g++)
+        {
+            double y = padT + chartH * g / 2;
+            canvas.Children.Add(new Line { StartPoint = new Point(padL, y), EndPoint = new Point(padL + chartW, y), Stroke = Brushes.LightGray, StrokeThickness = 1 });
+            var label = new TextBlock { Text = $"${maxVal * (2 - g) / 2:F0}", FontSize = 8, Foreground = Brushes.Gray };
+            Canvas.SetLeft(label, 2); Canvas.SetTop(label, y - 6);
+            canvas.Children.Add(label);
+        }
+
+        var brush = new SolidColorBrush(Color.Parse("#3B82F6"));
+        for (int i = 0; i < pts.Count - 1; i++)
+        {
+            double x1 = padL + i * xStep;
+            double y1 = padT + chartH * (1 - (double)pts[i].Amount / maxVal);
+            double x2 = padL + (i + 1) * xStep;
+            double y2 = padT + chartH * (1 - (double)pts[i + 1].Amount / maxVal);
+            canvas.Children.Add(new Line { StartPoint = new Point(x1, y1), EndPoint = new Point(x2, y2), Stroke = brush, StrokeThickness = 2 });
+        }
+        foreach (var (pt, i) in pts.Select((p, i) => (p, i)))
+        {
+            double cx = padL + i * xStep;
+            double cy = padT + chartH * (1 - (double)pt.Amount / maxVal);
+            var dot = new Ellipse { Width = 5, Height = 5, Fill = brush };
+            Canvas.SetLeft(dot, cx - 2.5); Canvas.SetTop(dot, cy - 2.5);
+            canvas.Children.Add(dot);
+        }
+
+        int[] showIdx = pts.Count <= 3 ? Enumerable.Range(0, pts.Count).ToArray() : new[] { 0, pts.Count / 2, pts.Count - 1 };
+        foreach (var i in showIdx)
+        {
+            double x = padL + i * xStep;
+            var label = new TextBlock { Text = pts[i].Label, FontSize = 8, Foreground = Brushes.Gray };
+            Canvas.SetLeft(label, x - 14); Canvas.SetTop(label, h - padB + 4);
+            canvas.Children.Add(label);
+        }
+    }
+}

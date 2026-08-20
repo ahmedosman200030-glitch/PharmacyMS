@@ -1,0 +1,215 @@
+using PharmacyMS.Application.Interfaces.Repositories;
+using PharmacyMS.Domain.Entities;
+
+namespace PharmacyMS.Desktop.ViewModels;
+
+public class AgingBucket
+{
+    public string Label { get; set; } = string.Empty;
+    public decimal Amount { get; set; }
+    public decimal Percent { get; set; }
+}
+
+public class TrendPoint
+{
+    public string Label { get; set; } = string.Empty;
+    public decimal Amount { get; set; }
+}
+
+public class ReceivableRow
+{
+    private static readonly string[] Palette =
+    {
+        "#DC2626", "#3B82F6", "#10B981", "#F59E0B", "#8B5CF6",
+        "#EC4899", "#14B8A6", "#F97316", "#6366F1", "#84CC16"
+    };
+
+    public int CustomerId { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public decimal TotalCredit { get; set; }
+    public decimal TotalPaid { get; set; }
+    public decimal Balance => TotalCredit - TotalPaid;
+    public string Status => Balance <= 0 ? "Paid" : "Outstanding";
+    public DateTime? LastPayment { get; set; }
+    public List<Sale> Sales { get; set; } = new();
+
+    public string Initials
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(CustomerName)) return "?";
+            var parts = CustomerName.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 1) return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpperInvariant();
+            return (parts[0][0].ToString() + parts[^1][0]).ToUpperInvariant();
+        }
+    }
+
+    public string AvatarColor
+    {
+        get
+        {
+            int hash = 0;
+            foreach (var c in CustomerName) hash = (hash * 31 + c) & 0x7fffffff;
+            return Palette[hash % Palette.Length];
+        }
+    }
+}
+
+public class ReceivablesViewModel
+{
+    private readonly ISaleRepository _saleRepo;
+    private readonly ICustomerRepository _customerRepo;
+    private readonly IPendingSalePaymentRepository _pendingPaymentRepo;
+
+    public DateTime FromDate { get; set; } = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+    public DateTime ToDate { get; set; } = DateTime.Today;
+
+    public decimal TotalReceivables { get; private set; }
+    public decimal TotalCollectedThisMonth { get; private set; }
+    public decimal OutstandingAmount { get; private set; }
+    public decimal AgingOver90 { get; private set; }
+    public int CustomerCount { get; private set; }
+
+    public List<ReceivableRow> AllRows { get; private set; } = new();
+    public List<AgingBucket> AgingBuckets { get; private set; } = new();
+    public List<TrendPoint> TrendPoints { get; private set; } = new();
+
+    public string ActiveFilter { get; set; } = "All";
+    public string SearchText { get; set; } = string.Empty;
+    public int PageSize { get; } = 8;
+    public int CurrentPage { get; set; } = 1;
+
+    public ReceivablesViewModel(ISaleRepository saleRepo, ICustomerRepository customerRepo, IPendingSalePaymentRepository pendingPaymentRepo)
+    {
+        _saleRepo = saleRepo;
+        _customerRepo = customerRepo;
+        _pendingPaymentRepo = pendingPaymentRepo;
+    }
+
+    public async Task LoadAsync()
+    {
+        var allSales = await _saleRepo.GetAllAsync();
+        var customerSales = allSales.Where(s => s.CustomerId.HasValue).ToList();
+        var grouped = customerSales.GroupBy(s => s.CustomerId!.Value).ToList();
+        var customers = (await _customerRepo.GetAllAsync()).ToDictionary(c => c.Id);
+
+        var monthStart = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        decimal collectedThisMonth = 0;
+
+        AllRows = new List<ReceivableRow>();
+        foreach (var g in grouped)
+        {
+            customers.TryGetValue(g.Key, out var customer);
+            var row = new ReceivableRow
+            {
+                CustomerId = g.Key,
+                CustomerName = customer?.Name ?? g.First().CustomerName,
+                Phone = customer?.Phone ?? "",
+                TotalCredit = g.Sum(s => s.TotalAmount),
+                TotalPaid = g.Sum(s => s.AmountPaid),
+                Sales = g.OrderBy(s => s.CreatedAt).ToList()
+            };
+
+            DateTime? lastPayment = null;
+            foreach (var sale in g)
+            {
+                var payments = await _saleRepo.GetPaymentsAsync(sale.Id);
+                foreach (var p in payments)
+                {
+                    if (lastPayment == null || p.PaidAt > lastPayment) lastPayment = p.PaidAt;
+                    if (p.PaidAt >= monthStart) collectedThisMonth += p.Amount;
+                }
+            }
+            row.LastPayment = lastPayment;
+            AllRows.Add(row);
+        }
+
+        AllRows = AllRows.OrderByDescending(r => r.Balance).ToList();
+
+        TotalReceivables = AllRows.Sum(r => r.TotalCredit);
+        TotalCollectedThisMonth = collectedThisMonth;
+        OutstandingAmount = AllRows.Sum(r => r.Balance);
+        CustomerCount = AllRows.Count;
+
+        var bucketLabels = new[] { "Current (0-30 days)", "31-60 days", "61-90 days", "Over 90 days" };
+        var bucketAmounts = new decimal[4];
+        foreach (var row in AllRows.Where(r => r.Balance > 0))
+        {
+            var oldestUnpaid = row.Sales.FirstOrDefault(s => s.TotalAmount - s.AmountPaid > 0);
+            var age = oldestUnpaid != null ? (DateTime.Today - oldestUnpaid.CreatedAt.Date).Days : 0;
+            var idx = age <= 30 ? 0 : age <= 60 ? 1 : age <= 90 ? 2 : 3;
+            bucketAmounts[idx] += row.Balance;
+        }
+        var totalAging = bucketAmounts.Sum();
+        AgingBuckets = bucketLabels.Select((b, i) => new AgingBucket
+        {
+            Label = b,
+            Amount = bucketAmounts[i],
+            Percent = totalAging > 0 ? bucketAmounts[i] / totalAging : 0
+        }).ToList();
+        AgingOver90 = bucketAmounts[3];
+
+        TrendPoints = new List<TrendPoint>();
+        var days = (ToDate.Date - FromDate.Date).Days;
+        if (days is >= 0 and <= 62)
+        {
+            var rangeSales = customerSales.Where(s => s.CreatedAt.Date >= FromDate.Date && s.CreatedAt.Date <= ToDate.Date).ToList();
+            for (var d = FromDate.Date; d <= ToDate.Date; d = d.AddDays(1))
+            {
+                var dayTotal = rangeSales.Where(s => s.CreatedAt.Date == d).Sum(s => s.TotalAmount - s.AmountPaid);
+                TrendPoints.Add(new TrendPoint { Label = d.ToString("MMM d"), Amount = dayTotal });
+            }
+        }
+    }
+
+    public List<ReceivableRow> GetFilteredRows()
+    {
+        IEnumerable<ReceivableRow> q = AllRows;
+        if (ActiveFilter == "Outstanding") q = q.Where(r => r.Balance > 0);
+        else if (ActiveFilter == "Paid") q = q.Where(r => r.Balance <= 0);
+        if (!string.IsNullOrWhiteSpace(SearchText))
+        {
+            var s = SearchText.Trim();
+            q = q.Where(r => r.CustomerName.Contains(s, StringComparison.OrdinalIgnoreCase)
+                           || r.Phone.Contains(s, StringComparison.OrdinalIgnoreCase));
+        }
+        return q.ToList();
+    }
+
+    public int TotalPages(List<ReceivableRow> filtered) => Math.Max(1, (int)Math.Ceiling(filtered.Count / (double)PageSize));
+
+    public List<ReceivableRow> GetPage(List<ReceivableRow> filtered)
+    {
+        var totalPages = TotalPages(filtered);
+        if (CurrentPage > totalPages) CurrentPage = totalPages;
+        if (CurrentPage < 1) CurrentPage = 1;
+        return filtered.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
+    }
+
+    /// Replaces the direct call to _saleRepo.RecordPaymentAsync from the UI.
+    /// Queues one pending payment per sale the amount is applied against;
+    /// nothing touches Sale.AmountPaid until an admin approves it.
+    public async Task SubmitPaymentForApprovalAsync(ReceivableRow row, decimal amount, string note = "")
+    {
+        var remaining = amount;
+        foreach (var sale in row.Sales)
+        {
+            if (remaining <= 0) break;
+            var due = sale.TotalAmount - sale.AmountPaid;
+            if (due <= 0) continue;
+            var pay = Math.Min(due, remaining);
+            await _pendingPaymentRepo.CreateAsync(new PharmacyMS.Domain.Entities.PendingSalePayment
+            {
+                SaleId = sale.Id,
+                CustomerName = row.CustomerName,
+                Amount = pay,
+                Note = note,
+                SubmittedByUserId = PharmacyMS.Application.Services.SessionManager.CurrentUser?.Id ?? 0,
+                SubmittedByName = PharmacyMS.Application.Services.SessionManager.CurrentUser?.FullName ?? "Unknown",
+                SubmittedAt = DateTime.Now
+            });
+            remaining -= pay;
+        }
+    }
+}

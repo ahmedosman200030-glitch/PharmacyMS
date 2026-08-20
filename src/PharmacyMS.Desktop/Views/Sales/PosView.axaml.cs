@@ -1,3 +1,5 @@
+using Avalonia.VisualTree;
+using System.Collections.Generic;
 using Avalonia.Controls;
 using PharmacyMS.Desktop.ViewModels;
 using PharmacyMS.Domain.Entities;
@@ -17,8 +19,51 @@ public partial class PosView : UserControl
 
         MedicineGrid.ItemsSource = _vm.AvailableMedicines;
         CartGrid.ItemsSource = _vm.Cart;
+        MedicineGrid.LoadingRow += (_, e) => e.Row.Header = (e.Row.GetIndex() + 1).ToString();
+        CartGrid.LoadingRow += (_, e) => e.Row.Header = (e.Row.GetIndex() + 1).ToString();
+
+        var unitOptions = new List<string>
+        {
+            "Box", "Bottle", "Packet", "Pcs", "Vial", "Ampoule",
+            "Sachet", "Strip", "Tube", "Syringe", "Roll", "Other"
+        };
+
+        CartGrid.LoadingRow += (_, e) =>
+        {
+            if (e.Row.DataContext is not CartLine line) return;
+            e.Row.Loaded += (_, _) =>
+            {
+                var combo = e.Row.FindDescendantOfType<ComboBox>();
+                if (combo == null) return;
+                combo.ItemsSource = unitOptions;
+                combo.SelectedItem = line.Unit;
+            };
+        };
+
+        CartGrid.AddHandler(ComboBox.SelectionChangedEvent, (object? sender, Avalonia.Controls.SelectionChangedEventArgs e) =>
+        {
+            if (e.Source is not ComboBox combo) return;
+            if (combo.Name != "UnitCombo") return;
+            if (combo.DataContext is not CartLine line) return;
+            if (combo.SelectedItem is string unit) line.Unit = unit;
+        }, Avalonia.Interactivity.RoutingStrategies.Bubble);
         CustomerCombo.ItemsSource = _vm.Customers;
         CustomerCombo.DisplayMemberBinding = new Avalonia.Data.Binding("Name");
+        CustomerCombo.SelectionChanged += (_, _) =>
+        {
+            if (_vm.IsCreditSale && CustomerCombo.SelectedItem is PharmacyMS.Domain.Entities.Customer c)
+            {
+                // Sync credit combo with main combo
+                for (int i = 0; i < CreditCustomerCombo.Items.Count; i++)
+                {
+                    if (CreditCustomerCombo.Items[i] is PharmacyMS.Domain.Entities.Customer cc && cc.Id == c.Id)
+                    {
+                        CreditCustomerCombo.SelectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        };
 
         AttachedToVisualTree += async (_, _) =>
         {
@@ -94,11 +139,40 @@ public partial class PosView : UserControl
         CreditSaleCheck.IsCheckedChanged += (_, _) =>
         {
             _vm.IsCreditSale = CreditSaleCheck.IsChecked == true;
-            CreditCustomerNameBox.IsVisible = _vm.IsCreditSale;
+            CreditCustomerCombo.IsVisible = _vm.IsCreditSale;
+            if (_vm.IsCreditSale)
+            {
+                CreditCustomerCombo.ItemsSource = _vm.Customers
+                    .Where(c => c.Name != "Walk-in Customer" && c.IsActive)
+                    .ToList();
+                CreditCustomerCombo.SelectedIndex = -1;
+            }
         };
-        CreditCustomerNameBox.PropertyChanged += (_, e) =>
+        CreditCustomerCombo.DisplayMemberBinding = new Avalonia.Data.Binding("Name");
+        CreditCustomerCombo.SelectionChanged += (_, _) =>
         {
-            if (e.Property == TextBox.TextProperty) _vm.CreditCustomerName = CreditCustomerNameBox.Text ?? "";
+            if (CreditCustomerCombo.SelectedItem is PharmacyMS.Domain.Entities.Customer c)
+            {
+                _vm.CreditCustomerName = c.Name;
+                _vm.SelectedCustomer = c;
+                // Sync with main customer dropdown
+                for (int i = 0; i < CustomerCombo.Items.Count; i++)
+                {
+                    if (CustomerCombo.Items[i] is PharmacyMS.Domain.Entities.Customer mc && mc.Id == c.Id)
+                    {
+                        CustomerCombo.SelectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        };
+
+        // Populate credit combo without Walk-in Customer when customers load
+        _vm.Customers.CollectionChanged += (_, _) =>
+        {
+            CreditCustomerCombo.ItemsSource = _vm.Customers
+                .Where(c => c.Name != "Walk-in Customer" && c.IsActive)
+                .ToList();
         };
 
         NotesButton.Click += (_, _) => NotesBox.IsVisible = !NotesBox.IsVisible;
@@ -185,14 +259,18 @@ public partial class PosView : UserControl
 
             if (_vm.IsCreditSale)
             {
-                var selected = CustomerCombo.SelectedItem as PharmacyMS.Domain.Entities.Customer;
-                var hasRealCustomer = selected != null && selected.Id != 0;
-                var hasTypedName = !string.IsNullOrWhiteSpace(CreditCustomerNameBox.Text);
-                if (!hasRealCustomer && !hasTypedName)
+                var creditCustomer = CreditCustomerCombo.SelectedItem as PharmacyMS.Domain.Entities.Customer;
+                if (creditCustomer == null)
                 {
-                    ShowStatus("Credit sale requires a customer — select one or type a name.");
+                    ShowStatus("Credit sale requires a real customer — please select one from the dropdown.");
                     return;
                 }
+                // Set the selected customer on the VM
+                _vm.SelectedCustomer = creditCustomer;
+                _vm.CreditCustomerName = creditCustomer.Name;
+
+                var selected = creditCustomer;
+                var hasRealCustomer = true;
 
                 var existingBalance = hasRealCustomer
                     ? await _vm.GetOutstandingBalanceAsync(selected!.Id)
@@ -222,7 +300,27 @@ public partial class PosView : UserControl
             var changeDue = _vm.ChangeDue;
             var totalDiscount = _vm.TotalDiscount;
 
-            var sale = await _vm.CheckoutAsync();
+            Sale sale;
+            try
+            {
+                sale = await _vm.CheckoutAsync();
+            }
+            catch (Exception ex)
+            {
+                ShowStatus($"Sale failed: {ex.Message}");
+                // Refresh stock/cart state so the cashier sees current reality
+                // (important on shared cloud DB — another PC may have just sold the item).
+                await _vm.LoadAsync();
+                RunFilter();
+                RefreshTotals();
+                return;
+            }
+
+            if (sale == null)
+            {
+                ShowStatus("Sale failed — please try again.");
+                return;
+            }
 
             AmountReceivedBox.Text = "0";
             PrescriptionCheck.IsChecked = false;
@@ -230,16 +328,23 @@ public partial class PosView : UserControl
             NotesBox.IsVisible = false;
             PayCash.IsChecked = true;
             CreditSaleCheck.IsChecked = false;
-            CreditCustomerNameBox.Text = "";
-            CreditCustomerNameBox.IsVisible = false;
+            CreditCustomerCombo.SelectedIndex = -1;
+            CreditCustomerCombo.IsVisible = false;
             BuildCategoryButtons();
             RefreshTotals();
             ShowStatus("Sale completed.");
 
-            var receipt = await receiptService.BuildReceiptAsync(
-                sale, customerName, paymentMethod, amountReceived, changeDue, totalDiscount);
-            var win = new ReceiptWindow(receipt, receiptService);
-            win.Show();
+            try
+            {
+                var receipt = await receiptService.BuildReceiptAsync(
+                    sale, customerName, paymentMethod, amountReceived, changeDue, totalDiscount);
+                var win = new ReceiptWindow(receipt, receiptService);
+                win.Show();
+            }
+            catch (Exception ex)
+            {
+                ShowStatus($"Receipt error: {ex.Message}");
+            }
         };
     }
 

@@ -1,9 +1,6 @@
-using CommunityToolkit.Mvvm.ComponentModel;
-
 namespace PharmacyMS.Desktop.ViewModels;
 
-public partial class MainViewModel : ViewModelBase
+public class MainViewModel : ViewModelBase
 {
-    [ObservableProperty]
-    public partial string Greeting { get; set; } = "Welcome to Avalonia!";
+    public string Greeting { get; set; } = "Welcome to PharmacyMS!";
 }

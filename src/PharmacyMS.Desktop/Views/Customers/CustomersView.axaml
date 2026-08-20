@@ -2,18 +2,25 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
         xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+        xmlns:conv="clr-namespace:PharmacyMS.Desktop.Converters"
         x:Class="PharmacyMS.Desktop.Views.Customers.CustomersView"
         x:DataType="vm:CustomersViewModel"
         Background="#F1F5F9">
+  <UserControl.Resources>
+    <conv:ApprovalStatusToBrushConverter x:Key="StatusBrush"/>
+    <conv:ApprovalStatusEqualsConverter x:Key="StatusEquals"/>
+  </UserControl.Resources>
   <DockPanel Margin="20">
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,16">
       <TextBlock Text="Customers" FontSize="22" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
-      <Button x:Name="AddButton" Content="Add Customer" Margin="20,0,0,0" Background="#22C55E" Foreground="White" CornerRadius="6" Padding="14,6"/>
+      <Button x:Name="AddButton" Content="Add Customer" Margin="20,0,0,0" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="14,6"/>
       <Button x:Name="EditButton" Content="Edit Selected" Background="#3B82F6" Foreground="White" CornerRadius="6" Padding="14,6"/>
       <Button x:Name="DeleteButton" Content="Delete Selected" Background="#EF4444" Foreground="White" CornerRadius="6" Padding="14,6"/>
+      <Button x:Name="ImportExcelButton" Content="📥 Import Excel" Background="#8B5CF6" Foreground="White" CornerRadius="6" Padding="14,6"/>
+      <Button x:Name="ExportExcelButton" Content="📤 Export Excel" Background="#3B82F6" Foreground="White" CornerRadius="6" Padding="14,6"/>
     </StackPanel>
     <Border Background="White" CornerRadius="10" Padding="4" BoxShadow="0 1 4 0 #22000000">
-      <DataGrid x:Name="Grid" x:DataType="ent:Customer" AutoGenerateColumns="False" IsReadOnly="True"
+      <DataGrid x:Name="Grid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="ent:Customer" AutoGenerateColumns="False" IsReadOnly="True"
                 GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
                 RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
         <DataGrid.Columns>
@@ -21,6 +28,29 @@
           <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="140"/>
           <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="200"/>
           <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="240"/>
+          <DataGridTemplateColumn Header="Status" Width="110">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate x:DataType="ent:Customer">
+                <Border Background="{Binding ApprovalStatus, Converter={StaticResource StatusBrush}}"
+                        CornerRadius="10" Padding="8,3" HorizontalAlignment="Left">
+                  <TextBlock Text="{Binding ApprovalStatus}" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                </Border>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+          <DataGridTemplateColumn Header="Approval" Width="170">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate x:DataType="ent:Customer">
+                <StackPanel Orientation="Horizontal" Spacing="6"
+                            IsVisible="{Binding ApprovalStatus, Converter={StaticResource StatusEquals}, ConverterParameter=Pending}">
+                  <Button Content="✓ Approve" Tag="{Binding}" Click="ApproveButton_Click"
+                          Background="#10B981" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                  <Button Content="✕ Reject" Tag="{Binding}" Click="RejectButton_Click"
+                          Background="#EF4444" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                </StackPanel>
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
         </DataGrid.Columns>
       </DataGrid>
     </Border>

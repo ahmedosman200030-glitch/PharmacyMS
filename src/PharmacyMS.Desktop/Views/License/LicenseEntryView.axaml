@@ -1,0 +1,33 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PharmacyMS.Desktop.Views.License.LicenseEntryView"
+        Title="License Required"
+        Width="480" Height="380"
+        WindowStartupLocation="CenterScreen"
+        CanResize="False"
+        Background="#F1F5F9">
+  <Border Padding="32" VerticalAlignment="Center">
+    <StackPanel Spacing="16">
+      <TextBlock Text="🔒 License Required" FontSize="20" FontWeight="Bold" Foreground="#0F172A" HorizontalAlignment="Center"/>
+      <TextBlock x:Name="StatusText" Text="Please enter your PharmacyMS license key to continue."
+                 FontSize="13" Foreground="#64748B" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center"/>
+
+      <TextBox x:Name="LicenseKeyBox" Watermark="PMS-XXXXXXXX-XXXXXXXX" FontSize="14" Padding="10"/>
+
+      <Button x:Name="ActivateButton" Content="Activate" HorizontalAlignment="Stretch"
+              HorizontalContentAlignment="Center" Padding="0,10" Background="#2563EB" Foreground="White"
+              CornerRadius="6" Click="OnActivateClick"/>
+
+      <TextBlock x:Name="ErrorText" Foreground="#DC2626" FontSize="12" TextWrapping="Wrap"
+                 HorizontalAlignment="Center" TextAlignment="Center" IsVisible="False"/>
+
+      <Border Background="#FFFBEB" BorderBrush="#FDE68A" BorderThickness="1" CornerRadius="8" Padding="12" Margin="0,8,0,0">
+        <StackPanel Spacing="2">
+          <TextBlock Text="Need a license?" FontSize="12" FontWeight="SemiBold" Foreground="#92400E"/>
+          <TextBlock Text="Contact Ahmed Osman — ahmedosman200030@gmail.com — +252 47 34969"
+                     FontSize="11.5" Foreground="#92400E" TextWrapping="Wrap"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </Border>
+</Window>

@@ -1,0 +1,28 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PharmacyMS.Desktop.Views.Shared.PartyPaymentDialog"
+        Width="400" Height="280" WindowStartupLocation="CenterOwner"
+        CanResize="False" Background="White">
+  <StackPanel Margin="20" Spacing="14">
+    <TextBlock x:Name="TitleText" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+
+    <StackPanel Spacing="4">
+      <TextBlock x:Name="PartyLabel" Text="Customer" FontSize="12" Foreground="#64748B"/>
+      <ComboBox x:Name="PartyCombo" HorizontalAlignment="Stretch"/>
+    </StackPanel>
+
+    <TextBlock x:Name="BalanceText" FontSize="13" Foreground="#334155"/>
+
+    <StackPanel Spacing="4">
+      <TextBlock Text="Payment Amount" FontSize="12" Foreground="#64748B"/>
+      <TextBox x:Name="AmountBox" Height="38"/>
+    </StackPanel>
+
+    <TextBlock x:Name="ErrorText" Foreground="#EF4444" FontSize="12" IsVisible="False" TextWrapping="Wrap"/>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,6,0,0">
+      <Button x:Name="CancelButton" Content="Cancel" Width="90" Height="34" Background="#E2E8F0" Foreground="#334155" CornerRadius="6"/>
+      <Button x:Name="ConfirmButton" Content="Record Payment" Padding="14,0" Height="34" Background="#DC2626" Foreground="White" CornerRadius="6"/>
+    </StackPanel>
+  </StackPanel>
+</Window>

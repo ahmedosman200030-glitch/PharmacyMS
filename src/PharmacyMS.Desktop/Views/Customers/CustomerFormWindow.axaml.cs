@@ -11,7 +11,12 @@ public partial class CustomerFormWindow : Window
     {
         InitializeComponent();
 
-        _customer = existing ?? new Customer();
+        _customer = existing ?? new Customer
+        {
+            ApprovalStatus = PharmacyMS.Application.Services.SessionManager.IsAdmin
+                ? PharmacyMS.Domain.Enums.ApprovalStatus.Approved
+                : PharmacyMS.Domain.Enums.ApprovalStatus.Pending
+        };
 
         if (existing != null)
         {
@@ -32,10 +37,22 @@ public partial class CustomerFormWindow : Window
             ErrorText.IsVisible = true;
             return;
         }
+        if (string.IsNullOrWhiteSpace(PhoneBox.Text))
+        {
+            ErrorText.Text = "Phone is required.";
+            ErrorText.IsVisible = true;
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(EmailBox.Text))
+        {
+            ErrorText.Text = "Email is required.";
+            ErrorText.IsVisible = true;
+            return;
+        }
 
         _customer.Name = NameBox.Text!.Trim();
-        _customer.Phone = string.IsNullOrWhiteSpace(PhoneBox.Text) ? null : PhoneBox.Text.Trim();
-        _customer.Email = string.IsNullOrWhiteSpace(EmailBox.Text) ? null : EmailBox.Text.Trim();
+        _customer.Phone = PhoneBox.Text!.Trim();
+        _customer.Email = EmailBox.Text!.Trim();
         _customer.Address = string.IsNullOrWhiteSpace(AddressBox.Text) ? null : AddressBox.Text.Trim();
         _customer.IsActive = true;
 

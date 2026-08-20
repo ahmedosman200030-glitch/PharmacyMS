@@ -6,77 +6,350 @@
         x:DataType="vm:ReportsViewModel"
         Background="#F1F5F9">
   <DockPanel Margin="20">
-    <TextBlock DockPanel.Dock="Top" Text="Reports" FontSize="22" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,16"/>
-    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12" Margin="0,0,0,16">
-      <TextBlock Text="From:" Foreground="#64748B" VerticalAlignment="Center"/>
-      <TextBox x:Name="FromBox" Width="130" Height="32" Text=""/>
-      <TextBlock Text="To:" Foreground="#64748B" VerticalAlignment="Center"/>
-      <TextBox x:Name="ToBox" Width="130" Height="32" Text=""/>
-      <Button x:Name="RunButton" Content="Run Report" Height="32" Background="#0F2A43" Foreground="White" CornerRadius="6" Padding="14,4"/>
-      <Button x:Name="ExportExcelButton" Content="⬇ Excel" Height="32" Background="#16A34A" Foreground="White" CornerRadius="6" Padding="14,4"/>
-      <Button x:Name="ExportPdfButton" Content="⬇ PDF" Height="32" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="14,4"/>
-    </StackPanel>
-    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="16" Margin="0,0,0,20">
-      <Border Background="White" CornerRadius="10" Padding="16" Width="210" BoxShadow="0 1 4 0 #22000000">
-        <StackPanel>
-          <TextBlock x:Name="RevenueText" Text="$0.00" FontSize="24" FontWeight="Bold" Foreground="#22C55E"/>
-          <TextBlock Text="Total Revenue" FontSize="12" Foreground="#64748B"/>
-        </StackPanel>
-      </Border>
-      <Border Background="White" CornerRadius="10" Padding="16" Width="210" BoxShadow="0 1 4 0 #22000000">
-        <StackPanel>
-          <TextBlock x:Name="CostText" Text="$0.00" FontSize="24" FontWeight="Bold" Foreground="#EF4444"/>
-          <TextBlock Text="Purchase Cost" FontSize="12" Foreground="#64748B"/>
-        </StackPanel>
-      </Border>
-      <Border Background="White" CornerRadius="10" Padding="16" Width="210" BoxShadow="0 1 4 0 #22000000">
-        <StackPanel>
-          <TextBlock x:Name="ProfitText" Text="$0.00" FontSize="24" FontWeight="Bold" Foreground="#F59E0B"/>
-          <TextBlock Text="Gross Profit" FontSize="12" Foreground="#64748B"/>
-        </StackPanel>
-      </Border>
-      <Border Background="White" CornerRadius="10" Padding="16" Width="180" BoxShadow="0 1 4 0 #22000000">
-        <StackPanel>
-          <TextBlock x:Name="TxText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#0F172A"/>
-          <TextBlock Text="Transactions" FontSize="12" Foreground="#64748B"/>
-        </StackPanel>
-      </Border>
-    </StackPanel>
-    <TextBlock DockPanel.Dock="Top" Text="Top Selling Medicines" FontSize="16" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,8"/>
-    <Border DockPanel.Dock="Top" Background="White" CornerRadius="10" Padding="4" BoxShadow="0 1 4 0 #22000000" Margin="0,0,0,20">
-      <DataGrid x:Name="TopGrid" x:DataType="dto:TopSellingMedicine" AutoGenerateColumns="False" IsReadOnly="True"
-                GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
-                RowBackground="White" HorizontalGridLinesBrush="#E2E8F0" MaxHeight="220">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="250"/>
-          <DataGridTextColumn Header="Qty Sold" Binding="{Binding QuantitySold}" Width="120"/>
-          <DataGridTextColumn Header="Revenue" Binding="{Binding Revenue}" Width="140"/>
-        </DataGrid.Columns>
-      </DataGrid>
-    </Border>
 
-    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12" Margin="0,0,0,12">
-      <TextBlock Text="Monthly Stock Reconciliation" FontSize="16" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
-      <Panel Width="12"/>
-      <TextBlock Text="Month:" Foreground="#64748B" VerticalAlignment="Center"/>
-      <TextBox x:Name="ReconMonthBox" Width="100" Height="32" Watermark="yyyy-MM"/>
-      <Button x:Name="ReconRunButton" Content="Generate" Height="32" Background="#0F2A43" Foreground="White" CornerRadius="6" Padding="14,4"/>
-      <Button x:Name="ReconExportButton" Content="⬇ Excel" Height="32" Background="#16A34A" Foreground="White" CornerRadius="6" Padding="14,4"/>
-      <Button x:Name="ReconExportPdfButton" Content="⬇ PDF" Height="32" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="14,4"/>
+    <!-- Header -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,14">
+      <TextBlock Text="Financial Reports" FontSize="22" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+        <TextBlock Text="From:" Foreground="#64748B" VerticalAlignment="Center"/>
+        <TextBox x:Name="FromBox" Width="120" Height="34" Text=""/>
+        <TextBlock Text="To:" Foreground="#64748B" VerticalAlignment="Center"/>
+        <TextBox x:Name="ToBox" Width="120" Height="34" Text=""/>
+        <Button x:Name="RunButton" Content="▶ Run" Height="34" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="16,0" FontWeight="SemiBold"/>
+        <Button x:Name="ExportPdfButton" Content="⬇ PDF" Height="34" Background="#1E293B" Foreground="White" CornerRadius="6" Padding="14,0"/>
+        <Button x:Name="ExportExcelButton" Content="⬇ Excel" Height="34" Background="#1E293B" Foreground="White" CornerRadius="6" Padding="14,0"/>
+      </StackPanel>
+    </Grid>
+
+    <!-- Summary Cards -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,*,*,*,*,*" Margin="0,0,0,18">
+      <Border Grid.Column="0" Background="#4F46E5" CornerRadius="14" Padding="14,12" Margin="0,0,8,0">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Border Width="38" Height="38" CornerRadius="19" Background="#FFFFFF33">
+            <TextBlock Text="💲" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Total Revenue" FontSize="10" Foreground="#E0E7FF" FontWeight="SemiBold"/>
+            <TextBlock x:Name="RevenueText" Text="$0.00" FontSize="16" FontWeight="Bold" Foreground="White"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="1" Background="#EF4444" CornerRadius="14" Padding="14,12" Margin="0,0,8,0">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Border Width="38" Height="38" CornerRadius="19" Background="#FFFFFF33">
+            <TextBlock Text="🛒" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Purchase Cost" FontSize="10" Foreground="#FEE2E2" FontWeight="SemiBold"/>
+            <TextBlock x:Name="CostText" Text="$0.00" FontSize="16" FontWeight="Bold" Foreground="White"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="2" Background="#16A34A" CornerRadius="14" Padding="14,12" Margin="0,0,8,0">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Border Width="38" Height="38" CornerRadius="19" Background="#FFFFFF33">
+            <TextBlock Text="📈" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Gross Profit" FontSize="10" Foreground="#DCFCE7" FontWeight="SemiBold"/>
+            <TextBlock x:Name="ProfitText" Text="$0.00" FontSize="16" FontWeight="Bold" Foreground="White"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="3" Background="#F59E0B" CornerRadius="14" Padding="14,12" Margin="0,0,8,0">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Border Width="38" Height="38" CornerRadius="19" Background="#FFFFFF33">
+            <TextBlock Text="🧾" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Tax Collected" FontSize="10" Foreground="#FEF3C7" FontWeight="SemiBold"/>
+            <TextBlock x:Name="TaxText" Text="$0.00" FontSize="16" FontWeight="Bold" Foreground="White"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="4" Background="#8B5CF6" CornerRadius="14" Padding="14,12" Margin="0,0,8,0">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Border Width="38" Height="38" CornerRadius="19" Background="#FFFFFF33">
+            <TextBlock Text="🏷️" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Discounts" FontSize="10" Foreground="#EDE9FE" FontWeight="SemiBold"/>
+            <TextBlock x:Name="DiscountText" Text="$0.00" FontSize="16" FontWeight="Bold" Foreground="White"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="5" Background="#0F172A" CornerRadius="14" Padding="14,12">
+        <StackPanel Orientation="Horizontal" Spacing="10">
+          <Border Width="38" Height="38" CornerRadius="19" Background="#FFFFFF22">
+            <TextBlock Text="📄" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+          </Border>
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Transactions" FontSize="10" Foreground="#94A3B8" FontWeight="SemiBold"/>
+            <TextBlock x:Name="TxText" Text="0" FontSize="16" FontWeight="Bold" Foreground="White"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- Report Categories label -->
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+      <TextBlock Text="🗂️" FontSize="16"/>
+      <TextBlock Text="Report Categories" FontSize="15" FontWeight="Bold" Foreground="#0F172A"/>
     </StackPanel>
-    <Border Background="White" CornerRadius="10" Padding="4" BoxShadow="0 1 4 0 #22000000">
-      <DataGrid x:Name="ReconGrid" x:DataType="dto:MonthlyStockReconciliationRow" AutoGenerateColumns="False" IsReadOnly="True"
-                GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
-                RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="220"/>
-          <DataGridTextColumn Header="Opening Stock" Binding="{Binding OpeningStock}" Width="130"/>
-          <DataGridTextColumn Header="Received" Binding="{Binding Received}" Width="110"/>
-          <DataGridTextColumn Header="Dispensed" Binding="{Binding Dispensed}" Width="110"/>
-          <DataGridTextColumn Header="Adjustments" Binding="{Binding Adjustments}" Width="120"/>
-          <DataGridTextColumn Header="Closing Stock" Binding="{Binding ClosingStock}" Width="130"/>
-        </DataGrid.Columns>
-      </DataGrid>
-    </Border>
+
+    <!-- Tabs styled as cards -->
+    <TabControl Background="Transparent">
+      <TabControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <WrapPanel Orientation="Horizontal"/>
+        </ItemsPanelTemplate>
+      </TabControl.ItemsPanel>
+      <TabControl.Styles>
+        <Style Selector="TabItem">
+          <Setter Property="Background" Value="White"/>
+          <Setter Property="BorderBrush" Value="#E2E8F0"/>
+          <Setter Property="BorderThickness" Value="1"/>
+          <Setter Property="CornerRadius" Value="10"/>
+          <Setter Property="Padding" Value="14,10"/>
+          <Setter Property="Margin" Value="0,0,10,10"/>
+          <Setter Property="MinWidth" Value="220"/>
+        </Style>
+        <Style Selector="TabItem:selected /template/ ContentPresenter">
+          <Setter Property="TextBlock.Foreground" Value="#0F172A"/>
+        </Style>
+        <Style Selector="TabItem:selected">
+          <Setter Property="BorderBrush" Value="#DC2626"/>
+          <Setter Property="BorderThickness" Value="2"/>
+          <Setter Property="Background" Value="#FEF2F2"/>
+        </Style>
+      </TabControl.Styles>
+
+      <!-- Tab 1: Daily Sales -->
+      <TabItem ><TabItem.Header><StackPanel Orientation="Horizontal" Spacing="10"><Border Width="36" Height="36" CornerRadius="8" Background="#EEF2FF"><TextBlock Text="📅" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><StackPanel><TextBlock Text="Daily Sales" FontWeight="Bold" FontSize="13" Foreground="#0F172A"/><TextBlock Text="View daily sales summary" FontSize="10" Foreground="#94A3B8"/></StackPanel></StackPanel></TabItem.Header>
+        <StackPanel Margin="0,10,0,0" Spacing="10">
+          <Border Background="#EEF2FF" CornerRadius="8" Padding="12,8" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="📅" FontSize="18"/>
+              <TextBlock Text="Daily Sales Summary" FontSize="15" FontWeight="Bold" Foreground="#4F46E5"/>
+            </StackPanel>
+          </Border>
+          <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
+            <DataGrid x:Name="DailySalesGrid" x:DataType="dto:DailySalesSummaryRow" AutoGenerateColumns="False" IsReadOnly="True"
+                      HeadersVisibility="All" RowHeaderWidth="40"
+                      GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="120"/>
+                <DataGridTextColumn Header="Transactions" Binding="{Binding Transactions}" Width="120"/>
+                <DataGridTextColumn Header="Revenue" Binding="{Binding Revenue, StringFormat={}{0:N2}}" Width="130"/>
+                <DataGridTextColumn Header="Discount" Binding="{Binding Discount, StringFormat={}{0:N2}}" Width="120"/>
+                <DataGridTextColumn Header="Tax" Binding="{Binding Tax, StringFormat={}{0:N2}}" Width="110"/>
+                <DataGridTextColumn Header="Net Revenue" Binding="{Binding NetRevenue, StringFormat={}{0:N2}}" Width="130"/>
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+        </StackPanel>
+      </TabItem>
+
+      <!-- Tab 2: Profit & Loss -->
+      <TabItem ><TabItem.Header><StackPanel Orientation="Horizontal" Spacing="10"><Border Width="36" Height="36" CornerRadius="8" Background="#E0F2FE"><TextBlock Text="📊" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><StackPanel><TextBlock Text="Profit &amp; Loss" FontWeight="Bold" FontSize="13" Foreground="#0F172A"/><TextBlock Text="Analyze profit and loss" FontSize="10" Foreground="#94A3B8"/></StackPanel></StackPanel></TabItem.Header>
+        <StackPanel Margin="0,10,0,0" Spacing="10">
+          <Border Background="#E0F2FE" CornerRadius="8" Padding="12,8" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="📊" FontSize="18"/>
+              <TextBlock Text="Profit &amp; Loss by Medicine" FontSize="15" FontWeight="Bold" Foreground="#0EA5E9"/>
+            </StackPanel>
+          </Border>
+          <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
+            <DataGrid x:Name="PnLGrid" x:DataType="dto:PurchaseVsSalesRow" AutoGenerateColumns="False" IsReadOnly="True"
+                      HeadersVisibility="All" RowHeaderWidth="40"
+                      GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="220"/>
+                <DataGridTextColumn Header="Qty Purchased" Binding="{Binding Purchased, StringFormat={}{0:N0}}" Width="130"/>
+                <DataGridTextColumn Header="Qty Sold" Binding="{Binding Sold, StringFormat={}{0:N0}}" Width="110"/>
+                <DataGridTextColumn Header="Purchase Cost" Binding="{Binding PurchaseCost, StringFormat={}{0:N2}}" Width="140"/>
+                <DataGridTextColumn Header="Sale Revenue" Binding="{Binding SaleRevenue, StringFormat={}{0:N2}}" Width="140"/>
+                <DataGridTextColumn Header="Profit" Binding="{Binding Profit, StringFormat={}{0:N2}}" Width="120"/>
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+        </StackPanel>
+      </TabItem>
+
+      <!-- Tab 3: Inventory Valuation -->
+      <TabItem ><TabItem.Header><StackPanel Orientation="Horizontal" Spacing="10"><Border Width="36" Height="36" CornerRadius="8" Background="#FEF3C7"><TextBlock Text="📦" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><StackPanel><TextBlock Text="Inventory Value" FontWeight="Bold" FontSize="13" Foreground="#0F172A"/><TextBlock Text="Check inventory valuation" FontSize="10" Foreground="#94A3B8"/></StackPanel></StackPanel></TabItem.Header>
+        <DockPanel Margin="0,10,0,0">
+          <Border DockPanel.Dock="Top" Background="#FEF3C7" CornerRadius="8" Padding="12,8" HorizontalAlignment="Left" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="📦" FontSize="18"/>
+              <TextBlock Text="Inventory Valuation" FontSize="15" FontWeight="Bold" Foreground="#F59E0B"/>
+            </StackPanel>
+          </Border>
+          <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="12" Margin="0,0,0,10">
+            <Button x:Name="LoadInventoryBtn" Content="🔄 Load Inventory" Height="34" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="14,0"/>
+            <Border Background="#EF4444" CornerRadius="8" Padding="12,8">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="Cost Value:" Foreground="#FEE2E2" FontSize="12" VerticalAlignment="Center"/>
+                <TextBlock x:Name="CostValueText" Text="$0.00" FontWeight="Bold" FontSize="12" Foreground="White" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Border>
+            <Border Background="#16A34A" CornerRadius="8" Padding="12,8">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="Retail Value:" Foreground="#DCFCE7" FontSize="12" VerticalAlignment="Center"/>
+                <TextBlock x:Name="RetailValueText" Text="$0.00" FontWeight="Bold" FontSize="12" Foreground="White" VerticalAlignment="Center"/>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+          <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
+            <DataGrid x:Name="InventoryGrid" x:DataType="dto:InventoryValuationRow" AutoGenerateColumns="False" IsReadOnly="True"
+                      HeadersVisibility="All" RowHeaderWidth="40"
+                      GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="220"/>
+                <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="140"/>
+                <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}" Width="80"/>
+                <DataGridTextColumn Header="Cost Price" Binding="{Binding CostPrice, StringFormat={}{0:N2}}" Width="110"/>
+                <DataGridTextColumn Header="Retail Price" Binding="{Binding RetailPrice, StringFormat={}{0:N2}}" Width="110"/>
+                <DataGridTextColumn Header="Cost Value" Binding="{Binding CostValue, StringFormat={}{0:N2}}" Width="120"/>
+                <DataGridTextColumn Header="Retail Value" Binding="{Binding RetailValue, StringFormat={}{0:N2}}" Width="120"/>
+                <DataGridTextColumn Header="Potential Profit" Binding="{Binding PotentialProfit, StringFormat={}{0:N2}}" Width="130"/>
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+        </DockPanel>
+      </TabItem>
+
+      <!-- Tab 4: Payment Methods -->
+      <TabItem ><TabItem.Header><StackPanel Orientation="Horizontal" Spacing="10"><Border Width="36" Height="36" CornerRadius="8" Background="#EDE9FE"><TextBlock Text="💳" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><StackPanel><TextBlock Text="Payments" FontWeight="Bold" FontSize="13" Foreground="#0F172A"/><TextBlock Text="View all payments" FontSize="10" Foreground="#94A3B8"/></StackPanel></StackPanel></TabItem.Header>
+        <StackPanel Margin="0,10,0,0" Spacing="10">
+          <Border Background="#EDE9FE" CornerRadius="8" Padding="12,8" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="💳" FontSize="18"/>
+              <TextBlock Text="Payment Method Breakdown" FontSize="15" FontWeight="Bold" Foreground="#8B5CF6"/>
+            </StackPanel>
+          </Border>
+          <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
+            <DataGrid x:Name="PaymentGrid" x:DataType="dto:PaymentMethodBreakdownRow" AutoGenerateColumns="False" IsReadOnly="True"
+                      HeadersVisibility="All" RowHeaderWidth="40"
+                      GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Payment Method" Binding="{Binding Method}" Width="200"/>
+                <DataGridTextColumn Header="Transactions" Binding="{Binding Count}" Width="150"/>
+                <DataGridTextColumn Header="Total Amount" Binding="{Binding Total, StringFormat={}{0:N2}}" Width="180"/>
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+        </StackPanel>
+      </TabItem>
+
+      <!-- Tab 5: Tax Report -->
+      <TabItem ><TabItem.Header><StackPanel Orientation="Horizontal" Spacing="10"><Border Width="36" Height="36" CornerRadius="8" Background="#FEE2E2"><TextBlock Text="🧾" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><StackPanel><TextBlock Text="Tax Report" FontWeight="Bold" FontSize="13" Foreground="#0F172A"/><TextBlock Text="Tax collection summary" FontSize="10" Foreground="#94A3B8"/></StackPanel></StackPanel></TabItem.Header>
+        <StackPanel Margin="0,10,0,0" Spacing="10">
+          <Border Background="#FEE2E2" CornerRadius="8" Padding="12,8" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="🧾" FontSize="18"/>
+              <TextBlock Text="Tax Report" FontSize="15" FontWeight="Bold" Foreground="#EF4444"/>
+            </StackPanel>
+          </Border>
+          <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
+            <DataGrid x:Name="TaxGrid" x:DataType="dto:TaxReportRow" AutoGenerateColumns="False" IsReadOnly="True"
+                      HeadersVisibility="All" RowHeaderWidth="40"
+                      GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Date" Binding="{Binding Date}" Width="140"/>
+                <DataGridTextColumn Header="Revenue" Binding="{Binding Revenue, StringFormat={}{0:N2}}" Width="150"/>
+                <DataGridTextColumn Header="Tax Rate %" Binding="{Binding TaxRate, StringFormat={}{0:N2}}" Width="130"/>
+                <DataGridTextColumn Header="Tax Collected" Binding="{Binding TaxAmount, StringFormat={}{0:N2}}" Width="150"/>
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+        </StackPanel>
+      </TabItem>
+
+      <!-- Tab 6: Supplier Payments -->
+      <TabItem ><TabItem.Header><StackPanel Orientation="Horizontal" Spacing="10"><Border Width="36" Height="36" CornerRadius="8" Background="#CCFBF1"><TextBlock Text="🏭" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><StackPanel><TextBlock Text="Supplier Payments" FontWeight="Bold" FontSize="13" Foreground="#0F172A"/><TextBlock Text="Payments to suppliers" FontSize="10" Foreground="#94A3B8"/></StackPanel></StackPanel></TabItem.Header>
+        <DockPanel Margin="0,10,0,0">
+          <Border DockPanel.Dock="Top" Background="#CCFBF1" CornerRadius="8" Padding="12,8" HorizontalAlignment="Left" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="🏭" FontSize="18"/>
+              <TextBlock Text="Supplier Payments" FontSize="15" FontWeight="Bold" Foreground="#0F766E"/>
+            </StackPanel>
+          </Border>
+          <Button DockPanel.Dock="Top" x:Name="LoadSuppliersBtn" Content="🔄 Load Suppliers" Height="34" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="14,0" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+          <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
+            <DataGrid x:Name="SupplierGrid" x:DataType="dto:SupplierPaymentRow" AutoGenerateColumns="False" IsReadOnly="True"
+                      HeadersVisibility="All" RowHeaderWidth="40"
+                      GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Supplier" Binding="{Binding SupplierName}" Width="200"/>
+                <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="130"/>
+                <DataGridTextColumn Header="Invoices" Binding="{Binding TotalInvoices}" Width="90"/>
+                <DataGridTextColumn Header="Total Amount" Binding="{Binding TotalAmount, StringFormat={}{0:N2}}" Width="130"/>
+                <DataGridTextColumn Header="Amount Paid" Binding="{Binding AmountPaid, StringFormat={}{0:N2}}" Width="130"/>
+                <DataGridTextColumn Header="Balance" Binding="{Binding Balance, StringFormat={}{0:N2}}" Width="120"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+        </DockPanel>
+      </TabItem>
+
+      <!-- Tab 7: Top Sellers (existing) -->
+      <TabItem ><TabItem.Header><StackPanel Orientation="Horizontal" Spacing="10"><Border Width="36" Height="36" CornerRadius="8" Background="#FEF9C3"><TextBlock Text="🏆" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><StackPanel><TextBlock Text="Top Sellers" FontWeight="Bold" FontSize="13" Foreground="#0F172A"/><TextBlock Text="Best selling medicines" FontSize="10" Foreground="#94A3B8"/></StackPanel></StackPanel></TabItem.Header>
+        <StackPanel Margin="0,10,0,0" Spacing="10">
+          <Border Background="#FEF9C3" CornerRadius="8" Padding="12,8" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="🏆" FontSize="18"/>
+              <TextBlock Text="Top Selling Medicines" FontSize="15" FontWeight="Bold" Foreground="#CA8A04"/>
+            </StackPanel>
+          </Border>
+          <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
+            <DataGrid x:Name="TopGrid" x:DataType="dto:TopSellingMedicine" AutoGenerateColumns="False" IsReadOnly="True"
+                      HeadersVisibility="All" RowHeaderWidth="40"
+                      GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="250"/>
+                <DataGridTextColumn Header="Qty Sold" Binding="{Binding QuantitySold}" Width="120"/>
+                <DataGridTextColumn Header="Revenue" Binding="{Binding Revenue, StringFormat={}{0:N2}}" Width="140"/>
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+        </StackPanel>
+      </TabItem>
+
+      <!-- Tab 8: Stock Reconciliation (existing) -->
+      <TabItem ><TabItem.Header><StackPanel Orientation="Horizontal" Spacing="10"><Border Width="36" Height="36" CornerRadius="8" Background="#F1F5F9"><TextBlock Text="📋" FontSize="17" HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><StackPanel><TextBlock Text="Stock Recon" FontWeight="Bold" FontSize="13" Foreground="#0F172A"/><TextBlock Text="Stock vs system balance" FontSize="10" Foreground="#94A3B8"/></StackPanel></StackPanel></TabItem.Header>
+        <DockPanel Margin="0,10,0,0">
+          <Border DockPanel.Dock="Top" Background="#F1F5F9" CornerRadius="8" Padding="12,8" HorizontalAlignment="Left" Margin="0,0,0,10">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <TextBlock Text="📋" FontSize="18"/>
+              <TextBlock Text="Monthly Stock Reconciliation" FontSize="15" FontWeight="Bold" Foreground="#475569"/>
+            </StackPanel>
+          </Border>
+          <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
+            <TextBlock Text="Month (yyyy-MM):" Foreground="#64748B" VerticalAlignment="Center"/>
+            <TextBox x:Name="ReconMonthBox" Width="120" Height="34"/>
+            <Button x:Name="ReconRunButton" Content="▶ Run" Height="34" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="14,0"/>
+            <Button x:Name="ReconExportButton" Content="⬇ Excel" Height="34" Background="#1E293B" Foreground="White" CornerRadius="6" Padding="14,0"/>
+            <Button x:Name="ReconExportPdfButton" Content="⬇ PDF" Height="34" Background="#1E293B" Foreground="White" CornerRadius="6" Padding="14,0"/>
+          </StackPanel>
+          <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
+            <DataGrid x:Name="ReconGrid" x:DataType="dto:MonthlyStockReconciliationRow" AutoGenerateColumns="False" IsReadOnly="True"
+                      HeadersVisibility="All" RowHeaderWidth="40"
+                      GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+              <DataGrid.Columns>
+                <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="220"/>
+                <DataGridTextColumn Header="Opening" Binding="{Binding OpeningStock}" Width="100"/>
+                <DataGridTextColumn Header="Received" Binding="{Binding Received}" Width="110"/>
+                <DataGridTextColumn Header="Dispensed" Binding="{Binding Dispensed}" Width="100"/>
+                <DataGridTextColumn Header="Adjustments" Binding="{Binding Adjustments}" Width="110"/>
+                <DataGridTextColumn Header="Closing" Binding="{Binding ClosingStock}" Width="100"/>
+              </DataGrid.Columns>
+            </DataGrid>
+          </Border>
+        </DockPanel>
+      </TabItem>
+
+    </TabControl>
   </DockPanel>
 </UserControl>

@@ -24,7 +24,7 @@
                   Background="#E2E8F0" Foreground="#334155" CornerRadius="8"
                   HorizontalContentAlignment="Center"/>
           <Button Grid.Column="1" x:Name="SaveButton" Content="Save" Height="42"
-                  Background="#22C55E" Foreground="White" CornerRadius="8"
+                  Background="#DC2626" Foreground="White" CornerRadius="8"
                   HorizontalContentAlignment="Center" FontWeight="Bold"/>
         </Grid>
       </StackPanel>
@@ -49,7 +49,8 @@
               </StackPanel>
               <StackPanel Grid.Column="1" Margin="8,0,0,0" Spacing="6">
                 <TextBlock Text="Category" FontSize="12" Foreground="#64748B"/>
-                <TextBox x:Name="CategoryBox" Height="38"/>
+                <ComboBox x:Name="CategoryBox" Height="38" HorizontalAlignment="Stretch"
+                          IsEditable="True" PlaceholderText="Select or type a category"/>
               </StackPanel>
             </Grid>
 
@@ -60,7 +61,8 @@
               </StackPanel>
               <StackPanel Grid.Column="1" Margin="8,0,0,0" Spacing="6">
                 <TextBlock Text="Supplier" FontSize="12" Foreground="#64748B"/>
-                <TextBox x:Name="SupplierBox" Height="38"/>
+                <ComboBox x:Name="SupplierBox" Height="38" HorizontalAlignment="Stretch"
+                          IsEditable="True" PlaceholderText="Select or type a supplier"/>
               </StackPanel>
             </Grid>
           </StackPanel>
@@ -87,14 +89,19 @@
         <Border Background="White" CornerRadius="10" Padding="20" BoxShadow="0 1 4 0 #22000000">
           <StackPanel Spacing="10">
             <TextBlock Text="Stock" FontSize="14" FontWeight="Bold" Foreground="#0F172A"/>
-            <Grid ColumnDefinitions="*,*">
+            <Grid ColumnDefinitions="*,*,*">
               <StackPanel Grid.Column="0" Margin="0,0,8,0" Spacing="6">
                 <TextBlock Text="Quantity In Stock *" FontSize="12" Foreground="#64748B"/>
                 <TextBox x:Name="QuantityBox" Height="38"/>
               </StackPanel>
-              <StackPanel Grid.Column="1" Margin="8,0,0,0" Spacing="6">
+              <StackPanel Grid.Column="1" Margin="8,0,8,0" Spacing="6">
                 <TextBlock Text="Reorder Level" FontSize="12" Foreground="#64748B"/>
                 <TextBox x:Name="ReorderLevelBox" Height="38" Text="10"/>
+              </StackPanel>
+              <StackPanel Grid.Column="2" Margin="8,0,0,0" Spacing="6">
+                <TextBlock Text="Unit *" FontSize="12" Foreground="#64748B"/>
+                <ComboBox x:Name="UnitBox" Height="38" HorizontalAlignment="Stretch"
+                          SelectedIndex="0"/>
               </StackPanel>
             </Grid>
           </StackPanel>

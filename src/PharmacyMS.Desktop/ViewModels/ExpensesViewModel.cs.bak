@@ -1,0 +1,114 @@
+using PharmacyMS.Application.Interfaces.Repositories;
+using PharmacyMS.Domain.Entities;
+
+namespace PharmacyMS.Desktop.ViewModels;
+
+public class ExpenseTrendPoint
+{
+    public string Label { get; set; } = string.Empty;
+    public decimal Amount { get; set; }
+}
+
+public class CategoryTotal
+{
+    public string Category { get; set; } = string.Empty;
+    public decimal Amount { get; set; }
+}
+
+public class ExpensesViewModel
+{
+    private readonly IExpenseRepository _expenseRepo;
+
+    public static readonly string[] PredefinedCategories =
+    {
+        "Rent", "Salaries", "Utilities", "Transport",
+        "Maintenance", "Marketing", "Office Supplies",
+        "Insurance", "Taxes", "Other"
+    };
+
+    public DateTime FromDate { get; set; } = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+    public DateTime ToDate { get; set; } = DateTime.Today;
+
+    public decimal TotalExpenses { get; private set; }
+    public int TransactionCount { get; private set; }
+    public decimal AverageExpense => TransactionCount > 0 ? TotalExpenses / TransactionCount : 0m;
+    public int CategoryCount { get; private set; }
+
+    public List<Expense> AllRows { get; private set; } = new();
+    public List<CategoryTotal> CategoryTotals { get; private set; } = new();
+    public List<ExpenseTrendPoint> TrendPoints { get; private set; } = new();
+
+    public string ActiveCategory { get; set; } = "All";
+    public string SearchText { get; set; } = string.Empty;
+    public int PageSize { get; } = 8;
+    public int CurrentPage { get; set; } = 1;
+
+    public ExpensesViewModel(IExpenseRepository expenseRepo)
+    {
+        _expenseRepo = expenseRepo;
+    }
+
+    public async Task LoadAsync()
+    {
+        var expenses = (await _expenseRepo.GetByDateRangeAsync(FromDate, ToDate)).ToList();
+        AllRows = expenses.OrderByDescending(e => e.Date).ToList();
+
+        TotalExpenses = expenses.Sum(e => e.Amount);
+        TransactionCount = expenses.Count;
+        CategoryCount = expenses.Select(e => e.Category).Distinct().Count();
+
+        CategoryTotals = expenses
+            .GroupBy(e => e.Category)
+            .Select(g => new CategoryTotal { Category = g.Key, Amount = g.Sum(e => e.Amount) })
+            .OrderByDescending(c => c.Amount)
+            .ToList();
+
+        TrendPoints = new List<ExpenseTrendPoint>();
+        var days = (ToDate.Date - FromDate.Date).Days;
+        if (days is >= 0 and <= 62)
+        {
+            for (var d = FromDate.Date; d <= ToDate.Date; d = d.AddDays(1))
+            {
+                var dayTotal = expenses.Where(e => e.Date.Date == d).Sum(e => e.Amount);
+                TrendPoints.Add(new ExpenseTrendPoint { Label = d.ToString("MMM d"), Amount = dayTotal });
+            }
+        }
+    }
+
+    public List<Expense> GetFilteredRows()
+    {
+        IEnumerable<Expense> q = AllRows;
+        if (ActiveCategory != "All")
+            q = q.Where(e => e.Category == ActiveCategory);
+        if (!string.IsNullOrWhiteSpace(SearchText))
+        {
+            var s = SearchText.Trim();
+            q = q.Where(e => e.Description.Contains(s, StringComparison.OrdinalIgnoreCase)
+                           || e.Category.Contains(s, StringComparison.OrdinalIgnoreCase));
+        }
+        return q.ToList();
+    }
+
+    public int TotalPages(List<Expense> filtered) =>
+        Math.Max(1, (int)Math.Ceiling(filtered.Count / (double)PageSize));
+
+    public List<Expense> GetPage(List<Expense> filtered)
+    {
+        var totalPages = TotalPages(filtered);
+        if (CurrentPage > totalPages) CurrentPage = totalPages;
+        if (CurrentPage < 1) CurrentPage = 1;
+        return filtered.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
+    }
+
+    public async Task<Expense> AddExpenseAsync(Expense expense)
+    {
+        var id = await _expenseRepo.CreateAsync(expense);
+        expense.Id = id;
+        return expense;
+    }
+
+    public async Task DeleteExpenseAsync(Expense expense)
+    {
+        await _expenseRepo.DeleteAsync(expense.Id);
+    }
+}

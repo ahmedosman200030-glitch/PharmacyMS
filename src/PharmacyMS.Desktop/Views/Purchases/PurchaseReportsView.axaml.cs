@@ -15,6 +15,8 @@ public partial class PurchaseReportsView : UserControl
         _vm = vm;
         SupplierGrid.ItemsSource = _vm.BySupplier;
         MedicineGrid.ItemsSource = _vm.ByMedicine;
+        SupplierGrid.LoadingRow += (_, e) => e.Row.Header = (e.Row.GetIndex() + 1).ToString();
+        MedicineGrid.LoadingRow += (_, e) => e.Row.Header = (e.Row.GetIndex() + 1).ToString();
 
         Loaded += async (_, _) =>
         {

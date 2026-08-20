@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Avalonia.Controls;
+using PharmacyMS.Desktop.Views.Accounting;
+using PharmacyMS.Desktop.Views.Approvals;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using PharmacyMS.Application.Interfaces.Repositories;
@@ -15,7 +17,7 @@ namespace PharmacyMS.Desktop.Views.Shell;
 
 public partial class MainWindow : Window
 {
-    private static readonly IBrush ActiveBrush = new SolidColorBrush(Color.Parse("#22C55E"));
+    private static readonly IBrush ActiveBrush = new SolidColorBrush(Color.Parse("#DC2626"));
     private static readonly IBrush InactiveBrush = Brushes.Transparent;
     private static readonly IBrush ActiveForeground = Brushes.White;
     private static readonly IBrush InactiveForeground = new SolidColorBrush(Color.Parse("#94A3B8"));
@@ -32,7 +34,7 @@ public partial class MainWindow : Window
     {
         DashboardButton, InventoryButton, CategoriesButton, SuppliersButton,
         NewPurchaseButton, PurchaseHistoryButton, PurchaseInvoicesButton, PurchaseReportsButton,
-        PointOfSaleButton, DailyClosingButton, SalesHistoryButton, CreditSalesButton, CustomersButton, ReportsButton, SettingsButton, UsersButton
+        PointOfSaleButton, DailyClosingButton, SalesHistoryButton, CreditSalesButton, CustomersButton, SettingsButton, UsersButton
     };
 
     public MainWindow()
@@ -48,6 +50,13 @@ public partial class MainWindow : Window
 
             MenuUserName.Text = user.FullName;
             MenuUserRole.Text = user.Role.ToString();
+            HeaderUserName.Text = user.FullName;
+            HeaderUserRole.Text = user.Role.ToString();
+            HeaderAvatarInitials.Text = GetInitials(user.FullName);
+            FlyoutAvatarInitials.Text = GetInitials(user.FullName);
+            FlyoutFullName.Text = user.FullName;
+            FlyoutRole.Text = user.Role.ToString();
+            FlyoutSessionTime.Text = DateTime.Now.ToString("hh:mm tt");
 
             if (!string.IsNullOrWhiteSpace(user.AvatarPath) && File.Exists(user.AvatarPath))
             {
@@ -64,16 +73,40 @@ public partial class MainWindow : Window
         _statsTimer.Tick += async (_, _) => await LoadHeaderStatsAsync();
         _statsTimer.Start();
 
+        // Enforce permissions on sidebar
         if (!SessionManager.IsAdmin)
         {
             UsersButton.IsVisible = false;
             SettingsButton.IsVisible = false;
+            PendingApprovalsButton.IsVisible = false;
+        }
+        else
+        {
+            MyStatusButton.IsVisible = false;
         }
 
         if (!SessionManager.CanViewReports)
+
+        if (!SessionManager.CanManageMedicines)
+            InventoryButton.IsVisible = false;
+
+        if (!SessionManager.CanManageCategories)
+            CategoriesButton.IsVisible = false;
+
+        if (!SessionManager.CanManageSuppliers)
+            SuppliersButton.IsVisible = false;
+
+        if (!SessionManager.CanManagePurchases)
+            PurchasesButton.IsVisible = false;
+
+        if (!SessionManager.CanManageSales)
         {
-            ReportsButton.IsVisible = false;
+            PosButton.IsVisible = false;
+            QuickPosButton.IsVisible = false;
         }
+
+        if (!SessionManager.CanManageCustomers)
+            CustomersButton.IsVisible = false;
 
         AvatarButton.Click += async (_, _) => await UploadAvatarAsync();
 
@@ -82,17 +115,8 @@ public partial class MainWindow : Window
         PageTitleText.Text = "Dashboard";
         ShowDashboard();
 
-        LogoutButton.Click += (_, _) =>
-        {
-            SessionManager.Logout();
-            Close();
-        };
-
-        MenuLogoutButton.Click += (_, _) =>
-        {
-            SessionManager.Logout();
-            Close();
-        };
+        LogoutButton.Click += (_, _) => DoLogout();
+        MenuLogoutButton.Click += (_, _) => DoLogout();
 
         MenuPreferencesButton.Click += (_, _) =>
         {
@@ -146,18 +170,30 @@ public partial class MainWindow : Window
         NewPurchaseButton.Click += (_, _) =>
         {
             SetActive(NewPurchaseButton);
-            PageTitleText.Text = "New Purchase";
+            PageTitleText.Text = "Purchase Orders";
             var medicineRepo = Program.Services.GetRequiredService<IMedicineRepository>();
-            var purchaseRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseRepository>();
+            var orderRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseOrderRepository>();
             var supplierRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.ISupplierRepository>();
-            var vm = new PharmacyMS.Desktop.ViewModels.PurchaseViewModel(medicineRepo, purchaseRepo, supplierRepo);
-            MainContent.Content = new PharmacyMS.Desktop.Views.Purchases.PurchaseView(vm);
+            var pdfService = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Services.IPurchaseOrderPdfService>();
+            var vm = new PharmacyMS.Desktop.ViewModels.PurchaseOrderViewModel(medicineRepo, orderRepo, supplierRepo, pdfService);
+            MainContent.Content = new PharmacyMS.Desktop.Views.Purchases.PurchaseOrderView(vm);
+        };
+
+        ReceivedGoodsButton.Click += (_, _) =>
+        {
+            SetActive(ReceivedGoodsButton);
+            PageTitleText.Text = "Received";
+            var orderRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseOrderRepository>();
+            var receiptRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IGoodsReceiptRepository>();
+            var purchaseRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseRepository>();
+            var vm = new PharmacyMS.Desktop.ViewModels.ReceiveGoodsViewModel(orderRepo, receiptRepo, purchaseRepo);
+            MainContent.Content = new PharmacyMS.Desktop.Views.Purchases.ReceiveGoodsView(vm);
         };
 
         PurchaseHistoryButton.Click += (_, _) =>
         {
             SetActive(PurchaseHistoryButton);
-            PageTitleText.Text = "Purchase History";
+            PageTitleText.Text = "Supplier Bills";
             var purchaseRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.PurchaseHistoryViewModel(purchaseRepo);
             MainContent.Content = new PharmacyMS.Desktop.Views.Purchases.PurchaseHistoryView(vm);
@@ -166,7 +202,7 @@ public partial class MainWindow : Window
         PurchaseInvoicesButton.Click += (_, _) =>
         {
             SetActive(PurchaseInvoicesButton);
-            PageTitleText.Text = "Purchase Invoices";
+            PageTitleText.Text = "Supplier Payments";
             var purchaseRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.PurchaseInvoiceViewModel(purchaseRepo);
             MainContent.Content = new PharmacyMS.Desktop.Views.Purchases.PurchaseInvoiceView(vm);
@@ -236,14 +272,93 @@ public partial class MainWindow : Window
             MainContent.Content = new PharmacyMS.Desktop.Views.Customers.CustomersView(vm);
         };
 
-        ReportsButton.Click += (_, _) =>
+        bool _accountingExpanded = false;
+        AccountingButton.Click += (_, _) =>
         {
-            SetActive(ReportsButton);
-            PageTitleText.Text = "Reports";
-            var repo = Program.Services.GetRequiredService<IReportRepository>();
-            var vm = new PharmacyMS.Desktop.ViewModels.ReportsViewModel(repo);
-            var brandingService = Program.Services.GetRequiredService<IBrandingService>();
-            MainContent.Content = new PharmacyMS.Desktop.Views.Reports.ReportsView(vm, brandingService);
+            _accountingExpanded = !_accountingExpanded;
+            AccountingSubPanel.IsVisible = _accountingExpanded;
+        };
+
+        void OpenAccounting(int tab = 0)
+        {
+            SetActive(AccountingButton);
+            PageTitleText.Text = "Accounting";
+            var saleRepo = Program.Services.GetRequiredService<ISaleRepository>();
+            var purchaseRepo = Program.Services.GetRequiredService<IPurchaseRepository>();
+            var expenseRepo = Program.Services.GetRequiredService<IExpenseRepository>();
+            var customerRepo = Program.Services.GetRequiredService<ICustomerRepository>();
+            var medicineRepo = Program.Services.GetRequiredService<IMedicineRepository>();
+            var vm = new PharmacyMS.Desktop.ViewModels.AccountingViewModel(saleRepo, purchaseRepo, expenseRepo, customerRepo, medicineRepo);
+            var view = new AccountingView(vm, tab);
+            MainContent.Content = view;
+        }
+
+        AccOverviewButton.Click += (_, _) => { SetActive(AccOverviewButton); OpenAccounting(0); };
+        AccIncomeButton.Click += (_, _) =>
+        {
+            SetActive(AccIncomeButton);
+            PageTitleText.Text = "Income";
+            var saleRepoForIncome = Program.Services.GetRequiredService<ISaleRepository>();
+            var incomeVm = new PharmacyMS.Desktop.ViewModels.IncomeViewModel(saleRepoForIncome);
+            MainContent.Content = new IncomeView(incomeVm);
+        };
+        AccExpensesButton.Click += (_, _) =>
+        {
+            SetActive(AccExpensesButton);
+            PageTitleText.Text = "Expenses";
+            var expenseRepo = Program.Services.GetRequiredService<IExpenseRepository>();
+            var pendingExpenseRepo = Program.Services.GetRequiredService<IPendingExpenseRepository>();
+            var expensesVm = new PharmacyMS.Desktop.ViewModels.ExpensesViewModel(expenseRepo, pendingExpenseRepo);
+            MainContent.Content = new ExpensesView(expensesVm);
+        };
+        AccReceivablesButton.Click += (_, _) =>
+        {
+            SetActive(AccReceivablesButton);
+            PageTitleText.Text = "Receivables";
+            var saleRepoForRec = Program.Services.GetRequiredService<ISaleRepository>();
+            var customerRepoForRec = Program.Services.GetRequiredService<ICustomerRepository>();
+            var pendingSalePaymentRepo = Program.Services.GetRequiredService<IPendingSalePaymentRepository>();
+            var recVm = new PharmacyMS.Desktop.ViewModels.ReceivablesViewModel(saleRepoForRec, customerRepoForRec, pendingSalePaymentRepo);
+            MainContent.Content = new ReceivablesView(recVm);
+        };
+        AccPayablesButton.Click += (_, _) =>
+        {
+            SetActive(AccPayablesButton);
+            PageTitleText.Text = "Payables";
+            var purchaseRepoForPay = Program.Services.GetRequiredService<IPurchaseRepository>();
+            var supplierRepoForPay = Program.Services.GetRequiredService<ISupplierRepository>();
+            var payVm = new PharmacyMS.Desktop.ViewModels.PayablesViewModel(purchaseRepoForPay, supplierRepoForPay);
+            MainContent.Content = new PayablesView(payVm);
+        };
+        AccCashFlowButton.Click += async (_, _) =>
+        {
+            SetActive(AccCashFlowButton);
+            PageTitleText.Text = "Cash Flow";
+            var saleRepoForCF = Program.Services.GetRequiredService<ISaleRepository>();
+            var purchaseRepoForCF = Program.Services.GetRequiredService<IPurchaseRepository>();
+            var expenseRepoForCF = Program.Services.GetRequiredService<IExpenseRepository>();
+            var cfVm = new PharmacyMS.Desktop.ViewModels.CashFlowViewModel(saleRepoForCF, purchaseRepoForCF, expenseRepoForCF);
+            MainContent.Content = new CashFlowView(cfVm);
+        };
+        AccPLButton.Click += async (_, _) =>
+        {
+            SetActive(AccPLButton);
+            PageTitleText.Text = "Profit & Loss";
+            var saleRepoForPL = Program.Services.GetRequiredService<ISaleRepository>();
+            var purchaseRepoForPL = Program.Services.GetRequiredService<IPurchaseRepository>();
+            var expenseRepoForPL = Program.Services.GetRequiredService<IExpenseRepository>();
+            var reportRepoForPL = Program.Services.GetRequiredService<IReportRepository>();
+            var plVm = new PharmacyMS.Desktop.ViewModels.PLViewModel(saleRepoForPL, purchaseRepoForPL, expenseRepoForPL, reportRepoForPL);
+            MainContent.Content = new PLView(plVm);
+        };
+        AccReportsButton.Click += (_, _) =>
+        {
+            SetActive(AccReportsButton);
+            PageTitleText.Text = "Financial Reports";
+            var accRepo = Program.Services.GetRequiredService<IReportRepository>();
+            var accReportsVm = new PharmacyMS.Desktop.ViewModels.ReportsViewModel(accRepo);
+            var accBrandingService = Program.Services.GetRequiredService<IBrandingService>();
+            MainContent.Content = new PharmacyMS.Desktop.Views.Reports.ReportsView(accReportsVm, accBrandingService);
         };
 
         SalesHistoryButton.Click += (_, _) =>
@@ -251,8 +366,10 @@ public partial class MainWindow : Window
             SetActive(SalesHistoryButton);
             PageTitleText.Text = "Sales History";
             var saleRepo = Program.Services.GetRequiredService<ISaleRepository>();
-            var vm = new PharmacyMS.Desktop.ViewModels.SalesHistoryViewModel(saleRepo);
-            MainContent.Content = new PharmacyMS.Desktop.Views.Sales.SalesHistoryView(vm);
+            var customerRepo = Program.Services.GetRequiredService<ICustomerRepository>();
+            var vm = new PharmacyMS.Desktop.ViewModels.SalesHistoryViewModel(saleRepo, customerRepo);
+            var brandingService = Program.Services.GetRequiredService<IBrandingService>();
+            MainContent.Content = new PharmacyMS.Desktop.Views.Sales.SalesHistoryView(vm, brandingService);
         };
 
         CreditSalesButton.Click += (_, _) =>
@@ -260,8 +377,11 @@ public partial class MainWindow : Window
             SetActive(CreditSalesButton);
             PageTitleText.Text = "Credit Sales";
             var saleRepo = Program.Services.GetRequiredService<ISaleRepository>();
-            var vm = new PharmacyMS.Desktop.ViewModels.CreditSalesViewModel(saleRepo);
-            MainContent.Content = new PharmacyMS.Desktop.Views.Sales.CreditSalesView(vm);
+            var customerRepo2 = Program.Services.GetRequiredService<ICustomerRepository>();
+            var pendingPayRepo = Program.Services.GetRequiredService<IPendingSalePaymentRepository>();
+            var vm = new PharmacyMS.Desktop.ViewModels.CreditSalesViewModel(saleRepo, customerRepo2, pendingPayRepo);
+            var brandingService2 = Program.Services.GetRequiredService<IBrandingService>();
+            MainContent.Content = new PharmacyMS.Desktop.Views.Sales.CreditSalesView(vm, brandingService2);
         };
 
         UsersButton.Click += (_, _) =>
@@ -273,12 +393,56 @@ public partial class MainWindow : Window
             MainContent.Content = new PharmacyMS.Desktop.Views.Users.UsersView(vm);
         };
 
+        PendingApprovalsButton.Click += async (_, _) =>
+        {
+            SetActive(PendingApprovalsButton);
+            PageTitleText.Text = "Pending Approvals";
+            var customerRepo = Program.Services.GetRequiredService<ICustomerRepository>();
+            var supplierRepo = Program.Services.GetRequiredService<ISupplierRepository>();
+            var purchaseRepo = Program.Services.GetRequiredService<IPurchaseRepository>();
+            var goodsReceiptRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IGoodsReceiptRepository>();
+            var paymentRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPendingSalePaymentRepository>();
+            var pendingExpenseRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPendingExpenseRepository>();
+            var saleRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.ISaleRepository>();
+            var realExpenseRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IExpenseRepository>();
+            var vm = new PharmacyMS.Desktop.ViewModels.PendingApprovalsViewModel(customerRepo, supplierRepo, purchaseRepo, goodsReceiptRepo, paymentRepo, pendingExpenseRepo, saleRepo, realExpenseRepo);
+            MainContent.Content = new PendingApprovalsView(vm);
+        };
+
+        MyStatusButton.Click += async (_, _) =>
+        {
+            SetActive(MyStatusButton);
+            PageTitleText.Text = "My Status";
+            var myPaymentRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPendingSalePaymentRepository>();
+            var myExpenseRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPendingExpenseRepository>();
+            var myReceiptRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IGoodsReceiptRepository>();
+            var myCustomerRepo = Program.Services.GetRequiredService<ICustomerRepository>();
+            var mySupplierRepo = Program.Services.GetRequiredService<ISupplierRepository>();
+            var myVm = new PharmacyMS.Desktop.ViewModels.MySubmissionsViewModel(myPaymentRepo, myExpenseRepo, myReceiptRepo, myCustomerRepo, mySupplierRepo);
+            MainContent.Content = new PharmacyMS.Desktop.Views.Approvals.MySubmissionsView(myVm);
+        };
+
         SettingsButton.Click += (_, _) =>
         {
             SetActive(SettingsButton);
             PageTitleText.Text = "Settings";
             OpenSettings();
         };
+
+    }
+
+
+    private void DoLogout()
+    {
+        SessionManager.Logout();
+        if (Avalonia.Application.Current?.ApplicationLifetime
+                is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            var login = new PharmacyMS.Desktop.Views.Auth.LoginView();
+            desktop.MainWindow = login;
+            login.Show();
+        }
+        Close();
     }
 
     private void OpenSettings()
@@ -456,6 +620,30 @@ public partial class MainWindow : Window
             NotifCountText.Text = total.ToString();
             NotifBadge.IsVisible = total > 0;
             NotifHeaderText.Text = $"🔔 Notifications ({total})";
+
+            // Pending receiving badge (Purchase Orders awaiting receipt)
+            var orderRepoForBadge = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseOrderRepository>();
+            var pendingReceivingCount = (await orderRepoForBadge.GetPendingReceivingAsync()).Count();
+            PendingReceivingBadgeText.Text = pendingReceivingCount.ToString();
+            PendingReceivingBadge.IsVisible = pendingReceivingCount > 0;
+
+            // Approvals badge (Admin only)
+            if (SessionManager.IsAdmin)
+            {
+                var purchaseRepo = Program.Services.GetRequiredService<IPurchaseRepository>();
+                var pendingCustomers = (await customerRepo.GetAllAsync()).Count(x => x.ApprovalStatus == PharmacyMS.Domain.Enums.ApprovalStatus.Pending);
+                var pendingSuppliers = (await supplierRepo.GetAllAsync()).Count(x => x.ApprovalStatus == PharmacyMS.Domain.Enums.ApprovalStatus.Pending);
+                var pendingPurchases = (await purchaseRepo.GetAllAsync()).Count(x => x.ApprovalStatus == PharmacyMS.Domain.Enums.ApprovalStatus.Pending);
+                var goodsReceiptRepoForBadge = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IGoodsReceiptRepository>();
+                var pendingReceiptsForBadge = (await goodsReceiptRepoForBadge.GetAllAsync()).Count(x => x.ApprovalStatus == PharmacyMS.Domain.Enums.ApprovalStatus.Pending);
+                var paymentRepoForBadge = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPendingSalePaymentRepository>();
+                var pendingPaymentsForBadge = (await paymentRepoForBadge.GetPendingAsync()).Count;
+                var expenseRepoForBadge = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPendingExpenseRepository>();
+                var pendingExpensesForBadge = (await expenseRepoForBadge.GetPendingAsync()).Count;
+                var pendingTotal = pendingCustomers + pendingSuppliers + pendingPurchases + pendingReceiptsForBadge + pendingPaymentsForBadge + pendingExpensesForBadge;
+                ApprovalsBadgeText.Text = pendingTotal.ToString();
+                ApprovalsBadge.IsVisible = pendingTotal > 0;
+            }
 
             NotifExpiredText.Text = $"⚠ {expiredCount} medicines have expired";
             NotifExpiredButton.IsVisible = expiredCount > 0;

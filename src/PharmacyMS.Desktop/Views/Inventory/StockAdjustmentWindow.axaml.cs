@@ -13,8 +13,10 @@ public partial class StockAdjustmentWindow : Window
     {
         InitializeComponent();
         _viewModel = viewModel;
+        DataContext = _viewModel;
 
         HistoryGrid.ItemsSource = _viewModel.RecentAdjustments;
+        HistoryGrid.LoadingRow += (_, e) => e.Row.Header = (e.Row.GetIndex() + 1).ToString();
 
         Opened += async (_, _) => await _viewModel.LoadAsync();
 

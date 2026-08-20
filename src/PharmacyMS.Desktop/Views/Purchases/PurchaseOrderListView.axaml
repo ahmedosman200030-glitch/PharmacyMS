@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+             xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+             x:Class="PharmacyMS.Desktop.Views.Purchases.PurchaseOrderListView"
+             x:DataType="vm:PurchaseOrderListViewModel">
+  <Border Background="White" CornerRadius="10" Margin="24" Padding="20">
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Top" Text="Purchase Orders" FontSize="18" FontWeight="Bold"
+                 Foreground="#0F172A" Margin="0,0,0,14"/>
+      <DataGrid x:Name="Grid" HeadersVisibility="All" RowHeaderWidth="40"
+                x:DataType="ent:PurchaseOrder"
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+                GridLinesVisibility="Horizontal">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Order #" Binding="{Binding OrderNumber}" Width="160"/>
+          <DataGridTextColumn Header="Date" Binding="{Binding CreatedAt}" Width="150"/>
+          <DataGridTextColumn Header="Supplier" Binding="{Binding SupplierName}" Width="200"/>
+          <DataGridTextColumn Header="Expected" Binding="{Binding ExpectedDate}" Width="130"/>
+          <DataGridTextColumn Header="Total" Binding="{Binding TotalAmount}" Width="100"/>
+          <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
+        </DataGrid.Columns>
+      </DataGrid>
+    </DockPanel>
+  </Border>
+</UserControl>

@@ -34,7 +34,7 @@
       <Setter Property="Fill" Value="#F1F5F9"/>
     </Style>
     <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="#1B9C8533"/>
+      <Setter Property="Fill" Value="#DC262633"/>
     </Style>
     <Style Selector="DataGridCell">
       <Setter Property="Foreground" Value="#0F172A"/>
@@ -68,7 +68,7 @@
           <TextBlock Text="Users" FontSize="24" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
           <TextBlock x:Name="SubtitleText" Text="Manage staff accounts and access" FontSize="13" Foreground="#64748B" VerticalAlignment="Center"/>
           <Panel Width="1" HorizontalAlignment="Stretch"/>
-          <Button x:Name="AddButton" Content="＋ Add User" Background="#1B9C85" Foreground="White" CornerRadius="8" Padding="16,10" FontWeight="SemiBold"/>
+          <Button x:Name="AddButton" Content="＋ Add User" Background="#DC2626" Foreground="White" CornerRadius="8" Padding="16,10" FontWeight="SemiBold"/>
         </StackPanel>
 
         <Grid ColumnDefinitions="*,Auto,Auto,Auto">
@@ -81,7 +81,7 @@
           </Border>
           <Border Grid.Column="2" Background="#FFFFFF" CornerRadius="8" Padding="14,8" Margin="10,0,0,0" BorderBrush="#E2E8F0" BorderThickness="1">
             <StackPanel Orientation="Horizontal" Spacing="6">
-              <Ellipse Width="8" Height="8" Fill="#22C55E" VerticalAlignment="Center"/>
+              <Ellipse Width="8" Height="8" Fill="#DC2626" VerticalAlignment="Center"/>
               <TextBlock x:Name="ActiveCountText" Text="0 Active" Foreground="#0F172A" FontWeight="SemiBold" VerticalAlignment="Center"/>
             </StackPanel>
           </Border>
@@ -100,15 +100,15 @@
       </StackPanel>
 
       <Border Background="#FFFFFF" CornerRadius="14" Padding="2" BorderBrush="#E2E8F0" BorderThickness="1">
-        <DataGrid x:Name="Grid" x:DataType="ent:User" AutoGenerateColumns="False" IsReadOnly="True"
+        <DataGrid x:Name="Grid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="ent:User" AutoGenerateColumns="False" IsReadOnly="True"
                   GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="#E2E8F0">
           <DataGrid.Columns>
             <DataGridTemplateColumn Header="User" Width="220">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate x:DataType="ent:User">
                   <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                    <Border Width="34" Height="34" CornerRadius="17" Background="#1B9C8533">
-                      <TextBlock Text="{Binding FullName, Converter={StaticResource Initials}}" Foreground="#1B9C85" FontWeight="Bold" FontSize="12"
+                    <Border Width="34" Height="34" CornerRadius="17" Background="#DC262633">
+                      <TextBlock Text="{Binding FullName, Converter={StaticResource Initials}}" Foreground="#DC2626" FontWeight="Bold" FontSize="12"
                                  HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <StackPanel VerticalAlignment="Center">
@@ -177,7 +177,7 @@
 
         <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="10" Margin="0,16,0,0">
           <Button x:Name="SaveButton" Content="Save" Height="42" Width="150"
-                  Background="#1B9C85" Foreground="White" CornerRadius="8" FontWeight="SemiBold"
+                  Background="#DC2626" Foreground="White" CornerRadius="8" FontWeight="SemiBold"
                   HorizontalContentAlignment="Center"/>
           <Button x:Name="CancelButton" Content="Cancel" Height="42" Width="120"
                   Background="Transparent" Foreground="#334155" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="8"

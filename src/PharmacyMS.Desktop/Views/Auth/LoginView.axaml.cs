@@ -15,6 +15,17 @@ public partial class LoginView : Window
     public LoginView()
     {
         InitializeComponent();
+        Opened += (_, _) =>
+        {
+            WindowState = WindowState.Normal;
+            var screen = Screens.Primary;
+            if (screen != null)
+            {
+                Width = screen.WorkingArea.Width;
+                Height = screen.WorkingArea.Height;
+                Position = screen.WorkingArea.Position;
+            }
+        };
 
         TogglePasswordButton.Click += (_, _) =>
         {
@@ -66,7 +77,15 @@ public partial class LoginView : Window
 
         SessionManager.Login(user);
         soundService.Play(SoundEvent.AppStart);
-        new MainWindow().Show();
+
+        var mainWindow = new MainWindow();
+
+        if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            desktop.MainWindow = mainWindow;
+        }
+
+        mainWindow.Show();
         Close();
     }
 

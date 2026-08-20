@@ -15,6 +15,7 @@ public class Medicine
     public int ReorderLevel { get; set; } = 10;
     public DateTime? ExpiryDate { get; set; }
     public string? BatchNumber { get; set; }
+    public string Unit { get; set; } = "Box";
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }

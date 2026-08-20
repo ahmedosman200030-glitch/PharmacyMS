@@ -7,12 +7,20 @@ namespace PharmacyMS.Desktop.ViewModels;
 public class SalesHistoryViewModel
 {
     private readonly ISaleRepository _saleRepo;
+    private readonly ICustomerRepository? _customerRepo;
 
     public ObservableCollection<Sale> Sales { get; } = new();
 
-    public SalesHistoryViewModel(ISaleRepository saleRepo)
+    public SalesHistoryViewModel(ISaleRepository saleRepo, ICustomerRepository? customerRepo = null)
     {
         _saleRepo = saleRepo;
+        _customerRepo = customerRepo;
+    }
+
+    public async Task<Customer?> GetCustomerAsync(int customerId)
+    {
+        if (_customerRepo == null) return null;
+        return await _customerRepo.GetByIdAsync(customerId);
     }
 
     public async Task LoadAllAsync()

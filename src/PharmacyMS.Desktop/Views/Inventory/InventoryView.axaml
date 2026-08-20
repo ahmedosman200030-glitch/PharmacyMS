@@ -9,7 +9,7 @@
     <!-- Header -->
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,14">
       <TextBlock Text="Inventory" FontSize="22" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
-      <Button x:Name="AddButton" Content="+ Add Medicine" Margin="20,0,0,0" Background="#22C55E" Foreground="White" CornerRadius="6" Padding="14,6"/>
+      <Button x:Name="AddButton" Content="+ Add Medicine" Margin="20,0,0,0" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="14,6"/>
       <Button x:Name="EditButton" Content="Edit Selected" Background="#3B82F6" Foreground="White" CornerRadius="6" Padding="14,6"/>
       <Button x:Name="DeleteButton" Content="Delete Selected" Background="#EF4444" Foreground="White" CornerRadius="6" Padding="14,6"/>
       <Button x:Name="RestockButton" Content="Restock" Background="#0F2A43" Foreground="White" CornerRadius="6" Padding="14,6"/>
@@ -34,7 +34,7 @@
       </Border>
       <Border Grid.Column="2" Background="White" CornerRadius="10" Padding="12" Margin="6,0,6,0" BoxShadow="0 1 4 0 #22000000">
         <StackPanel>
-          <TextBlock x:Name="RetailValueText" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="#22C55E"/>
+          <TextBlock x:Name="RetailValueText" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="#DC2626"/>
           <TextBlock Text="Retail Value" FontSize="11" Foreground="#64748B"/>
         </StackPanel>
       </Border>
@@ -75,7 +75,7 @@
 
     <!-- Grid -->
     <Border Background="White" CornerRadius="10" Padding="4" BoxShadow="0 1 4 0 #22000000">
-      <DataGrid x:Name="Grid" x:DataType="vm:MedicineRow" AutoGenerateColumns="False" IsReadOnly="True"
+      <DataGrid x:Name="Grid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="vm:MedicineRow" AutoGenerateColumns="False" IsReadOnly="True"
                 GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
                 RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
         <DataGrid.Columns>

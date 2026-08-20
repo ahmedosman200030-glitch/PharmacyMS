@@ -20,6 +20,7 @@ public partial class InventoryView : UserControl
         InitializeComponent();
         _vm = vm;
         Grid.ItemsSource = _vm.Rows;
+        Grid.LoadingRow += (_, e) => e.Row.Header = (e.Row.GetIndex() + 1).ToString();
 
         AttachedToVisualTree += async (_, _) =>
         {
@@ -80,7 +81,7 @@ public partial class InventoryView : UserControl
 
         DeleteButton.Click += async (_, _) =>
         {
-            if (Grid.SelectedItem is MedicineRow row)
+            if (Grid.SelectedItem is MedicineRow row && await ConfirmDeleteAsync(row.Medicine.Name))
             {
                 await _vm.DeleteAsync(row.Medicine);
                 RefreshSummary();
@@ -108,7 +109,52 @@ public partial class InventoryView : UserControl
             win.Show();
         };
 
+        ImportExcelButton.Click += async (_, _) => await ImportExcelAsync();
         ExportButton.Click += async (_, _) => await ExportCsvAsync();
+    }
+
+    private async Task<bool> ConfirmDeleteAsync(string itemName)
+    {
+        var tcs = new TaskCompletionSource<bool>();
+        var dialog = new Window
+        {
+            Title = "Confirm Delete",
+            Width = 380,
+            Height = 160,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Content = new StackPanel
+            {
+                Margin = new Avalonia.Thickness(20),
+                Spacing = 16,
+                Children =
+                {
+                    new TextBlock { Text = $"Delete \"{itemName}\"? This cannot be undone.", TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                    new StackPanel
+                    {
+                        Orientation = Avalonia.Layout.Orientation.Horizontal,
+                        Spacing = 10,
+                        HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+                        Children =
+                        {
+                            new Button { Content = "Cancel", Padding = new Avalonia.Thickness(14,6) },
+                            new Button { Content = "Delete", Padding = new Avalonia.Thickness(14,6), Background = Avalonia.Media.Brushes.Crimson, Foreground = Avalonia.Media.Brushes.White }
+                        }
+                    }
+                }
+            }
+        };
+
+        var panel = (StackPanel)dialog.Content!;
+        var buttonRow = (StackPanel)panel.Children[1];
+        var cancelBtn = (Button)buttonRow.Children[0];
+        var deleteBtn = (Button)buttonRow.Children[1];
+
+        cancelBtn.Click += (_, _) => { tcs.TrySetResult(false); dialog.Close(); };
+        deleteBtn.Click += (_, _) => { tcs.TrySetResult(true); dialog.Close(); };
+        dialog.Closed += (_, _) => tcs.TrySetResult(false);
+
+        await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+        return await tcs.Task;
     }
 
     private async Task EditSelectedAsync()
@@ -174,6 +220,49 @@ public partial class InventoryView : UserControl
         LowStockCountText.Text = _vm.LowStockCount.ToString();
         OutOfStockCountText.Text = _vm.OutOfStockCount.ToString();
         ExpiringCountText.Text = _vm.ExpiringCount.ToString();
+    }
+
+    private async Task ImportExcelAsync()
+    {
+        var topLevel = TopLevel.GetTopLevel(this);
+        if (topLevel == null) return;
+
+        var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            Title = "Import Medicines from Excel",
+            AllowMultiple = false,
+            FileTypeFilter = new[]
+            {
+                new FilePickerFileType("Excel Files") { Patterns = new[] { "*.xlsx", "*.xls" } }
+            }
+        });
+
+        if (files == null || files.Count == 0) return;
+
+        await using var stream = await files[0].OpenReadAsync();
+        var result = await _vm.ImportFromExcelAsync(stream);
+
+        var message = $"Import complete!\nAdded: {result.Added}\nSkipped: {result.Skipped}";
+        if (result.Errors.Count > 0)
+            message += $"\nErrors:\n{string.Join("\n", result.Errors.Take(5))}";
+
+        var dialog = new Avalonia.Controls.Window
+        {
+            Title = "Import Result",
+            Width = 400,
+            Height = 250,
+            WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterOwner,
+            Content = new Avalonia.Controls.TextBlock
+            {
+                Text = message,
+                Margin = new Avalonia.Thickness(20),
+                TextWrapping = Avalonia.Media.TextWrapping.Wrap
+            }
+        };
+        await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Avalonia.Controls.Window);
+
+        RefreshFilterCombos();
+        RefreshSummary();
     }
 
     private async Task ExportCsvAsync()

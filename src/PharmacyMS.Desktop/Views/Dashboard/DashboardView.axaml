@@ -101,7 +101,7 @@
                 </Border>
                 <Border Grid.Column="1" Classes="card" Margin="0,0,10,0">
                     <StackPanel Orientation="Horizontal" Spacing="14">
-                        <Border Classes="stat-icon" Background="#22C55E">
+                        <Border Classes="stat-icon" Background="#DC2626">
                             <Viewbox Width="26" Height="26">
                               <Canvas Width="24" Height="24">
                                 <Path Stroke="White" StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
@@ -305,7 +305,7 @@
                                     <Grid ColumnDefinitions="Auto,*,Auto">
                                         <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8"
                                                 Background="#DCFCE7" Margin="0,0,10,0">
-                                            <TextBlock Text="&#128196;" FontSize="14" Foreground="#16A34A"
+                                            <TextBlock Text="&#128196;" FontSize="14" Foreground="#B91C1C"
                                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Border>
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -314,7 +314,7 @@
                                         </StackPanel>
                                         <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding AmountText}" FontSize="13" FontWeight="Bold" Foreground="#111827" HorizontalAlignment="Right"/>
-                                            <TextBlock Text="{Binding TimeText}" FontSize="11" FontWeight="SemiBold" Foreground="#16A34A" HorizontalAlignment="Right"/>
+                                            <TextBlock Text="{Binding TimeText}" FontSize="11" FontWeight="SemiBold" Foreground="#B91C1C" HorizontalAlignment="Right"/>
                                         </StackPanel>
                                     </Grid>
                                 </DataTemplate>

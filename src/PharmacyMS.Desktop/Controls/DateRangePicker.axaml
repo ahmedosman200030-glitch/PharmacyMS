@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="PharmacyMS.Desktop.Controls.DateRangePicker">
+  <Button x:Name="ToggleButton"
+          Background="White"
+          BorderBrush="#CBD5E1"
+          BorderThickness="1"
+          CornerRadius="8"
+          Padding="12,8"
+          HorizontalContentAlignment="Left"
+          VerticalAlignment="Center">
+    <Button.Flyout>
+      <Flyout Placement="BottomEdgeAlignedRight">
+        <StackPanel Margin="14" Spacing="12">
+          <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="16">
+            <StackPanel Grid.Column="0" Spacing="6">
+              <TextBlock Text="From" FontSize="12" FontWeight="SemiBold" Foreground="#64748B"/>
+              <Calendar x:Name="FromCalendar" SelectionMode="SingleDate"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="6">
+              <TextBlock Text="To" FontSize="12" FontWeight="SemiBold" Foreground="#64748B"/>
+              <Calendar x:Name="ToCalendar" SelectionMode="SingleDate"/>
+            </StackPanel>
+          </Grid>
+          <Button x:Name="ApplyButton"
+                  Content="Apply"
+                  HorizontalAlignment="Right"
+                  Background="#2563EB"
+                  Foreground="White"
+                  CornerRadius="8"
+                  Padding="16,7"
+                  FontSize="13"/>
+        </StackPanel>
+      </Flyout>
+    </Button.Flyout>
+    <StackPanel Orientation="Horizontal" Spacing="8">
+      <TextBlock Text="📅" FontSize="13" VerticalAlignment="Center"/>
+      <TextBlock x:Name="RangeLabel" Text="Select date range" FontSize="13" Foreground="#0F172A" VerticalAlignment="Center"/>
+      <TextBlock Text="▾" FontSize="11" Foreground="#94A3B8" VerticalAlignment="Center"/>
+    </StackPanel>
+  </Button>
+</UserControl>

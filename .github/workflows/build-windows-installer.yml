@@ -1,0 +1,51 @@
+name: Build Windows Installer
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install Velopack CLI (Windows build)
+        run: dotnet tool install -g vpk
+
+      - name: Publish self-contained win-x64 build
+        run: |
+          dotnet publish src/PharmacyMS.Desktop/PharmacyMS.Desktop.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -o ./publish/win-x64
+
+      - name: Pack into Setup.exe with Velopack
+        run: |
+          vpk pack `
+            --packId PharmacyMS `
+            --packVersion 1.0.0 `
+            --packDir ./publish/win-x64 `
+            --mainExe PharmacyMS.Desktop.exe `
+            --icon ./src/PharmacyMS.Desktop/Assets/pharmacy-logo.ico `
+            --packTitle "PharmacyMS" `
+            --packAuthors "AL-HIJRA PHARMACY" `
+            --outputDir ./release
+
+      - name: Upload installer as build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: PharmacyMS-Windows-Installer
+          path: ./release/*

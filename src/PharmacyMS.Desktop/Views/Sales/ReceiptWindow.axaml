@@ -35,11 +35,21 @@
           <TextBlock x:Name="PharmacyNameText" FontSize="20" FontWeight="Bold"
                      Foreground="#0F172A" HorizontalAlignment="Center" TextAlignment="Center"/>
 
-          <!-- Address / Phone -->
+          <!-- Tagline -->
+          <TextBlock x:Name="TaglineText" FontSize="12" FontStyle="Italic" Foreground="#94A3B8"
+                     HorizontalAlignment="Center" TextAlignment="Center" Margin="0,1,0,0" IsVisible="False"/>
+
+          <!-- Address / Phones / Email -->
           <TextBlock x:Name="AddressText" FontSize="12" Foreground="#64748B"
-                     HorizontalAlignment="Center" TextAlignment="Center" Margin="0,2,0,0"/>
-          <TextBlock x:Name="PhoneText" FontSize="12" Foreground="#64748B"
-                     HorizontalAlignment="Center" TextAlignment="Center"/>
+                     HorizontalAlignment="Center" TextAlignment="Center" Margin="0,4,0,0"/>
+          <TextBlock x:Name="PhoneText" FontSize="12" FontWeight="SemiBold" Foreground="#334155"
+                     HorizontalAlignment="Center" TextAlignment="Center" IsVisible="False"/>
+          <TextBlock x:Name="Phone2Text" FontSize="12" FontWeight="SemiBold" Foreground="#334155"
+                     HorizontalAlignment="Center" TextAlignment="Center" IsVisible="False"/>
+          <TextBlock x:Name="EmailText" FontSize="12" Foreground="#64748B"
+                     HorizontalAlignment="Center" TextAlignment="Center" IsVisible="False"/>
+          <TextBlock x:Name="ContactNumberText" FontSize="12" FontWeight="SemiBold" Foreground="#334155"
+                     HorizontalAlignment="Center" TextAlignment="Center" IsVisible="False"/>
 
           <!-- Divider -->
           <Border Height="1" Background="#E2E8F0" Margin="0,12"/>
@@ -59,11 +69,12 @@
           <Border Height="1" Background="#E2E8F0" Margin="0,10"/>
 
           <!-- Column headers -->
-          <Grid ColumnDefinitions="*,40,70,80">
+          <Grid ColumnDefinitions="*,40,55,70,80">
             <TextBlock Grid.Column="0" Text="Item" FontSize="11" FontWeight="Bold" Foreground="#64748B"/>
             <TextBlock Grid.Column="1" Text="Qty" FontSize="11" FontWeight="Bold" Foreground="#64748B" TextAlignment="Center"/>
-            <TextBlock Grid.Column="2" Text="Price" FontSize="11" FontWeight="Bold" Foreground="#64748B" TextAlignment="Right"/>
-            <TextBlock Grid.Column="3" Text="Total" FontSize="11" FontWeight="Bold" Foreground="#64748B" TextAlignment="Right"/>
+            <TextBlock Grid.Column="2" Text="Unit" FontSize="11" FontWeight="Bold" Foreground="#64748B" TextAlignment="Center"/>
+            <TextBlock Grid.Column="3" Text="Price" FontSize="11" FontWeight="Bold" Foreground="#64748B" TextAlignment="Right"/>
+            <TextBlock Grid.Column="4" Text="Total" FontSize="11" FontWeight="Bold" Foreground="#64748B" TextAlignment="Right"/>
           </Grid>
           <Border Height="1" Background="#E2E8F0" Margin="0,4"/>
 
@@ -71,11 +82,12 @@
           <ItemsControl x:Name="ItemsList">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="svc:ReceiptLine">
-                <Grid ColumnDefinitions="*,40,70,80" Margin="0,3">
+                <Grid ColumnDefinitions="*,40,55,70,80" Margin="0,3">
                   <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="12" Foreground="#334155" TextWrapping="Wrap"/>
                   <TextBlock Grid.Column="1" Text="{Binding Quantity}" FontSize="12" Foreground="#334155" TextAlignment="Center"/>
-                  <TextBlock Grid.Column="2" Text="{Binding UnitPrice, StringFormat={}{0:F2}}" FontSize="12" Foreground="#334155" TextAlignment="Right"/>
-                  <TextBlock Grid.Column="3" Text="{Binding LineTotal, StringFormat={}{0:F2}}" FontSize="12" Foreground="#334155" TextAlignment="Right"/>
+                  <TextBlock Grid.Column="2" Text="{Binding Unit}" FontSize="12" Foreground="#334155" TextAlignment="Center"/>
+                  <TextBlock Grid.Column="3" Text="{Binding UnitPrice, StringFormat={}{0:F2}}" FontSize="12" Foreground="#334155" TextAlignment="Right"/>
+                  <TextBlock Grid.Column="4" Text="{Binding LineTotal, StringFormat={}{0:F2}}" FontSize="12" Foreground="#334155" TextAlignment="Right"/>
                 </Grid>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
@@ -101,13 +113,15 @@
             <TextBlock Text="TOTAL" FontSize="14" FontWeight="Bold" Foreground="#0F172A"/>
             <TextBlock Grid.Column="1" x:Name="TotalText" FontSize="14" FontWeight="Bold" Foreground="#0F172A"/>
           </Grid>
+          <TextBlock x:Name="SlshText" FontSize="12" FontWeight="SemiBold" Foreground="#475467"
+                     HorizontalAlignment="Right" Margin="0,0,0,2" IsVisible="False"/>
           <Grid ColumnDefinitions="*,Auto" Margin="0,2">
             <TextBlock x:Name="PaymentLabel" Text="Payment" FontSize="12" Foreground="#64748B"/>
             <TextBlock Grid.Column="1" x:Name="PaidText" FontSize="12" Foreground="#334155"/>
           </Grid>
           <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-            <TextBlock Text="Change" FontSize="12" Foreground="#22C55E" FontWeight="Bold"/>
-            <TextBlock Grid.Column="1" x:Name="ChangeText" FontSize="12" Foreground="#22C55E" FontWeight="Bold"/>
+            <TextBlock Text="Change" FontSize="12" Foreground="#DC2626" FontWeight="Bold"/>
+            <TextBlock Grid.Column="1" x:Name="ChangeText" FontSize="12" Foreground="#DC2626" FontWeight="Bold"/>
           </Grid>
 
           <Border Height="1" Background="#E2E8F0" Margin="0,12"/>

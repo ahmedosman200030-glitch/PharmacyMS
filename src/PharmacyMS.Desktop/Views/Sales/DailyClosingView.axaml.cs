@@ -14,6 +14,7 @@ public partial class DailyClosingView : UserControl
         _vm = vm;
 
         HistoryGrid.ItemsSource = _vm.History;
+        HistoryGrid.LoadingRow += (_, e) => e.Row.Header = (e.Row.GetIndex() + 1).ToString();
 
         AttachedToVisualTree += async (_, _) => await RefreshAsync();
 

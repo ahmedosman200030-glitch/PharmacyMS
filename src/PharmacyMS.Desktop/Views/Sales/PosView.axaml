@@ -16,7 +16,9 @@
 
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
       <CheckBox x:Name="CreditSaleCheck" Content="Partial / Credit Sale" VerticalAlignment="Center"/>
-      <TextBox x:Name="CreditCustomerNameBox" Width="260" Height="34" PlaceholderText="Customer name (required for credit)" IsVisible="False"/>
+      <ComboBox x:Name="CreditCustomerCombo" Width="280" Height="34" IsVisible="False"
+                Background="White" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="6"
+                PlaceholderText="Select customer for credit..."/>
     </StackPanel>
 
     <!-- Bottom: quick actions -->
@@ -30,7 +32,7 @@
           <Button x:Name="ClearCartButton" Content="✖ Clear" Height="36" Padding="12,0" Background="#EF4444" Foreground="White" CornerRadius="6"/>
           <Button x:Name="CalculatorButton" Content="🧮 Calculator" Height="36" Padding="12,0" Background="#E2E8F0" Foreground="#334155" CornerRadius="6"/>
           <Button x:Name="PrintReceiptButton" Content="🖨 Print Receipt" Height="36" Padding="12,0" Background="#0F2A43" Foreground="White" CornerRadius="6"/>
-          <Button x:Name="CompleteSaleButton" Content="✅ Complete Sale" Height="36" Padding="14,0" Background="#22C55E" Foreground="White" CornerRadius="6" FontWeight="Bold"/>
+          <Button x:Name="CompleteSaleButton" Content="✅ Complete Sale" Height="36" Padding="14,0" Background="#DC2626" Foreground="White" CornerRadius="6" FontWeight="Bold"/>
         </StackPanel>
         <TextBox x:Name="NotesBox" Height="34" PlaceholderText="Add a note for this sale..." IsVisible="False"/>
         <TextBlock x:Name="StatusText" FontSize="12" Foreground="#EF4444"/>
@@ -50,13 +52,13 @@
         <DockPanel>
           <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" Margin="4,10,0,0">
             <TextBox x:Name="QtyBox" Width="60" Text="1" Height="34" PlaceholderText="Qty"/>
-            <Button x:Name="AddToCartButton" Content="Add Selected to Cart" Height="34" Background="#22C55E" Foreground="White" CornerRadius="6" Padding="12,0"/>
+            <Button x:Name="AddToCartButton" Content="Add Selected to Cart" Height="34" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="12,0"/>
           </StackPanel>
 
           <Grid RowDefinitions="*,*">
             <DockPanel Grid.Row="0" Margin="0,0,0,8">
               <TextBlock DockPanel.Dock="Top" Text="Available Medicines" FontSize="13" FontWeight="Bold" Foreground="#0F172A" Margin="4,0,0,6"/>
-              <DataGrid x:Name="MedicineGrid" x:DataType="ent:Medicine" AutoGenerateColumns="False" IsReadOnly="True"
+              <DataGrid x:Name="MedicineGrid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="ent:Medicine" AutoGenerateColumns="False" IsReadOnly="True"
                         GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
                         RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
                 <DataGrid.Columns>
@@ -70,11 +72,19 @@
 
             <DockPanel Grid.Row="1">
               <TextBlock DockPanel.Dock="Top" Text="Shopping Cart" FontSize="13" FontWeight="Bold" Foreground="#0F172A" Margin="4,0,0,6"/>
-              <DataGrid x:Name="CartGrid" x:DataType="vm:CartLine" AutoGenerateColumns="False" IsReadOnly="True"
+              <DataGrid x:Name="CartGrid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="vm:CartLine" AutoGenerateColumns="False" IsReadOnly="True"
                         GridLinesVisibility="Horizontal" Background="#F8FAFC" Foreground="#334155"
                         RowBackground="#F8FAFC" HorizontalGridLinesBrush="#E2E8F0">
                 <DataGrid.Columns>
                   <DataGridTextColumn Header="Medicine" Binding="{Binding Name}" Width="120"/>
+                  <DataGridTemplateColumn Header="Unit" Width="90">
+                    <DataGridTemplateColumn.CellTemplate>
+                      <DataTemplate x:DataType="vm:CartLine">
+                        <ComboBox x:Name="UnitCombo" SelectedItem="{Binding Unit, Mode=OneWay}"
+                                  HorizontalAlignment="Stretch" Height="26" FontSize="11"/>
+                      </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                  </DataGridTemplateColumn>
                   <DataGridTextColumn Header="Batch" Binding="{Binding Batch}" Width="75"/>
                   <DataGridTemplateColumn Header="Qty" Width="80">
                     <DataGridTemplateColumn.CellTemplate>
@@ -142,7 +152,7 @@
             <TextBlock Text="Amount Paid" Foreground="#64748B" FontSize="13" VerticalAlignment="Center"/>
             <TextBox Grid.Column="1" x:Name="AmountReceivedBox" Width="110" Height="30" Text="0" HorizontalContentAlignment="Right"/>
           </Grid>
-          <Grid ColumnDefinitions="*,Auto"><TextBlock Text="Change" FontWeight="Bold" Foreground="#22C55E" FontSize="14"/><TextBlock Grid.Column="1" x:Name="ChangeText" Text="$0.00" FontWeight="Bold" FontSize="14" Foreground="#22C55E"/></Grid>
+          <Grid ColumnDefinitions="*,Auto"><TextBlock Text="Change" FontWeight="Bold" Foreground="#DC2626" FontSize="14"/><TextBlock Grid.Column="1" x:Name="ChangeText" Text="$0.00" FontWeight="Bold" FontSize="14" Foreground="#DC2626"/></Grid>
         </StackPanel>
       </Border>
 

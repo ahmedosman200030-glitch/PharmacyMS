@@ -68,6 +68,9 @@ public class PurchaseViewModel
             SupplierName = supplier.Name,
             InvoiceNumber = invoiceNumber,
             TotalAmount = Total,
+            ApprovalStatus = PharmacyMS.Application.Services.SessionManager.IsAdmin
+                ? PharmacyMS.Domain.Enums.ApprovalStatus.Approved
+                : PharmacyMS.Domain.Enums.ApprovalStatus.Pending,
             Items = Lines.Select(l => new PurchaseItem
             {
                 MedicineId = l.MedicineId,

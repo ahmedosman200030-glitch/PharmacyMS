@@ -53,4 +53,18 @@ public class PurchaseInvoiceViewModel
         await _purchaseRepo.RecordPaymentAsync(purchaseId, amount);
         await LoadAsync();
     }
+
+    public async Task ApproveAsync(Purchase purchase)
+    {
+        purchase.ApprovalStatus = PharmacyMS.Domain.Enums.ApprovalStatus.Approved;
+        await _purchaseRepo.UpdateApprovalStatusAsync(purchase.Id, purchase.ApprovalStatus);
+        await LoadAsync();
+    }
+
+    public async Task RejectAsync(Purchase purchase)
+    {
+        purchase.ApprovalStatus = PharmacyMS.Domain.Enums.ApprovalStatus.Rejected;
+        await _purchaseRepo.UpdateApprovalStatusAsync(purchase.Id, purchase.ApprovalStatus);
+        await LoadAsync();
+    }
 }

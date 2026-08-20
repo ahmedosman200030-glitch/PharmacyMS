@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+             xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+             x:Class="PharmacyMS.Desktop.Views.Purchases.ReceiveGoodsView"
+             x:DataType="vm:ReceiveGoodsViewModel">
+
+  <Grid ColumnDefinitions="360,*" Margin="24">
+
+    <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="20" Margin="0,0,10,0">
+      <DockPanel>
+        <TextBlock DockPanel.Dock="Top" Text="Pending Orders" FontSize="18" FontWeight="Bold"
+                   Foreground="#0F172A" Margin="0,0,0,14"/>
+        <DataGrid x:Name="OrdersGrid" HeadersVisibility="All" RowHeaderWidth="40"
+                  x:DataType="ent:PurchaseOrder"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  GridLinesVisibility="Horizontal"
+                  Background="White"
+                  Foreground="#0F172A"
+                  RowBackground="White"
+                  SelectionMode="Single">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Order #" Binding="{Binding OrderNumber}" Width="130"/>
+            <DataGridTextColumn Header="Supplier" Binding="{Binding SupplierName}" Width="*"/>
+            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+          </DataGrid.Columns>
+        </DataGrid>
+      </DockPanel>
+    </Border>
+
+    <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="20" Margin="10,0,0,0">
+      <DockPanel>
+
+        <TextBlock DockPanel.Dock="Top" Text="Verify &amp; Receive" FontSize="18" FontWeight="Bold"
+                   Foreground="#0F172A" Margin="0,0,0,14"/>
+
+        <StackPanel DockPanel.Dock="Bottom" Margin="0,14,0,0" Spacing="10">
+          <TextBlock x:Name="StatusText" IsVisible="False" FontSize="13" Foreground="#1D9E75"/>
+          <TextBox x:Name="NotesBox" PlaceholderText="Receiving notes (optional)" Height="34"/>
+          <Button x:Name="ConfirmButton" Content="Confirm Receipt" Height="44"
+                  Background="#1D9E75" Foreground="White" CornerRadius="8"
+                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+        </StackPanel>
+
+        <DataGrid x:Name="LinesGrid" HeadersVisibility="All" RowHeaderWidth="40"
+                  x:DataType="vm:ReceiveLine"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="False"
+                  GridLinesVisibility="Horizontal"
+                  Background="White"
+                  Foreground="#0F172A"
+                  RowBackground="White">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Medicine" Binding="{Binding Name}" Width="*" IsReadOnly="True"/>
+            <DataGridTextColumn Header="Ordered" Binding="{Binding RemainingQuantity}" Width="80" IsReadOnly="True"/>
+            <DataGridTextColumn Header="Received" Binding="{Binding ReceivedQuantity}" Width="80"/>
+            <DataGridTextColumn Header="Batch #" Binding="{Binding BatchNumber}" Width="120"/>
+            <DataGridTextColumn Header="Expiry" Binding="{Binding ExpiryDate}" Width="130"/>
+          </DataGrid.Columns>
+        </DataGrid>
+
+      </DockPanel>
+    </Border>
+
+  </Grid>
+</UserControl>

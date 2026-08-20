@@ -17,9 +17,12 @@ public class DatabaseInitializer
         using var conn = _context.CreateConnection();
         await conn.OpenAsync();
 
-        await conn.ExecuteAsync(@"
+        var pk = _context.AutoIncrementPk();
+        var now = _context.NowExpr();
+
+        await conn.ExecuteAsync($@"
             CREATE TABLE IF NOT EXISTS Users (
-                Id SERIAL PRIMARY KEY,
+                Id {pk},
                 Username TEXT NOT NULL UNIQUE,
                 PasswordHash TEXT NOT NULL,
                 FullName TEXT NOT NULL,
@@ -31,17 +34,17 @@ public class DatabaseInitializer
                 SecurityQuestion TEXT,
                 SecurityAnswerHash TEXT,
                 AvatarPath TEXT,
-                Permissions BIGINT NOT NULL DEFAULT 0
+                Permissions INTEGER NOT NULL DEFAULT 0
             );");
 
-        await conn.ExecuteAsync(@"
+        await conn.ExecuteAsync($@"
             CREATE TABLE IF NOT EXISTS Medicines (
-                Id SERIAL PRIMARY KEY,
+                Id {pk},
                 Name TEXT NOT NULL,
                 GenericName TEXT,
                 Category TEXT,
                 Manufacturer TEXT,
-                UnitPrice DOUBLE PRECISION NOT NULL DEFAULT 0,
+                UnitPrice REAL NOT NULL DEFAULT 0,
                 QuantityInStock INTEGER NOT NULL DEFAULT 0,
                 ReorderLevel INTEGER NOT NULL DEFAULT 10,
                 ExpiryDate TEXT,
@@ -51,75 +54,133 @@ public class DatabaseInitializer
                 UpdatedAt TEXT,
                 Barcode TEXT,
                 Supplier TEXT,
-                CostPrice DOUBLE PRECISION NOT NULL DEFAULT 0
+                CostPrice REAL NOT NULL DEFAULT 0,
+                Unit TEXT NOT NULL DEFAULT 'Box'
             );");
 
-        await conn.ExecuteAsync(@"
+        
+        // Migration: add Unit column to Medicines if missing
+        try
+        {
+            await conn.ExecuteAsync("ALTER TABLE Medicines ADD COLUMN Unit TEXT NOT NULL DEFAULT 'Box'");
+        }
+        catch { /* column already exists */ }
+
+        await conn.ExecuteAsync($@"
             CREATE TABLE IF NOT EXISTS Sales (
-                Id SERIAL PRIMARY KEY,
+                Id {pk},
                 InvoiceNumber TEXT NOT NULL,
                 CashierId INTEGER NOT NULL,
-                TotalAmount DOUBLE PRECISION NOT NULL,
+                TotalAmount REAL NOT NULL,
                 CreatedAt TEXT NOT NULL,
-                Subtotal DOUBLE PRECISION NOT NULL DEFAULT 0,
-                TaxRate DOUBLE PRECISION NOT NULL DEFAULT 0,
-                TaxAmount DOUBLE PRECISION NOT NULL DEFAULT 0,
+                Subtotal REAL NOT NULL DEFAULT 0,
+                TaxRate REAL NOT NULL DEFAULT 0,
+                TaxAmount REAL NOT NULL DEFAULT 0,
                 CustomerId INTEGER,
-                AmountPaid DOUBLE PRECISION NOT NULL DEFAULT 0,
+                AmountPaid REAL NOT NULL DEFAULT 0,
                 CustomerName TEXT NOT NULL DEFAULT 'Walk-in Customer',
                 PaymentMethod TEXT NOT NULL DEFAULT 'Cash',
-                TotalDiscount DOUBLE PRECISION NOT NULL DEFAULT 0,
-                ChangeDue DOUBLE PRECISION NOT NULL DEFAULT 0
+                TotalDiscount REAL NOT NULL DEFAULT 0,
+                ChangeDue REAL NOT NULL DEFAULT 0
             );");
 
-        await conn.ExecuteAsync(@"
-            CREATE TABLE IF NOT EXISTS DailyClosings (
-                Id SERIAL PRIMARY KEY,
-                ClosingDate TEXT NOT NULL,
-                CashSales DOUBLE PRECISION NOT NULL DEFAULT 0,
-                CardSales DOUBLE PRECISION NOT NULL DEFAULT 0,
-                MobileSales DOUBLE PRECISION NOT NULL DEFAULT 0,
-                InsuranceSales DOUBLE PRECISION NOT NULL DEFAULT 0,
-                ExpectedCash DOUBLE PRECISION NOT NULL DEFAULT 0,
-                ActualCash DOUBLE PRECISION NOT NULL DEFAULT 0,
-                Difference DOUBLE PRECISION NOT NULL DEFAULT 0,
-                Notes TEXT,
-                ClosedByUserId INTEGER NOT NULL,
-                ClosedByUserName TEXT NOT NULL,
-                CreatedAt TEXT NOT NULL
-            );");
-
-        await conn.ExecuteAsync(@"
+        await conn.ExecuteAsync($@"
             CREATE TABLE IF NOT EXISTS SaleItems (
-                Id SERIAL PRIMARY KEY,
+                Id {pk},
                 SaleId INTEGER NOT NULL,
                 MedicineId INTEGER NOT NULL,
                 MedicineName TEXT NOT NULL,
-                UnitPrice DOUBLE PRECISION NOT NULL,
+                Unit TEXT NOT NULL DEFAULT 'Box',
+                UnitPrice REAL NOT NULL,
                 Quantity INTEGER NOT NULL
             );");
 
-        await conn.ExecuteAsync(@"
+        // Migration: add Unit column to SaleItems if missing
+        try
+        {
+            await conn.ExecuteAsync("ALTER TABLE SaleItems ADD COLUMN Unit TEXT NOT NULL DEFAULT 'Box'");
+        }
+        catch { /* column already exists */ }
+
+        await conn.ExecuteAsync($@"
             CREATE TABLE IF NOT EXISTS Purchases (
-                Id SERIAL PRIMARY KEY,
+                Id {pk},
                 SupplierName TEXT NOT NULL,
                 InvoiceNumber TEXT,
-                TotalAmount DOUBLE PRECISION NOT NULL,
+                TotalAmount REAL NOT NULL,
                 CreatedAt TEXT NOT NULL,
                 SupplierId INTEGER,
-                AmountPaid DOUBLE PRECISION NOT NULL DEFAULT 0
+                AmountPaid REAL NOT NULL DEFAULT 0,
+                ApprovalStatus INTEGER NOT NULL DEFAULT 0,
+                PurchaseOrderId INTEGER,
+                GoodsReceiptId INTEGER
             );");
 
-        await conn.ExecuteAsync(@"
+        await conn.ExecuteAsync($@"
             CREATE TABLE IF NOT EXISTS PurchaseItems (
-                Id SERIAL PRIMARY KEY,
+                Id {pk},
                 PurchaseId INTEGER NOT NULL,
                 MedicineId INTEGER NOT NULL,
                 MedicineName TEXT NOT NULL,
-                UnitCost DOUBLE PRECISION NOT NULL,
+                UnitCost REAL NOT NULL,
                 Quantity INTEGER NOT NULL,
                 BatchNumber TEXT,
                 ExpiryDate TEXT
+            );");
+
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS PurchaseOrders (
+                Id {pk},
+                SupplierId INTEGER,
+                SupplierName TEXT NOT NULL,
+                OrderNumber TEXT NOT NULL,
+                Status INTEGER NOT NULL DEFAULT 0,
+                ExpectedDate TEXT,
+                Notes TEXT,
+                CreatedAt TEXT NOT NULL,
+                CreatedByUserId INTEGER NOT NULL
+            );");
+
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS PurchaseOrderItems (
+                Id {pk},
+                PurchaseOrderId INTEGER NOT NULL,
+                MedicineId INTEGER NOT NULL,
+                MedicineName TEXT NOT NULL,
+                Quantity INTEGER NOT NULL,
+                Unit TEXT NOT NULL DEFAULT 'Box',
+                UnitCost REAL NOT NULL,
+                ReceivedQuantity INTEGER NOT NULL DEFAULT 0
+            );");
+
+        // Migration: add Unit column to PurchaseOrderItems if missing
+        try
+        {
+            await conn.ExecuteAsync("ALTER TABLE PurchaseOrderItems ADD COLUMN Unit TEXT NOT NULL DEFAULT 'Box'");
+        }
+        catch { /* column already exists */ }
+
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS GoodsReceipts (
+                Id {pk},
+                PurchaseOrderId INTEGER NOT NULL,
+                ReceivedAt TEXT NOT NULL,
+                ReceivedByUserId INTEGER NOT NULL,
+                Notes TEXT
+            );");
+
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS GoodsReceiptItems (
+                Id {pk},
+                GoodsReceiptId INTEGER NOT NULL,
+                PurchaseOrderItemId INTEGER NOT NULL,
+                MedicineId INTEGER NOT NULL,
+                MedicineName TEXT NOT NULL,
+                OrderedQuantity INTEGER NOT NULL,
+                ReceivedQuantity INTEGER NOT NULL,
+                BatchNumber TEXT,
+                ExpiryDate TEXT,
+                UnitCost REAL NOT NULL
             );");
 
         await conn.ExecuteAsync(@"
@@ -128,45 +189,48 @@ public class DatabaseInitializer
                 Value TEXT NOT NULL
             );");
 
-        await conn.ExecuteAsync(@"
+        await conn.ExecuteAsync($@"
             CREATE TABLE IF NOT EXISTS Categories (
-                Id SERIAL PRIMARY KEY,
+                Id {pk},
                 Name TEXT NOT NULL,
-                ContactPerson TEXT,
-                Phone TEXT,
-                Email TEXT,
-                Address TEXT,
+                Description TEXT,
                 IsActive INTEGER NOT NULL DEFAULT 1,
                 CreatedAt TEXT NOT NULL
             );");
 
-        await conn.ExecuteAsync(@"
+        await conn.ExecuteAsync($@"
             CREATE TABLE IF NOT EXISTS Customers (
-                Id SERIAL PRIMARY KEY,
+                Id {pk},
                 Name TEXT NOT NULL,
                 Phone TEXT,
                 Email TEXT,
                 Address TEXT,
                 IsActive INTEGER NOT NULL DEFAULT 1,
                 CreatedAt TEXT NOT NULL,
-                UpdatedAt TEXT
+                UpdatedAt TEXT,
+                ApprovalStatus INTEGER NOT NULL DEFAULT 0,
+                SubmittedByUserId INTEGER NOT NULL DEFAULT 0,
+                SubmittedByName TEXT NOT NULL DEFAULT ''
             );");
 
-        await conn.ExecuteAsync(@"
+        await conn.ExecuteAsync($@"
             CREATE TABLE IF NOT EXISTS Suppliers (
-                Id SERIAL PRIMARY KEY,
+                Id {pk},
                 Name TEXT NOT NULL,
                 ContactPerson TEXT,
                 Phone TEXT,
                 Email TEXT,
                 Address TEXT,
                 IsActive INTEGER NOT NULL DEFAULT 1,
-                CreatedAt TEXT NOT NULL
+                CreatedAt TEXT NOT NULL,
+                ApprovalStatus INTEGER NOT NULL DEFAULT 0,
+                SubmittedByUserId INTEGER NOT NULL DEFAULT 0,
+                SubmittedByName TEXT NOT NULL DEFAULT ''
             );");
 
-        await conn.ExecuteAsync(@"
+        await conn.ExecuteAsync($@"
             CREATE TABLE IF NOT EXISTS StockAdjustments (
-                Id SERIAL PRIMARY KEY,
+                Id {pk},
                 MedicineId INTEGER NOT NULL,
                 MedicineName TEXT NOT NULL,
                 QuantityChange INTEGER NOT NULL,
@@ -176,16 +240,178 @@ public class DatabaseInitializer
                 CreatedAt TEXT NOT NULL
             );");
 
-        // Seed admin user if not exists
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS SalePayments (
+                Id {pk},
+                SaleId INTEGER NOT NULL,
+                Amount REAL NOT NULL,
+                PaidAt TEXT NOT NULL DEFAULT ({now}),
+                Note TEXT NOT NULL DEFAULT ''
+            );");
+
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS PurchasePayments (
+                Id {pk},
+                PurchaseId INTEGER NOT NULL,
+                Amount REAL NOT NULL,
+                PaidAt TEXT NOT NULL DEFAULT ({now}),
+                Note TEXT NOT NULL DEFAULT ''
+            );");
+
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS DailyClosings (
+                Id {pk},
+                ClosingDate TEXT NOT NULL,
+                CashSales REAL NOT NULL DEFAULT 0,
+                CardSales REAL NOT NULL DEFAULT 0,
+                MobileSales REAL NOT NULL DEFAULT 0,
+                InsuranceSales REAL NOT NULL DEFAULT 0,
+                ExpectedCash REAL NOT NULL DEFAULT 0,
+                ActualCash REAL NOT NULL DEFAULT 0,
+                Difference REAL NOT NULL DEFAULT 0,
+                Notes TEXT,
+                ClosedByUserId INTEGER NOT NULL,
+                ClosedByUserName TEXT NOT NULL,
+                CreatedAt TEXT NOT NULL
+            );");
+
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS PendingSalePayments (
+                Id {pk},
+                SaleId INTEGER NOT NULL,
+                CustomerName TEXT NOT NULL DEFAULT '',
+                Amount REAL NOT NULL,
+                Note TEXT NOT NULL DEFAULT '',
+                SubmittedByUserId INTEGER NOT NULL,
+                SubmittedByName TEXT NOT NULL DEFAULT '',
+                SubmittedAt TEXT NOT NULL DEFAULT ({now}),
+                ApprovalStatus INTEGER NOT NULL DEFAULT 0,
+                RejectionReason TEXT
+            );");
+
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS PendingExpenses (
+                Id {pk},
+                Date TEXT NOT NULL,
+                Category TEXT NOT NULL,
+                Description TEXT,
+                Amount REAL NOT NULL DEFAULT 0,
+                SubmittedByUserId INTEGER NOT NULL,
+                SubmittedByName TEXT NOT NULL DEFAULT '',
+                SubmittedAt TEXT NOT NULL DEFAULT ({now}),
+                ApprovalStatus INTEGER NOT NULL DEFAULT 0,
+                RejectionReason TEXT
+            );");
+
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS Expenses (
+                Id {pk},
+                Date TEXT NOT NULL,
+                Category TEXT NOT NULL,
+                Description TEXT,
+                Amount REAL NOT NULL DEFAULT 0,
+                CreatedBy TEXT,
+                CreatedAt TEXT NOT NULL
+            );");
+
+        // ── Auto-migrate: add missing columns to existing SQLite databases ──
+        // Skipped on Postgres — a fresh Postgres DB already gets the full
+        // current schema from the CREATE TABLE statements above.
+        if (!_context.IsPostgres)
+        {
+            var customerCols = (await conn.QueryAsync<string>("SELECT name FROM pragma_table_info('Customers')")).ToHashSet();
+            if (!customerCols.Contains("ApprovalStatus"))
+                await conn.ExecuteAsync("ALTER TABLE Customers ADD COLUMN ApprovalStatus INTEGER NOT NULL DEFAULT 1");
+
+            var supplierCols = (await conn.QueryAsync<string>("SELECT name FROM pragma_table_info('Suppliers')")).ToHashSet();
+            if (!supplierCols.Contains("ApprovalStatus"))
+                await conn.ExecuteAsync("ALTER TABLE Suppliers ADD COLUMN ApprovalStatus INTEGER NOT NULL DEFAULT 1");
+
+            if (!customerCols.Contains("SubmittedByUserId"))
+                await conn.ExecuteAsync("ALTER TABLE Customers ADD COLUMN SubmittedByUserId INTEGER NOT NULL DEFAULT 0");
+            if (!customerCols.Contains("SubmittedByName"))
+                await conn.ExecuteAsync("ALTER TABLE Customers ADD COLUMN SubmittedByName TEXT NOT NULL DEFAULT ''");
+
+            if (!supplierCols.Contains("SubmittedByUserId"))
+                await conn.ExecuteAsync("ALTER TABLE Suppliers ADD COLUMN SubmittedByUserId INTEGER NOT NULL DEFAULT 0");
+            if (!supplierCols.Contains("SubmittedByName"))
+                await conn.ExecuteAsync("ALTER TABLE Suppliers ADD COLUMN SubmittedByName TEXT NOT NULL DEFAULT ''");
+
+            var purchaseCols = (await conn.QueryAsync<string>("SELECT name FROM pragma_table_info('Purchases')")).ToHashSet();
+            if (!purchaseCols.Contains("ApprovalStatus"))
+                await conn.ExecuteAsync("ALTER TABLE Purchases ADD COLUMN ApprovalStatus INTEGER NOT NULL DEFAULT 1");
+
+            if (!purchaseCols.Contains("SupplierId"))
+                await conn.ExecuteAsync("ALTER TABLE Purchases ADD COLUMN SupplierId INTEGER");
+
+            if (!purchaseCols.Contains("AmountPaid"))
+                await conn.ExecuteAsync("ALTER TABLE Purchases ADD COLUMN AmountPaid REAL NOT NULL DEFAULT 0");
+
+            if (!purchaseCols.Contains("PurchaseOrderId"))
+                await conn.ExecuteAsync("ALTER TABLE Purchases ADD COLUMN PurchaseOrderId INTEGER");
+
+            if (!purchaseCols.Contains("GoodsReceiptId"))
+                await conn.ExecuteAsync("ALTER TABLE Purchases ADD COLUMN GoodsReceiptId INTEGER");
+
+            var goodsReceiptCols = (await conn.QueryAsync<string>("SELECT name FROM pragma_table_info('GoodsReceipts')")).ToHashSet();
+            if (!goodsReceiptCols.Contains("ApprovalStatus"))
+                await conn.ExecuteAsync("ALTER TABLE GoodsReceipts ADD COLUMN ApprovalStatus INTEGER NOT NULL DEFAULT 1");
+            if (!goodsReceiptCols.Contains("RejectionReason"))
+                await conn.ExecuteAsync("ALTER TABLE GoodsReceipts ADD COLUMN RejectionReason TEXT");
+
+            var medicineCols = (await conn.QueryAsync<string>("SELECT name FROM pragma_table_info('Medicines')")).ToHashSet();
+            if (!medicineCols.Contains("Barcode"))
+                await conn.ExecuteAsync("ALTER TABLE Medicines ADD COLUMN Barcode TEXT");
+
+            if (!medicineCols.Contains("Supplier"))
+                await conn.ExecuteAsync("ALTER TABLE Medicines ADD COLUMN Supplier TEXT");
+
+            if (!medicineCols.Contains("CostPrice"))
+                await conn.ExecuteAsync("ALTER TABLE Medicines ADD COLUMN CostPrice REAL NOT NULL DEFAULT 0");
+
+            var userCols = (await conn.QueryAsync<string>("SELECT name FROM pragma_table_info('Users')")).ToHashSet();
+            if (!userCols.Contains("SecurityQuestion"))
+                await conn.ExecuteAsync("ALTER TABLE Users ADD COLUMN SecurityQuestion TEXT");
+
+            if (!userCols.Contains("SecurityAnswerHash"))
+                await conn.ExecuteAsync("ALTER TABLE Users ADD COLUMN SecurityAnswerHash TEXT");
+
+            if (!userCols.Contains("AvatarPath"))
+                await conn.ExecuteAsync("ALTER TABLE Users ADD COLUMN AvatarPath TEXT");
+
+            if (!userCols.Contains("Permissions"))
+                await conn.ExecuteAsync("ALTER TABLE Users ADD COLUMN Permissions INTEGER NOT NULL DEFAULT 0");
+
+            var saleCols = (await conn.QueryAsync<string>("SELECT name FROM pragma_table_info('Sales')")).ToHashSet();
+            if (!saleCols.Contains("CustomerId"))
+                await conn.ExecuteAsync("ALTER TABLE Sales ADD COLUMN CustomerId INTEGER");
+
+            if (!saleCols.Contains("AmountPaid"))
+                await conn.ExecuteAsync("ALTER TABLE Sales ADD COLUMN AmountPaid REAL NOT NULL DEFAULT 0");
+
+            if (!saleCols.Contains("CustomerName"))
+                await conn.ExecuteAsync("ALTER TABLE Sales ADD COLUMN CustomerName TEXT NOT NULL DEFAULT 'Walk-in Customer'");
+
+            if (!saleCols.Contains("PaymentMethod"))
+                await conn.ExecuteAsync("ALTER TABLE Sales ADD COLUMN PaymentMethod TEXT NOT NULL DEFAULT 'Cash'");
+
+            if (!saleCols.Contains("TotalDiscount"))
+                await conn.ExecuteAsync("ALTER TABLE Sales ADD COLUMN TotalDiscount REAL NOT NULL DEFAULT 0");
+
+            if (!saleCols.Contains("ChangeDue"))
+                await conn.ExecuteAsync("ALTER TABLE Sales ADD COLUMN ChangeDue REAL NOT NULL DEFAULT 0");
+        }
+        // ── End auto-migrate ──
+
         var existingAdmin = await conn.QueryFirstOrDefaultAsync<int?>(
             "SELECT Id FROM Users WHERE Username = 'admin'");
 
         if (existingAdmin == null)
         {
             var hash = BCrypt.Net.BCrypt.HashPassword("Admin@123");
-            await conn.ExecuteAsync(@"
+            await conn.ExecuteAsync($@"
                 INSERT INTO Users (Username, PasswordHash, FullName, Role, IsActive, Permissions, CreatedAt)
-                VALUES ('admin', @Hash, 'System Administrator', 0, 1, @Perms, now()::text);",
+                VALUES ('admin', @Hash, 'System Administrator', 0, 1, @Perms, {now});",
                 new { Hash = hash, Perms = (long)Permission.All });
         }
     }

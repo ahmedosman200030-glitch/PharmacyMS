@@ -16,6 +16,8 @@ public partial class PurchaseInvoiceView : UserControl
         InitializeComponent();
         _vm = vm;
         ListGrid.ItemsSource = _vm.Purchases;
+        ListGrid.LoadingRow += (_, e) => e.Row.Header = (e.Row.GetIndex() + 1).ToString();
+        ItemsGrid.LoadingRow += (_, e) => e.Row.Header = (e.Row.GetIndex() + 1).ToString();
 
         Loaded += async (_, _) =>
         {
@@ -53,6 +55,24 @@ public partial class PurchaseInvoiceView : UserControl
                 await ShowDetailAsync(purchaseId);
             }
         };
+    }
+
+    public async void ApproveButton_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: PharmacyMS.Domain.Entities.Purchase purchase })
+        {
+            await _vm.ApproveAsync(purchase);
+            RefreshStats();
+        }
+    }
+
+    public async void RejectButton_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: PharmacyMS.Domain.Entities.Purchase purchase })
+        {
+            await _vm.RejectAsync(purchase);
+            RefreshStats();
+        }
     }
 
     private async Task ShowDetailAsync(int purchaseId)

@@ -1,4 +1,5 @@
 using PharmacyMS.Domain.Entities;
+using PharmacyMS.Domain.Enums;
 
 namespace PharmacyMS.Application.Interfaces.Repositories;
 
@@ -12,4 +13,6 @@ public interface ICustomerRepository
     Task DeleteAsync(int id);
     Task<Customer> GetOrCreateByNameAsync(string name);
     Task<decimal> GetOutstandingBalanceAsync(int customerId);
+    Task UpdateApprovalStatusAsync(int id, ApprovalStatus status);
+    Task<IEnumerable<Customer>> GetBySubmitterAsync(int userId);
 }

@@ -8,7 +8,7 @@
   <ScrollViewer>
   <StackPanel Margin="14" Spacing="14">
 
-    <TextBlock x:Name="StatusText" FontSize="12" Foreground="#22C55E"/>
+    <TextBlock x:Name="StatusText" FontSize="12" Foreground="#DC2626"/>
 
     <Border Background="White" CornerRadius="10" Padding="16" BoxShadow="0 1 4 0 #22000000">
       <StackPanel Spacing="12">
@@ -17,7 +17,7 @@
         <Grid ColumnDefinitions="*,*,*,*" >
           <Border Grid.Column="0" Background="#0F2A43" CornerRadius="8" Padding="12" Margin="0,0,6,0">
             <StackPanel>
-              <TextBlock Text="CASH (count this)" FontSize="10" Foreground="#22C55E" FontWeight="Bold"/>
+              <TextBlock Text="CASH (count this)" FontSize="10" Foreground="#DC2626" FontWeight="Bold"/>
               <TextBlock x:Name="CashSalesText" Text="$0.00" FontSize="20" FontWeight="Bold" Foreground="White"/>
             </StackPanel>
           </Border>
@@ -50,7 +50,7 @@
         <TextBox x:Name="ActualCashBox" Width="200" Height="38" PlaceholderText="Actual cash counted"/>
         <TextBlock x:Name="DifferenceText" FontSize="14" FontWeight="Bold"/>
         <TextBox x:Name="NotesBox" Height="34" PlaceholderText="Notes (optional — e.g. reason for shortage)"/>
-        <Button x:Name="CloseRegisterButton" Content="Close Register" Height="38" Width="160" Background="#22C55E" Foreground="White" CornerRadius="6" FontWeight="Bold"/>
+        <Button x:Name="CloseRegisterButton" Content="Close Register" Height="38" Width="160" Background="#DC2626" Foreground="White" CornerRadius="6" FontWeight="Bold"/>
       </StackPanel>
     </Border>
 
@@ -61,7 +61,7 @@
     <Border Background="White" CornerRadius="10" Padding="10" BoxShadow="0 1 4 0 #22000000">
       <DockPanel>
         <TextBlock DockPanel.Dock="Top" Text="Closing History" FontSize="16" FontWeight="Bold" Foreground="#0F172A" Margin="4,0,0,10"/>
-        <DataGrid x:Name="HistoryGrid" AutoGenerateColumns="False" IsReadOnly="True"
+        <DataGrid x:Name="HistoryGrid" HeadersVisibility="All" RowHeaderWidth="40" AutoGenerateColumns="False" IsReadOnly="True"
                   CanUserSortColumns="False" SelectionMode="Single"
                   GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
                   RowBackground="White"

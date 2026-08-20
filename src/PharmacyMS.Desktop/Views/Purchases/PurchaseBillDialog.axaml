@@ -1,0 +1,109 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+        x:Class="PharmacyMS.Desktop.Views.Purchases.PurchaseBillDialog"
+        Title="Supplier Bill"
+        Width="560" Height="640"
+        WindowStartupLocation="CenterOwner"
+        Background="#F1F5F9"
+        CanResize="False">
+  <Border Background="White" CornerRadius="12" Margin="16" Padding="0">
+    <DockPanel>
+
+      <!-- Header -->
+      <Border DockPanel.Dock="Top" Background="#0F172A" CornerRadius="12,12,0,0" Padding="20,16">
+        <StackPanel Spacing="2">
+          <TextBlock Text="AL-HIJRA PHARMACY" FontSize="18" FontWeight="Bold" Foreground="White"
+                     HorizontalAlignment="Center"/>
+          <TextBlock Text="SUPPLIER BILL" FontSize="12" Foreground="#94A3B8"
+                     HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+
+      <!-- Footer: signatures + close -->
+      <StackPanel DockPanel.Dock="Bottom" Margin="20,0,20,20" Spacing="16">
+        <Border Height="1" Background="#E2E8F0" Margin="0,8,0,0"/>
+        <Grid ColumnDefinitions="*,*">
+          <StackPanel Grid.Column="0" Spacing="4">
+            <Border Height="1" Background="#94A3B8" Width="160" HorizontalAlignment="Left" Margin="0,20,0,0"/>
+            <TextBlock Text="Supplier Signature" FontSize="11" Foreground="#64748B"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Spacing="4" HorizontalAlignment="Right">
+            <Border Height="1" Background="#94A3B8" Width="160" HorizontalAlignment="Right" Margin="0,20,0,0"/>
+            <TextBlock Text="Pharmacy Signature" FontSize="11" Foreground="#64748B" HorizontalAlignment="Right"/>
+          </StackPanel>
+        </Grid>
+        <Button x:Name="CloseButton" Content="Close" HorizontalAlignment="Right"
+                Background="#1D9E75" Foreground="White" CornerRadius="6" Padding="16,8"/>
+      </StackPanel>
+
+      <!-- Body -->
+      <ScrollViewer Padding="20,16">
+        <StackPanel Spacing="16">
+
+          <!-- Bill meta -->
+          <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+            <StackPanel Grid.Row="0" Grid.Column="0" Spacing="2">
+              <TextBlock Text="Bill No" FontSize="11" Foreground="#64748B"/>
+              <TextBlock x:Name="BillNoText" FontSize="14" FontWeight="SemiBold" Foreground="#0F172A"/>
+            </StackPanel>
+            <StackPanel Grid.Row="0" Grid.Column="1" Spacing="2" HorizontalAlignment="Right">
+              <TextBlock Text="Date" FontSize="11" Foreground="#64748B" HorizontalAlignment="Right"/>
+              <TextBlock x:Name="DateText" FontSize="14" FontWeight="SemiBold" Foreground="#0F172A"
+                         HorizontalAlignment="Right"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="0" Spacing="2" Margin="0,10,0,0">
+              <TextBlock Text="Supplier" FontSize="11" Foreground="#64748B"/>
+              <TextBlock x:Name="SupplierText" FontSize="14" FontWeight="SemiBold" Foreground="#0F172A"/>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="1" Spacing="2" Margin="0,10,0,0" HorizontalAlignment="Right">
+              <TextBlock Text="Payment Status" FontSize="11" Foreground="#64748B" HorizontalAlignment="Right"/>
+              <TextBlock x:Name="StatusText" FontSize="14" FontWeight="Bold" HorizontalAlignment="Right"/>
+            </StackPanel>
+          </Grid>
+
+          <Border Height="1" Background="#E2E8F0"/>
+
+          <!-- Items table -->
+          <DataGrid x:Name="ItemsGrid" HeadersVisibility="All" RowHeaderWidth="32"
+                    x:DataType="ent:PurchaseItem"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    RowHeight="38"
+                    GridLinesVisibility="Horizontal"
+                    HorizontalGridLinesBrush="#E2E8F0"
+                    BorderThickness="0"
+                    MaxHeight="220">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Medicine" Binding="{Binding MedicineName}" Width="*"/>
+              <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}" Width="60"/>
+              <DataGridTextColumn Header="Cost" Binding="{Binding UnitCost, StringFormat='{}${0:F2}'}" Width="80"/>
+              <DataGridTextColumn Header="Total" Binding="{Binding LineTotal, StringFormat='{}${0:F2}'}" Width="90"/>
+            </DataGrid.Columns>
+          </DataGrid>
+
+          <Border Height="1" Background="#E2E8F0"/>
+
+          <!-- Totals -->
+          <StackPanel Spacing="6" HorizontalAlignment="Right" Width="220">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Grid.Column="0" Text="Total" FontSize="13" Foreground="#64748B"/>
+              <TextBlock x:Name="TotalText" Grid.Column="1" FontSize="13" Foreground="#0F172A"/>
+            </Grid>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Grid.Column="0" Text="Paid" FontSize="13" Foreground="#64748B"/>
+              <TextBlock x:Name="PaidText" Grid.Column="1" FontSize="13" Foreground="#1D9E75"/>
+            </Grid>
+            <Border Height="1" Background="#E2E8F0" Margin="0,4"/>
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Grid.Column="0" Text="Due" FontSize="15" FontWeight="Bold" Foreground="#0F172A"/>
+              <TextBlock x:Name="DueText" Grid.Column="1" FontSize="15" FontWeight="Bold" Foreground="#DC2626"/>
+            </Grid>
+          </StackPanel>
+
+        </StackPanel>
+      </ScrollViewer>
+
+    </DockPanel>
+  </Border>
+</Window>

@@ -10,11 +10,13 @@
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,16">
       <TextBox x:Name="NameBox" Width="200" Height="34" PlaceholderText="Category name"/>
       <TextBox x:Name="DescBox" Width="280" Height="34" PlaceholderText="Description"/>
-      <Button x:Name="AddButton" Content="Add" Height="34" Background="#22C55E" Foreground="White" CornerRadius="6" Padding="14,4"/>
+      <Button x:Name="AddButton" Content="Add" Height="34" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="14,4"/>
       <Button x:Name="DeleteButton" Content="Delete Selected" Height="34" Background="#EF4444" Foreground="White" CornerRadius="6" Padding="14,4"/>
+      <Button x:Name="ImportExcelButton" Content="📥 Import Excel" Height="34" Background="#8B5CF6" Foreground="White" CornerRadius="6" Padding="14,4"/>
+      <Button x:Name="ExportExcelButton" Content="📤 Export Excel" Height="34" Background="#3B82F6" Foreground="White" CornerRadius="6" Padding="14,4"/>
     </StackPanel>
     <Border Background="White" CornerRadius="10" Padding="4" BoxShadow="0 1 4 0 #22000000">
-      <DataGrid x:Name="Grid" x:DataType="ent:Category" AutoGenerateColumns="False" IsReadOnly="True"
+      <DataGrid x:Name="Grid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="ent:Category" AutoGenerateColumns="False" IsReadOnly="True"
                 GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
                 RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
         <DataGrid.Columns>

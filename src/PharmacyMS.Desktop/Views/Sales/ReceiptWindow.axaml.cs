@@ -33,8 +33,42 @@ public partial class ReceiptWindow : Window
         }
 
         PharmacyNameText.Text = _receipt.PharmacyName;
+
+        if (!string.IsNullOrWhiteSpace(_receipt.Tagline))
+        {
+            TaglineText.Text = _receipt.Tagline;
+            TaglineText.IsVisible = true;
+        }
+
         AddressText.Text = _receipt.Address;
-        PhoneText.Text = _receipt.Phone;
+
+        if (!string.IsNullOrWhiteSpace(_receipt.Phone))
+        {
+            PhoneText.Text = $"ZAAD: {_receipt.Phone}";
+            PhoneText.IsVisible = true;
+        }
+        else
+        {
+            PhoneText.IsVisible = false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_receipt.Phone2))
+        {
+            Phone2Text.Text = $"E-DAHAB: {_receipt.Phone2}";
+            Phone2Text.IsVisible = true;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_receipt.Email))
+        {
+            EmailText.Text = _receipt.Email;
+            EmailText.IsVisible = true;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_receipt.ContactNumber))
+        {
+            ContactNumberText.Text = $"Contact: {_receipt.ContactNumber}";
+            ContactNumberText.IsVisible = true;
+        }
 
         InvoiceText.Text = _receipt.InvoiceNumber;
         DateText.Text = _receipt.DateTime.ToString("dd MMM yyyy  HH:mm");
@@ -58,6 +92,12 @@ public partial class ReceiptWindow : Window
         TaxLabel.Text = $"Tax ({_receipt.TaxPercent:F0}%)";
         TaxText.Text = $"${_receipt.TaxAmount:F2}";
         TotalText.Text = $"${_receipt.Total:F2}";
+
+        if (_receipt.SlshTotal.HasValue)
+        {
+            SlshText.Text = $"{_receipt.SlshTotal.Value:N0} SLSH";
+            SlshText.IsVisible = true;
+        }
         PaymentLabel.Text = $"Payment ({_receipt.PaymentMethod})";
         PaidText.Text = $"${_receipt.AmountReceived:F2}";
         ChangeText.Text = $"${_receipt.Change:F2}";

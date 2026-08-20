@@ -25,6 +25,8 @@ public class SuppliersViewModel
 
     public async Task<int> AddAsync(Supplier supplier)
     {
+        supplier.SubmittedByUserId = PharmacyMS.Application.Services.SessionManager.CurrentUser?.Id ?? 0;
+        supplier.SubmittedByName = PharmacyMS.Application.Services.SessionManager.CurrentUser?.FullName ?? "Unknown";
         var id = await _repository.CreateAsync(supplier);
         supplier.Id = id;
         Suppliers.Add(supplier);
@@ -37,5 +39,17 @@ public class SuppliersViewModel
     {
         await _repository.DeleteAsync(supplier.Id);
         Suppliers.Remove(supplier);
+    }
+
+    public async Task ApproveAsync(Supplier supplier)
+    {
+        supplier.ApprovalStatus = PharmacyMS.Domain.Enums.ApprovalStatus.Approved;
+        await _repository.UpdateAsync(supplier);
+    }
+
+    public async Task RejectAsync(Supplier supplier)
+    {
+        supplier.ApprovalStatus = PharmacyMS.Domain.Enums.ApprovalStatus.Rejected;
+        await _repository.UpdateAsync(supplier);
     }
 }

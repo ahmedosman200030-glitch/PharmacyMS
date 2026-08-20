@@ -15,4 +15,12 @@ public interface IReportRepository
     Task<IEnumerable<MonthlyStockReconciliationRow>> GetMonthlyStockReconciliationAsync(DateTime monthStart, DateTime monthEnd);
     Task<string?> GetSettingAsync(string key);
     Task SetSettingAsync(string key, string value);
+
+    // New financial reports
+    Task<IEnumerable<DailySalesSummaryRow>> GetDailySalesAsync(DateTime from, DateTime to);
+    Task<IEnumerable<PaymentMethodBreakdownRow>> GetPaymentMethodBreakdownAsync(DateTime from, DateTime to);
+    Task<IEnumerable<TaxReportRow>> GetTaxReportAsync(DateTime from, DateTime to);
+    Task<IEnumerable<InventoryValuationRow>> GetInventoryValuationAsync();
+    Task<IEnumerable<PurchaseVsSalesRow>> GetPurchaseVsSalesAsync(DateTime from, DateTime to);
+    Task<IEnumerable<SupplierPaymentRow>> GetSupplierPaymentsAsync();
 }

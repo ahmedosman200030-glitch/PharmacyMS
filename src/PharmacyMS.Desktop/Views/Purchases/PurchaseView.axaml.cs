@@ -19,6 +19,8 @@ public partial class PurchaseView : UserControl
         MedicineGrid.ItemsSource = _viewModel.AvailableMedicines;
         SupplierCombo.ItemsSource = _viewModel.Suppliers;
         LinesGrid.ItemsSource = _viewModel.Lines;
+        MedicineGrid.LoadingRow += (_, e) => e.Row.Header = (e.Row.GetIndex() + 1).ToString();
+        LinesGrid.LoadingRow += (_, e) => e.Row.Header = (e.Row.GetIndex() + 1).ToString();
 
         Loaded += async (_, _) => await _viewModel.LoadAsync();
 

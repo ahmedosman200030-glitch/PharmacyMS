@@ -21,4 +21,9 @@ public class PurchaseHistoryViewModel
         foreach (var p in await _purchaseRepo.GetAllAsync())
             Purchases.Add(p);
     }
+
+    public async Task<Purchase?> LoadDetailAsync(int purchaseId)
+    {
+        return await _purchaseRepo.GetByIdAsync(purchaseId);
+    }
 }

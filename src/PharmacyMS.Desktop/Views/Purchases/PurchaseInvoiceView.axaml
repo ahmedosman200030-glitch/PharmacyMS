@@ -2,8 +2,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
              xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+             xmlns:conv="clr-namespace:PharmacyMS.Desktop.Converters"
              x:Class="PharmacyMS.Desktop.Views.Purchases.PurchaseInvoiceView"
              x:DataType="vm:PurchaseInvoiceViewModel">
+  <UserControl.Resources>
+    <conv:ApprovalStatusToBrushConverter x:Key="ApprovalBrush"/>
+    <conv:PaymentStatusToBrushConverter x:Key="StatusBrush"/>
+    <conv:ApprovalStatusEqualsConverter x:Key="StatusEquals"/>
+  </UserControl.Resources>
   <DockPanel Margin="24">
 
     <!-- Stat cards -->
@@ -38,11 +44,11 @@
 
       <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="16" Margin="0,0,12,0">
         <DockPanel>
-          <TextBlock DockPanel.Dock="Top" Text="Purchase Invoices" FontSize="16" FontWeight="Bold"
+          <TextBlock DockPanel.Dock="Top" Text="Supplier Payments" FontSize="16" FontWeight="Bold"
                      Foreground="#0F172A" Margin="0,0,0,10"/>
           <TextBox x:Name="SearchBox" DockPanel.Dock="Top" PlaceholderText="Search invoice # or supplier..."
                     Height="32" Margin="0,0,0,10"/>
-          <DataGrid x:Name="ListGrid"
+          <DataGrid x:Name="ListGrid" HeadersVisibility="All" RowHeaderWidth="40"
                     x:DataType="ent:Purchase"
                     AutoGenerateColumns="False"
                     IsReadOnly="True"
@@ -50,7 +56,29 @@
             <DataGrid.Columns>
               <DataGridTextColumn Header="Invoice" Binding="{Binding InvoiceNumber}" Width="110"/>
               <DataGridTextColumn Header="Supplier" Binding="{Binding SupplierName}" Width="150"/>
-              <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="80"/>
+              <DataGridTemplateColumn Header="Status" Width="100">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate x:DataType="ent:Purchase">
+                    <Border Background="{Binding Status, Converter={StaticResource StatusBrush}}"
+                            CornerRadius="10" Padding="8,3" HorizontalAlignment="Left">
+                      <TextBlock Text="{Binding Status}" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                    </Border>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+              <DataGridTemplateColumn Header="Approval" Width="160">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate x:DataType="ent:Purchase">
+                    <StackPanel Orientation="Horizontal" Spacing="6"
+                                IsVisible="{Binding ApprovalStatus, Converter={StaticResource StatusEquals}, ConverterParameter=Pending}">
+                      <Button Content="✓ Approve" Tag="{Binding}" Click="ApproveButton_Click"
+                              Background="#10B981" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                      <Button Content="✕ Reject" Tag="{Binding}" Click="RejectButton_Click"
+                              Background="#EF4444" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                    </StackPanel>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
               <DataGridTemplateColumn Header="" Width="50">
                 <DataGridTemplateColumn.CellTemplate>
                   <DataTemplate x:DataType="ent:Purchase">
@@ -95,7 +123,7 @@
             <TextBlock x:Name="InvoiceDueText" FontSize="16" FontWeight="Bold" Foreground="#DC2626" HorizontalAlignment="Right"/>
           </StackPanel>
 
-          <DataGrid x:Name="ItemsGrid"
+          <DataGrid x:Name="ItemsGrid" HeadersVisibility="All" RowHeaderWidth="40"
                     x:DataType="ent:PurchaseItem"
                     AutoGenerateColumns="False"
                     IsReadOnly="True"

@@ -15,7 +15,7 @@
   <Color x:Key="BrandTextSecondaryColor">#64748B</Color>
 
   <Color x:Key="BrandDangerColor">#EF4444</Color>
-  <Color x:Key="BrandSuccessColor">#22C55E</Color>
+  <Color x:Key="BrandSuccessColor">#DC2626</Color>
   <Color x:Key="BrandWarningColor">#F59E0B</Color>
 
   <SolidColorBrush x:Key="BrandPrimaryBrush" Color="{StaticResource BrandPrimaryColor}"/>

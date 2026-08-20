@@ -1,0 +1,19 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PharmacyMS.Desktop.Views.Approvals.RejectReasonDialog"
+        Width="380" Height="240" WindowStartupLocation="CenterOwner"
+        CanResize="False" Background="White"
+        Title="Reject Receipt">
+  <StackPanel Margin="20" Spacing="14">
+    <TextBlock x:Name="InfoText" TextWrapping="Wrap" FontSize="14" Foreground="#0F172A"/>
+    <StackPanel Spacing="4">
+      <TextBlock Text="Reason for rejection" FontSize="12" Foreground="#64748B"/>
+      <TextBox x:Name="ReasonBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True"/>
+    </StackPanel>
+    <TextBlock x:Name="ErrorText" Foreground="#EF4444" FontSize="12" IsVisible="False"/>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+      <Button x:Name="CancelButton" Content="Cancel" Width="90" Height="34" Background="#E2E8F0" Foreground="#334155" CornerRadius="6"/>
+      <Button x:Name="ConfirmButton" Content="Reject" Width="90" Height="34" Background="#EF4444" Foreground="White" CornerRadius="6"/>
+    </StackPanel>
+  </StackPanel>
+</Window>

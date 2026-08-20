@@ -2,24 +2,125 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
              xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+             xmlns:conv="clr-namespace:PharmacyMS.Desktop.Converters"
              x:Class="PharmacyMS.Desktop.Views.Purchases.PurchaseHistoryView"
              x:DataType="vm:PurchaseHistoryViewModel">
-  <Border Background="White" CornerRadius="10" Margin="24" Padding="20">
+  <UserControl.Resources>
+    <conv:ApprovalStatusToBrushConverter x:Key="ApprovalBrush"/>
+    <conv:PaymentStatusToBrushConverter x:Key="StatusBrush"/>
+  </UserControl.Resources>
+
+  <UserControl.Styles>
+    <Style Selector="DataGridRow:nth-child(2n)">
+      <Setter Property="Background" Value="#F8FAFC"/>
+    </Style>
+    <Style Selector="DataGridRow:pointerover">
+      <Setter Property="Background" Value="#F1F5F9"/>
+    </Style>
+    <Style Selector="Button.viewBtn:pointerover">
+      <Setter Property="Background" Value="#E2F6EE"/>
+    </Style>
+  </UserControl.Styles>
+
+  <Border Background="#F8FAFC" Padding="24">
     <DockPanel>
-      <TextBlock DockPanel.Dock="Top" Text="Purchase History" FontSize="18" FontWeight="Bold"
-                 Foreground="#0F172A" Margin="0,0,0,14"/>
-      <DataGrid x:Name="Grid"
-                x:DataType="ent:Purchase"
-                AutoGenerateColumns="False"
-                IsReadOnly="True"
-                GridLinesVisibility="Horizontal">
-        <DataGrid.Columns>
-          <DataGridTextColumn Header="Date" Binding="{Binding CreatedAt}" Width="160"/>
-          <DataGridTextColumn Header="Supplier" Binding="{Binding SupplierName}" Width="220"/>
-          <DataGridTextColumn Header="Invoice #" Binding="{Binding InvoiceNumber}" Width="140"/>
-          <DataGridTextColumn Header="Total" Binding="{Binding TotalAmount}" Width="120"/>
-        </DataGrid.Columns>
-      </DataGrid>
+
+      <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,16">
+        <StackPanel Spacing="2">
+          <TextBlock Text="Supplier Bills" FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
+          <TextBlock Text="Purchase history and supplier invoices" FontSize="13" Foreground="#64748B"/>
+        </StackPanel>
+      </StackPanel>
+
+      <Grid DockPanel.Dock="Top" ColumnDefinitions="*,*,*,*" Margin="0,0,0,16">
+        <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="16" Margin="0,0,8,0"
+                BoxShadow="0 1 3 0 #14000000">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Total Bills" FontSize="13" Foreground="#64748B"/>
+            <TextBlock x:Name="TotalBillsText" FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="16" Margin="8,0"
+                BoxShadow="0 1 3 0 #14000000">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Total Amount" FontSize="13" Foreground="#64748B"/>
+            <TextBlock x:Name="TotalAmountText" FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="2" Background="White" CornerRadius="10" Padding="16" Margin="8,0"
+                BoxShadow="0 1 3 0 #14000000">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Paid" FontSize="13" Foreground="#64748B"/>
+            <TextBlock x:Name="PaidAmountText" FontSize="22" FontWeight="Bold" Foreground="#1D9E75"/>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="3" Background="White" CornerRadius="10" Padding="16" Margin="8,0,0,0"
+                BoxShadow="0 1 3 0 #14000000">
+          <StackPanel Spacing="4">
+            <TextBlock Text="Due" FontSize="13" Foreground="#64748B"/>
+            <TextBlock x:Name="DueAmountText" FontSize="22" FontWeight="Bold" Foreground="#DC2626"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+
+      <Border Background="White" CornerRadius="10" Padding="20" BoxShadow="0 1 3 0 #14000000">
+        <DockPanel>
+          <Grid DockPanel.Dock="Top" ColumnDefinitions="*,240" Margin="0,0,0,14">
+            <TextBlock Grid.Column="0" Text="All Purchases" FontSize="16" FontWeight="Bold" Foreground="#0F172A"
+                       VerticalAlignment="Center"/>
+            <TextBox x:Name="SearchBox" Grid.Column="1" PlaceholderText="Search invoice # or supplier..."
+                     Height="34"/>
+          </Grid>
+
+          <DataGrid x:Name="HistoryGrid" HeadersVisibility="All" RowHeaderWidth="40"
+                    x:DataType="ent:Purchase"
+                    AutoGenerateColumns="False"
+                    IsReadOnly="True"
+                    RowHeight="46"
+                    GridLinesVisibility="Horizontal"
+                    HorizontalGridLinesBrush="#E2E8F0"
+                    BorderThickness="0">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Date" Binding="{Binding CreatedAt, StringFormat='{}{0:yyyy-MM-dd  HH:mm}'}" Width="150"/>
+              <DataGridTextColumn Header="Supplier" Binding="{Binding SupplierName}" Width="*"/>
+              <DataGridTextColumn Header="Invoice #" Binding="{Binding InvoiceNumber}" Width="140"/>
+              <DataGridTextColumn Header="Total" Binding="{Binding TotalAmount, StringFormat='{}${0:F2}'}" Width="110"/>
+
+              <DataGridTemplateColumn Header="Approval" Width="130">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate x:DataType="ent:Purchase">
+                    <Border Background="{Binding ApprovalStatus, Converter={StaticResource ApprovalBrush}}"
+                            CornerRadius="10" Padding="8,3" HorizontalAlignment="Left" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding ApprovalStatus}" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                    </Border>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+
+              <DataGridTemplateColumn Header="Payment" Width="110">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate x:DataType="ent:Purchase">
+                    <Border Background="{Binding Status, Converter={StaticResource StatusBrush}}"
+                            CornerRadius="10" Padding="8,3" HorizontalAlignment="Left" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Status}" FontSize="11" FontWeight="SemiBold" Foreground="White"/>
+                    </Border>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+
+              <DataGridTemplateColumn Header="" Width="60">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate x:DataType="ent:Purchase">
+                    <Button Classes="viewBtn" Content="&#128065; View" Tag="{Binding}" Click="ViewButton_Click"
+                            Padding="6,3" Background="Transparent" BorderThickness="1" BorderBrush="#1D9E75"
+                            Foreground="#1D9E75" FontSize="11" CornerRadius="6"/>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+            </DataGrid.Columns>
+          </DataGrid>
+        </DockPanel>
+      </Border>
     </DockPanel>
   </Border>
 </UserControl>

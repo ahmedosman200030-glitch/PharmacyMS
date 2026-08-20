@@ -21,6 +21,7 @@ public partial class UsersView : UserControl
         InitializeComponent();
         _vm = vm;
         Grid.ItemsSource = _vm.Users;
+        Grid.LoadingRow += (_, e) => e.Row.Header = (e.Row.GetIndex() + 1).ToString();
         AttachedToVisualTree += async (_, _) =>
         {
             await _vm.LoadAsync();
@@ -73,7 +74,7 @@ public partial class UsersView : UserControl
             DeactivateButton.Content = u.IsActive ? "Deactivate Selected" : "Activate Selected";
             DeactivateButton.Foreground = u.IsActive
                 ? Avalonia.Media.Brush.Parse("#EF4444")
-                : Avalonia.Media.Brush.Parse("#22C55E");
+                : Avalonia.Media.Brush.Parse("#DC2626");
         }
         else
         {

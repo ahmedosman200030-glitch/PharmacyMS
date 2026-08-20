@@ -1,0 +1,204 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
+             xmlns:ent="clr-namespace:PharmacyMS.Domain.Entities;assembly=PharmacyMS.Domain"
+             xmlns:conv="clr-namespace:PharmacyMS.Desktop.Converters"
+             x:Class="PharmacyMS.Desktop.Views.Approvals.PendingApprovalsView"
+             x:DataType="vm:PendingApprovalsViewModel"
+             Background="#F1F5F9">
+  <UserControl.Resources>
+    <conv:ApprovalStatusToBrushConverter x:Key="StatusBrush"/>
+  </UserControl.Resources>
+  <ScrollViewer>
+  <StackPanel Margin="24" Spacing="20">
+
+    <TextBlock Text="Pending Approvals" FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
+
+    <!-- Customers -->
+    <Border Background="White" CornerRadius="10" Padding="16" BoxShadow="0 1 4 0 #22000000">
+      <StackPanel Spacing="10">
+        <TextBlock Text="👤 Customers" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A"/>
+        <DataGrid x:Name="CustomersGrid" HeadersVisibility="All" RowHeaderWidth="40"
+                  x:DataType="ent:Customer" AutoGenerateColumns="False" IsReadOnly="True"
+                  GridLinesVisibility="Horizontal" MaxHeight="240">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="200"/>
+            <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="140"/>
+            <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="200"/>
+            <DataGridTemplateColumn Header="Actions" Width="180">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="ent:Customer">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Button Content="✓ Approve" Tag="{Binding}" Click="ApproveCustomer_Click"
+                            Background="#10B981" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                    <Button Content="✕ Reject" Tag="{Binding}" Click="RejectCustomer_Click"
+                            Background="#EF4444" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+        <TextBlock x:Name="NoCustomersText" Text="✅ No pending customers" Foreground="#64748B" FontSize="13" IsVisible="False"/>
+      </StackPanel>
+    </Border>
+
+    <!-- Suppliers -->
+    <Border Background="White" CornerRadius="10" Padding="16" BoxShadow="0 1 4 0 #22000000">
+      <StackPanel Spacing="10">
+        <TextBlock Text="🚚 Suppliers" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A"/>
+        <DataGrid x:Name="SuppliersGrid" HeadersVisibility="All" RowHeaderWidth="40"
+                  x:DataType="ent:Supplier" AutoGenerateColumns="False" IsReadOnly="True"
+                  GridLinesVisibility="Horizontal" MaxHeight="240">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="180"/>
+            <DataGridTextColumn Header="Contact" Binding="{Binding ContactPerson}" Width="150"/>
+            <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="130"/>
+            <DataGridTemplateColumn Header="Actions" Width="180">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="ent:Supplier">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Button Content="✓ Approve" Tag="{Binding}" Click="ApproveSupplier_Click"
+                            Background="#10B981" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                    <Button Content="✕ Reject" Tag="{Binding}" Click="RejectSupplier_Click"
+                            Background="#EF4444" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+        <TextBlock x:Name="NoSuppliersText" Text="✅ No pending suppliers" Foreground="#64748B" FontSize="13" IsVisible="False"/>
+      </StackPanel>
+    </Border>
+
+    <!-- Stock Receiving -->
+    <Border Background="White" CornerRadius="10" Padding="16" BoxShadow="0 1 4 0 #22000000">
+      <StackPanel Spacing="10">
+        <TextBlock Text="📥 Stock Receiving" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A"/>
+        <DataGrid x:Name="ReceiptsGrid" HeadersVisibility="All" RowHeaderWidth="40"
+                  x:DataType="ent:GoodsReceipt" AutoGenerateColumns="False" IsReadOnly="True"
+                  GridLinesVisibility="Horizontal" MaxHeight="240">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="PO #" Binding="{Binding PurchaseOrderId}" Width="60"/>
+            <DataGridTextColumn Header="Received" Binding="{Binding ReceivedAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Width="150"/>
+            <DataGridTextColumn Header="Sent By" Binding="{Binding ReceivedByUserName}" Width="120"/>
+            <DataGridTextColumn Header="Total" Binding="{Binding TotalAmount, StringFormat='{}${0:F2}'}" Width="90"/>
+            <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="*"/>
+            <DataGridTemplateColumn Header="Actions" Width="240">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="ent:GoodsReceipt">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Button Content="👁 View" Tag="{Binding}" Click="ViewReceipt_Click"
+                            Background="#E2E8F0" Foreground="#334155" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                    <Button Content="✓ Approve" Tag="{Binding}" Click="ApproveReceipt_Click"
+                            Background="#10B981" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                    <Button Content="✕ Reject" Tag="{Binding}" Click="RejectReceipt_Click"
+                            Background="#EF4444" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+        <TextBlock x:Name="NoReceiptsText" Text="✅ No pending receipts" Foreground="#64748B" FontSize="13" IsVisible="False"/>
+      </StackPanel>
+    </Border>
+
+    <!-- Purchases -->
+    <Border Background="White" CornerRadius="10" Padding="16" BoxShadow="0 1 4 0 #22000000">
+      <StackPanel Spacing="10">
+        <TextBlock Text="🧾 Purchase Invoices" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A"/>
+        <DataGrid x:Name="PurchasesGrid" HeadersVisibility="All" RowHeaderWidth="40"
+                  x:DataType="ent:Purchase" AutoGenerateColumns="False" IsReadOnly="True"
+                  GridLinesVisibility="Horizontal" MaxHeight="240">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Invoice #" Binding="{Binding InvoiceNumber}" Width="120"/>
+            <DataGridTextColumn Header="Supplier" Binding="{Binding SupplierName}" Width="180"/>
+            <DataGridTextColumn Header="Total" Binding="{Binding TotalAmount}" Width="100"/>
+            <DataGridTextColumn Header="Date" Binding="{Binding CreatedAt}" Width="140"/>
+            <DataGridTemplateColumn Header="Actions" Width="180">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="ent:Purchase">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Button Content="✓ Approve" Tag="{Binding}" Click="ApprovePurchase_Click"
+                            Background="#10B981" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                    <Button Content="✕ Reject" Tag="{Binding}" Click="RejectPurchase_Click"
+                            Background="#EF4444" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+        <TextBlock x:Name="NoPurchasesText" Text="✅ No pending purchases" Foreground="#64748B" FontSize="13" IsVisible="False"/>
+      </StackPanel>
+    </Border>
+
+    <!-- Sale Payments -->
+    <Border Background="White" CornerRadius="10" Padding="16" BoxShadow="0 1 4 0 #22000000">
+      <StackPanel Spacing="10">
+        <TextBlock Text="💵 Sale Payments" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A"/>
+        <DataGrid x:Name="PaymentsGrid" HeadersVisibility="All" RowHeaderWidth="40"
+                  x:DataType="ent:PendingSalePayment" AutoGenerateColumns="False" IsReadOnly="True"
+                  GridLinesVisibility="Horizontal" MaxHeight="240">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Sale #" Binding="{Binding SaleId}" Width="70"/>
+            <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" Width="180"/>
+            <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat='{}${0:F2}'}" Width="100"/>
+            <DataGridTextColumn Header="Note" Binding="{Binding Note}" Width="160"/>
+            <DataGridTextColumn Header="Submitted By" Binding="{Binding SubmittedByName}" Width="130"/>
+            <DataGridTextColumn Header="Submitted" Binding="{Binding SubmittedAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Width="*"/>
+            <DataGridTemplateColumn Header="Actions" Width="180">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="ent:PendingSalePayment">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Button Content="✓ Approve" Tag="{Binding}" Click="ApprovePayment_Click"
+                            Background="#10B981" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                    <Button Content="✕ Reject" Tag="{Binding}" Click="RejectPayment_Click"
+                            Background="#EF4444" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+        <TextBlock x:Name="NoPaymentsText" Text="✅ No pending payments" Foreground="#64748B" FontSize="13" IsVisible="False"/>
+      </StackPanel>
+    </Border>
+
+    <!-- Expenses -->
+    <Border Background="White" CornerRadius="10" Padding="16" BoxShadow="0 1 4 0 #22000000">
+      <StackPanel Spacing="10">
+        <TextBlock Text="💸 Expenses" FontSize="15" FontWeight="SemiBold" Foreground="#0F172A"/>
+        <DataGrid x:Name="ExpensesGrid" HeadersVisibility="All" RowHeaderWidth="40"
+                  x:DataType="ent:PendingExpense" AutoGenerateColumns="False" IsReadOnly="True"
+                  GridLinesVisibility="Horizontal" MaxHeight="240">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat='{}{0:yyyy-MM-dd}'}" Width="100"/>
+            <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="130"/>
+            <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="200"/>
+            <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat='{}${0:F2}'}" Width="90"/>
+            <DataGridTextColumn Header="Submitted By" Binding="{Binding SubmittedByName}" Width="130"/>
+            <DataGridTextColumn Header="Submitted" Binding="{Binding SubmittedAt, StringFormat='{}{0:yyyy-MM-dd HH:mm}'}" Width="*"/>
+            <DataGridTemplateColumn Header="Actions" Width="180">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate x:DataType="ent:PendingExpense">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <Button Content="✓ Approve" Tag="{Binding}" Click="ApproveExpense_Click"
+                            Background="#10B981" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                    <Button Content="✕ Reject" Tag="{Binding}" Click="RejectExpense_Click"
+                            Background="#EF4444" Foreground="White" CornerRadius="4" Padding="8,3" FontSize="11"/>
+                  </StackPanel>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+          </DataGrid.Columns>
+        </DataGrid>
+        <TextBlock x:Name="NoExpensesText" Text="✅ No pending expenses" Foreground="#64748B" FontSize="13" IsVisible="False"/>
+      </StackPanel>
+    </Border>
+
+  </StackPanel>
+  </ScrollViewer>
+</UserControl>

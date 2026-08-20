@@ -4,40 +4,108 @@
         x:Class="PharmacyMS.Desktop.Views.Sales.CreditSalesView"
         x:DataType="vm:CreditSalesViewModel"
         Background="#F1F5F9">
-  <DockPanel Margin="14">
+  <DockPanel Margin="20">
 
-    <Border DockPanel.Dock="Top" Background="#0F2A43" CornerRadius="10" Padding="14" Margin="0,0,0,10">
-      <StackPanel>
-        <TextBlock Text="TOTAL OUTSTANDING" FontSize="11" Foreground="#94A3B8" FontWeight="Bold"/>
-        <TextBlock x:Name="TotalOutstandingText" Text="$0.00" FontSize="24" FontWeight="Bold" Foreground="White"/>
-      </StackPanel>
-    </Border>
+    <!-- HEADER STATS -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,*,*,*" Margin="0,0,0,16">
+      <Border Grid.Column="0" Background="#0F172A" CornerRadius="12" Padding="16" Margin="0,0,8,0">
+        <StackPanel>
+          <TextBlock Text="TOTAL OUTSTANDING" FontSize="10" Foreground="#94A3B8" FontWeight="Bold" Margin="0,0,0,4"/>
+          <TextBlock x:Name="TotalOutstandingText" Text="$0.00" FontSize="22" FontWeight="Bold" Foreground="White"/>
+          <TextBlock x:Name="UnpaidCountText" Text="0 unpaid invoices" FontSize="11" Foreground="#64748B" Margin="0,2,0,0"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="1" Background="White" CornerRadius="12" Padding="16" Margin="0,0,8,0" BorderBrush="#E2E8F0" BorderThickness="1">
+        <StackPanel>
+          <TextBlock Text="OVERDUE (30+ DAYS)" FontSize="10" Foreground="#DC2626" FontWeight="Bold" Margin="0,0,0,4"/>
+          <TextBlock x:Name="OverdueText" Text="$0.00" FontSize="22" FontWeight="Bold" Foreground="#DC2626"/>
+          <TextBlock Text="Needs attention" FontSize="11" Foreground="#94A3B8" Margin="0,2,0,0"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="2" Background="White" CornerRadius="12" Padding="16" Margin="0,0,8,0" BorderBrush="#E2E8F0" BorderThickness="1">
+        <StackPanel>
+          <TextBlock Text="CUSTOMERS WITH CREDIT" FontSize="10" Foreground="#64748B" FontWeight="Bold" Margin="0,0,0,4"/>
+          <TextBlock x:Name="CustomersCountText" Text="0" FontSize="22" FontWeight="Bold" Foreground="#0F172A"/>
+          <TextBlock Text="Unique customers" FontSize="11" Foreground="#94A3B8" Margin="0,2,0,0"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="3" Background="White" CornerRadius="12" Padding="16" BorderBrush="#E2E8F0" BorderThickness="1">
+        <StackPanel Spacing="6">
+          <TextBlock Text="PRINT STATEMENT FOR" FontSize="10" Foreground="#64748B" FontWeight="Bold" Margin="0,0,0,2"/>
+          <ComboBox x:Name="CustomerDropdown" Height="32" HorizontalAlignment="Stretch"
+                    Background="White" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="6"
+                    FontSize="12" Foreground="#0F172A"/>
+          <Button x:Name="PrintStatementBtn" Content="🖨 Print Statement" Height="30" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="10,0" FontSize="12" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+          <Button x:Name="ExportReportBtn" Content="📊 Summary Report" Height="30" Background="#1E293B" Foreground="White" CornerRadius="6" Padding="10,0" FontSize="12" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+        </StackPanel>
+      </Border>
+    </Grid>
 
-    <TextBlock x:Name="StatusText" DockPanel.Dock="Top" FontSize="12" Foreground="#22C55E" Margin="0,0,0,8"/>
+    <!-- TOOLBAR -->
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,12">
+      <TextBox x:Name="SearchBox" Grid.Column="0" Height="38" PlaceholderText="Search by customer or invoice..." MaxWidth="400" HorizontalAlignment="Left"
+               Background="White" BorderBrush="#E2E8F0" BorderThickness="1" CornerRadius="8" Padding="12,0"/>
+      <Button x:Name="SendReminderBtn" Grid.Column="1" Content="📱 Send Reminders" Height="38" Background="#F59E0B" Foreground="White" CornerRadius="8" Padding="14,0" Margin="8,0,0,0" FontWeight="SemiBold"/>
+      <TextBlock x:Name="StatusText" Grid.Column="2" FontSize="12" Foreground="#DC2626" VerticalAlignment="Center" Margin="12,0,0,0"/>
+    </Grid>
 
-    <Border Background="White" CornerRadius="10" Padding="10" BoxShadow="0 1 4 0 #22000000">
-      <DockPanel>
-        <TextBlock DockPanel.Dock="Top" Text="Credit Sales" FontSize="16" FontWeight="Bold" Foreground="#0F172A" Margin="4,0,0,10"/>
-        <DataGrid x:Name="CreditSalesGrid" x:DataType="vm:CreditSaleRow" AutoGenerateColumns="False" IsReadOnly="True"
-                  GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
-                  RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
-          <DataGrid.Columns>
-            <DataGridTextColumn Header="Invoice #" Binding="{Binding InvoiceNumber}" Width="160"/>
-            <DataGridTextColumn Header="Date" Binding="{Binding CreatedAt}" Width="150"/>
-            <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" Width="180"/>
-            <DataGridTextColumn Header="Total" Binding="{Binding TotalAmount}" Width="100"/>
-            <DataGridTextColumn Header="Paid" Binding="{Binding AmountPaid}" Width="100"/>
-            <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" Width="100"/>
-            <DataGridTemplateColumn Header="" Width="140">
-              <DataGridTemplateColumn.CellTemplate>
-                <DataTemplate x:DataType="vm:CreditSaleRow">
-                  <Button x:Name="RecordPaymentBtn" Content="Record Payment" Height="28" Padding="10,0" Background="#0F2A43" Foreground="White" CornerRadius="6"/>
-                </DataTemplate>
-              </DataGridTemplateColumn.CellTemplate>
-            </DataGridTemplateColumn>
-          </DataGrid.Columns>
-        </DataGrid>
-      </DockPanel>
-    </Border>
+    <!-- TABS -->
+    <TabControl DockPanel.Dock="Top" Background="Transparent">
+
+      <!-- Tab 1: Invoices -->
+      <TabItem Header="📋 Credit Invoices">
+        <Border Background="White" CornerRadius="12" Padding="10" BoxShadow="0 1 4 0 #22000000" Margin="0,10,0,0">
+          <DataGrid x:Name="CreditSalesGrid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="vm:CreditSaleRow" AutoGenerateColumns="False" IsReadOnly="True"
+                    GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
+                    RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Invoice #" Binding="{Binding InvoiceNumber}" Width="160"/>
+              <DataGridTextColumn Header="Date" Binding="{Binding CreatedAt}" Width="150"/>
+              <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" Width="180"/>
+              <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="130"/>
+              <DataGridTextColumn Header="Total" Binding="{Binding TotalAmount}" Width="100"/>
+              <DataGridTextColumn Header="Paid" Binding="{Binding AmountPaid}" Width="100"/>
+              <DataGridTextColumn Header="Balance" Binding="{Binding Balance}" Width="100"/>
+              <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="90"/>
+              <DataGridTemplateColumn Header="" Width="150">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate x:DataType="vm:CreditSaleRow">
+                    <Button x:Name="RecordPaymentBtn" Content="💳 Record Payment" Height="28" Padding="10,0" Background="#DC2626" Foreground="White" CornerRadius="6" FontSize="12"/>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+            </DataGrid.Columns>
+          </DataGrid>
+        </Border>
+      </TabItem>
+
+      <!-- Tab 2: Customer Summary -->
+      <TabItem Header="👥 By Customer">
+        <Border Background="White" CornerRadius="12" Padding="10" BoxShadow="0 1 4 0 #22000000" Margin="0,10,0,0">
+          <DataGrid x:Name="CustomerSummaryGrid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="vm:CustomerCreditSummary" AutoGenerateColumns="False" IsReadOnly="True"
+                    GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
+                    RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" Width="200"/>
+              <DataGridTextColumn Header="Phone" Binding="{Binding Phone}" Width="140"/>
+              <DataGridTextColumn Header="Invoices" Binding="{Binding TotalInvoices}" Width="90"/>
+              <DataGridTextColumn Header="Total Owed" Binding="{Binding TotalOwed}" Width="120"/>
+              <DataGridTextColumn Header="Total Paid" Binding="{Binding TotalPaid}" Width="120"/>
+              <DataGridTextColumn Header="Balance Due" Binding="{Binding Balance}" Width="120"/>
+              <DataGridTextColumn Header="Last Sale" Binding="{Binding LastSaleDate}" Width="150"/>
+              <DataGridTemplateColumn Header="" Width="150">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate x:DataType="vm:CustomerCreditSummary">
+                    <Button x:Name="SendReminderRowBtn" Content="📱 Send Reminder" Height="28" Padding="10,0" Background="#F59E0B" Foreground="White" CornerRadius="6" FontSize="12"/>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+            </DataGrid.Columns>
+          </DataGrid>
+        </Border>
+      </TabItem>
+
+    </TabControl>
+
   </DockPanel>
 </UserControl>

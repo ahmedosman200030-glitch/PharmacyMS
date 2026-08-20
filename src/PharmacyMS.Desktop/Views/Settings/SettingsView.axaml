@@ -15,7 +15,7 @@
       </StackPanel>
       <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
         <TextBlock x:Name="ErrorText" Foreground="#EF4444" FontSize="12" VerticalAlignment="Center" IsVisible="False"/>
-        <TextBlock x:Name="SuccessText" Text="Saved." Foreground="#22C55E" FontSize="12" VerticalAlignment="Center" IsVisible="False"/>
+        <TextBlock x:Name="SuccessText" Text="Saved." Foreground="#DC2626" FontSize="12" VerticalAlignment="Center" IsVisible="False"/>
         <Button x:Name="SaveButton" Content="Save Settings" Height="40" Padding="18,0"
                 Background="#DC2626" Foreground="White" CornerRadius="8" FontWeight="SemiBold"/>
       </StackPanel>
@@ -79,6 +79,16 @@
             </StackPanel>
           </Button>
 
+          <Button x:Name="NavCloudSync" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="☁️" FontSize="16"/>
+              <StackPanel Spacing="1">
+                <TextBlock Text="Cloud Sync" FontSize="13" FontWeight="SemiBold"/>
+                <TextBlock Text="Connect to Supabase/Postgres" FontSize="10.5" Foreground="#94A3B8"/>
+              </StackPanel>
+            </StackPanel>
+          </Button>
+
           <Button x:Name="NavSounds" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
             <StackPanel Orientation="Horizontal" Spacing="10">
               <TextBlock Text="🔊" FontSize="16"/>
@@ -123,14 +133,19 @@
 
                 <StackPanel Grid.Column="1" Spacing="14">
                   <TextBlock Text="App Details" FontSize="13" FontWeight="SemiBold" Foreground="#334155"/>
-                  <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
-                    <StackPanel Grid.Column="0" Spacing="6">
+                  <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto" RowSpacing="14">
+                    <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
                       <TextBlock Text="App Name" FontSize="12" Foreground="#64748B"/>
                       <TextBox x:Name="AppNameBox" Height="38"/>
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Spacing="6">
+                    <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
                       <TextBlock Text="Currency Symbol" FontSize="12" Foreground="#64748B"/>
                       <TextBox x:Name="CurrencySymbolBox" Height="38"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
+                      <TextBlock Text="Language" FontSize="12" Foreground="#64748B"/>
+                      <ComboBox x:Name="LanguageCombo" Height="38" HorizontalAlignment="Stretch"/>
+                      <TextBlock Text="Applies to receipts now; more screens coming." FontSize="11" Foreground="#94A3B8"/>
                     </StackPanel>
                   </Grid>
                 </StackPanel>
@@ -148,7 +163,7 @@
 
               <StackPanel Spacing="12">
                 <TextBlock Text="Pharmacy Details" FontSize="13" FontWeight="SemiBold" Foreground="#334155"/>
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto" RowSpacing="14">
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto,Auto" RowSpacing="14">
                   <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
                     <TextBlock Text="Pharmacy Name" FontSize="12" Foreground="#64748B"/>
                     <TextBox x:Name="PharmacyNameBox" Height="38"/>
@@ -157,7 +172,11 @@
                     <TextBlock Text="Website" FontSize="12" Foreground="#64748B"/>
                     <TextBox x:Name="WebsiteBox" Height="38"/>
                   </StackPanel>
-                  <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
+                  <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Spacing="6">
+                    <TextBlock Text="Tagline" FontSize="12" Foreground="#64748B"/>
+                    <TextBox x:Name="TaglineBox" Height="38" Watermark="e.g. Your Health, Our Priority"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="2" Grid.Column="0" Spacing="6">
                     <TextBlock Text="Address" FontSize="12" Foreground="#64748B"/>
                     <TextBox x:Name="AddressBox" Height="38"/>
                   </StackPanel>
@@ -168,18 +187,22 @@
 
               <StackPanel Spacing="12">
                 <TextBlock Text="Contact Information" FontSize="13" FontWeight="SemiBold" Foreground="#334155"/>
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto" RowSpacing="14">
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto,Auto" RowSpacing="14">
                   <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
-                    <TextBlock Text="Phone Number" FontSize="12" Foreground="#64748B"/>
-                    <TextBox x:Name="PhoneNumberBox" Height="38"/>
+                    <TextBlock Text="ZAAD Merchant Number" FontSize="12" Foreground="#64748B"/>
+                    <TextBox x:Name="PhoneNumberBox" Height="38" Watermark="e.g. 6XXXXXXXX"/>
                   </StackPanel>
                   <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
-                    <TextBlock Text="Mobile Number" FontSize="12" Foreground="#64748B"/>
-                    <TextBox x:Name="MobileNumberBox" Height="38"/>
+                    <TextBlock Text="e-Dahab Merchant Number" FontSize="12" Foreground="#64748B"/>
+                    <TextBox x:Name="MobileNumberBox" Height="38" Watermark="e.g. 6XXXXXXXX"/>
                   </StackPanel>
                   <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
                     <TextBlock Text="Email Address" FontSize="12" Foreground="#64748B"/>
                     <TextBox x:Name="EmailBox" Height="38"/>
+                  </StackPanel>
+                  <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
+                    <TextBlock Text="Contact Number" FontSize="12" Foreground="#64748B"/>
+                    <TextBox x:Name="ContactNumberBox" Height="38" Watermark="e.g. 063XXXXXXX"/>
                   </StackPanel>
                 </Grid>
               </StackPanel>
@@ -190,7 +213,7 @@
           <Border x:Name="PanelTax" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000" IsVisible="False">
             <StackPanel Spacing="16">
               <TextBlock Text="Tax &amp; Invoicing" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
-              <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto" RowSpacing="14">
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto,Auto" RowSpacing="14">
                 <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
                   <TextBlock Text="Tax / VAT Rate (%)" FontSize="12" Foreground="#64748B"/>
                   <TextBox x:Name="TaxRateBox" Height="38"/>
@@ -208,6 +231,11 @@
                 <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
                   <TextBlock Text="Receipt Footer" FontSize="12" Foreground="#64748B"/>
                   <TextBox x:Name="ReceiptFooterBox" Height="38"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="0" Spacing="6">
+                  <TextBlock Text="SLSH Exchange Rate" FontSize="12" Foreground="#64748B"/>
+                  <TextBox x:Name="SlshRateBox" Height="38" Watermark="e.g. 8500"/>
+                  <TextBlock Text="Shillings per $1 — shown on receipts under the total." FontSize="11" Foreground="#94A3B8"/>
                 </StackPanel>
               </Grid>
             </StackPanel>
@@ -252,11 +280,58 @@
 
               <StackPanel Orientation="Horizontal" Spacing="10">
                 <Button x:Name="BackupButton" Content="Backup Now" Height="38"
-                        Background="#22C55E" Foreground="White" CornerRadius="6" Padding="16,4"/>
+                        Background="#DC2626" Foreground="White" CornerRadius="6" Padding="16,4"/>
                 <Button x:Name="RestoreButton" Content="Restore From File" Height="38"
                         Background="#F59E0B" Foreground="White" CornerRadius="6" Padding="16,4"/>
               </StackPanel>
-              <TextBlock x:Name="DbStatusText" FontSize="12" Foreground="#22C55E" IsVisible="False" TextWrapping="Wrap"/>
+              <TextBlock x:Name="DbStatusText" FontSize="12" Foreground="#DC2626" IsVisible="False" TextWrapping="Wrap"/>
+            </StackPanel>
+          </Border>
+
+          <!-- Cloud Sync -->
+          <Border x:Name="PanelCloudSync" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000" IsVisible="False">
+            <StackPanel Spacing="16">
+              <TextBlock Text="Cloud Sync" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+              <TextBlock Text="Connect this PC to a shared Supabase/Postgres database instead of the local SQLite file." FontSize="12" Foreground="#64748B" TextWrapping="Wrap"/>
+
+              <CheckBox x:Name="UseCloudDbCheck" Content="Use Cloud Database (Postgres)" FontSize="13"/>
+
+              <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto,Auto" RowSpacing="14">
+                <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+                  <TextBlock Text="Host" FontSize="12" Foreground="#64748B"/>
+                  <TextBox x:Name="CloudHostBox" Height="38" Watermark="aws-0-&lt;region&gt;.pooler.supabase.com (NOT db.xxxx.supabase.co)"/>
+                </StackPanel>
+                <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
+                  <TextBlock Text="Port" FontSize="12" Foreground="#64748B"/>
+                  <TextBox x:Name="CloudPortBox" Height="38" Watermark="5432"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
+                  <TextBlock Text="Database" FontSize="12" Foreground="#64748B"/>
+                  <TextBox x:Name="CloudDatabaseBox" Height="38" Watermark="postgres"/>
+                </StackPanel>
+                <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
+                  <TextBlock Text="Username" FontSize="12" Foreground="#64748B"/>
+                  <TextBox x:Name="CloudUsernameBox" Height="38" Watermark="postgres.&lt;project-ref&gt;"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="0" Spacing="6">
+                  <TextBlock Text="Password" FontSize="12" Foreground="#64748B"/>
+                  <TextBox x:Name="CloudPasswordBox" Height="38" PasswordChar="•"/>
+                </StackPanel>
+                <StackPanel Grid.Row="2" Grid.Column="1" Spacing="6">
+                  <TextBlock Text="SSL Mode" FontSize="12" Foreground="#64748B"/>
+                  <ComboBox x:Name="CloudSslModeCombo" Height="38" HorizontalAlignment="Stretch"/>
+                </StackPanel>
+              </Grid>
+
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button x:Name="TestCloudConnectionButton" Content="Test Connection" Height="38"
+                        Background="#3B82F6" Foreground="White" CornerRadius="6" Padding="16,4"/>
+                <Button x:Name="SaveCloudSyncButton" Content="Save &amp; Restart" Height="38"
+                        Background="#DC2626" Foreground="White" CornerRadius="6" Padding="16,4"/>
+                <Button x:Name="MigrateToCloudButton" Content="Migrate Local Data to Cloud" Height="38"
+                        Background="#16A34A" Foreground="White" CornerRadius="6" Padding="16,4"/>
+              </StackPanel>
+              <TextBlock x:Name="CloudSyncStatusText" FontSize="12" IsVisible="False" TextWrapping="Wrap"/>
             </StackPanel>
           </Border>
 
@@ -319,24 +394,70 @@
 
           <!-- About -->
           <Border x:Name="PanelAbout" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000" IsVisible="False">
-            <StackPanel Spacing="16">
-              <TextBlock Text="About" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
-              <Border Background="#F8FAFC" CornerRadius="8" Padding="16">
-                <StackPanel Spacing="8">
-                  <Grid ColumnDefinitions="140,*">
-                    <TextBlock Grid.Column="0" Text="Application" FontSize="12" Foreground="#64748B"/>
-                    <TextBlock Grid.Column="1" Text="PharmacyMS Desktop" FontSize="12" Foreground="#334155"/>
-                  </Grid>
-                  <Grid ColumnDefinitions="140,*">
-                    <TextBlock Grid.Column="0" Text="Version" FontSize="12" Foreground="#64748B"/>
-                    <TextBlock Grid.Column="1" Text="1.0.0 (.NET 10, Avalonia)" FontSize="12" Foreground="#334155"/>
-                  </Grid>
-                  <Grid ColumnDefinitions="140,*">
-                    <TextBlock Grid.Column="0" Text="Author" FontSize="12" Foreground="#64748B"/>
-                    <TextBlock Grid.Column="1" Text="Ahmed Osman" FontSize="12" Foreground="#334155"/>
-                  </Grid>
-                </StackPanel>
+            <StackPanel Spacing="18">
+
+              <StackPanel Spacing="10">
+                <TextBlock Text="📱 Application Information" FontSize="15" FontWeight="Bold" Foreground="#0F172A"/>
+                <Border Background="#F8FAFC" CornerRadius="8" Padding="16">
+                  <StackPanel Spacing="7">
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Application Name" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="PharmacyMS" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Version" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="2.0.0" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Edition" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="Desktop" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Platform" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="Windows &amp; macOS" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="License" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="Proprietary" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Database" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="Local Pharmacy Database" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Language" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" x:Name="AboutLanguageText" Text="English/Somali" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Currency" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" x:Name="AboutCurrencyText" Text="$" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Release Year" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="2026" FontSize="12" Foreground="#334155"/></Grid>
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+
+              <StackPanel Spacing="10">
+                <TextBlock Text="🛠️ System Information" FontSize="15" FontWeight="Bold" Foreground="#0F172A"/>
+                <Border Background="#F8FAFC" CornerRadius="8" Padding="16">
+                  <StackPanel Spacing="7">
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Application Version" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="2.0.0" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Database Version" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="1.0" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Last Backup" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="Available in Backup &amp; Restore" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Database Size" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" x:Name="AboutDbSizeText" Text="—" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Installation Date" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" x:Name="AboutInstallDateText" Text="—" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Current User" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" x:Name="AboutCurrentUserText" Text="—" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="License Expires" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" x:Name="AboutLicenseExpiryText" Text="—" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="System Status" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="🟢 Healthy" FontSize="12" Foreground="#334155"/></Grid>
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+
+              <StackPanel Spacing="10">
+                <TextBlock Text="👨‍💻 Developed By" FontSize="15" FontWeight="Bold" Foreground="#0F172A"/>
+                <Border Background="#F8FAFC" CornerRadius="8" Padding="16">
+                  <StackPanel Spacing="4">
+                    <TextBlock Text="Ahmed Osman" FontSize="13" FontWeight="SemiBold" Foreground="#0F172A"/>
+                    <TextBlock Text="PharmacyMS Developer" FontSize="12" Foreground="#64748B"/>
+                    <TextBlock Text="📧 ahmedosman200030@gmail.com" FontSize="12" Foreground="#334155" Margin="0,6,0,0"/>
+                    <TextBlock Text="📞 +252 47 34969" FontSize="12" Foreground="#334155"/>
+                    <TextBlock Text="PharmacyMS is independently developed by Ahmed Osman as a desktop pharmacy management solution."
+                               FontSize="12" Foreground="#64748B" TextWrapping="Wrap" Margin="0,8,0,0"/>
+                  </StackPanel>
+                </Border>
+              </StackPanel>
+
+              <Border Background="#FFFBEB" BorderBrush="#FDE68A" BorderThickness="1" CornerRadius="8" Padding="14">
+                <TextBlock Text="PharmacyMS is designed to keep pharmacy operational data within the local application database. Users are responsible for maintaining regular backups and protecting access to their pharmacy system."
+                           FontSize="11.5" Foreground="#92400E" TextWrapping="Wrap"/>
               </Border>
+
+              <StackPanel Spacing="4">
+                <TextBlock Text="📄 Copyright" FontSize="13" FontWeight="SemiBold" Foreground="#0F172A"/>
+                <TextBlock Text="© 2026 Ahmed Osman. All rights reserved." FontSize="12" Foreground="#64748B"/>
+              </StackPanel>
+
+              <StackPanel Spacing="2" HorizontalAlignment="Center" Margin="0,8,0,0">
+                <TextBlock Text="PharmacyMS v1.0.0" FontSize="12" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                <TextBlock Text="Reliable • Secure • Simple" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
+              </StackPanel>
+
             </StackPanel>
           </Border>
 
