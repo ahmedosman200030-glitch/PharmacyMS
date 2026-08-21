@@ -86,6 +86,7 @@
           <DataGridTextColumn Header="Price" Binding="{Binding UnitPrice}" Width="70"/>
           <DataGridTextColumn Header="Margin %" Binding="{Binding MarginPercent}" Width="80"/>
           <DataGridTextColumn Header="Stock" Binding="{Binding QuantityInStock}" Width="60"/>
+          <DataGridTextColumn Header="Unit" Binding="{Binding Unit}" Width="70"/>
           <DataGridTextColumn Header="Reorder At" Binding="{Binding ReorderLevel}" Width="90"/>
           <DataGridTextColumn Header="Batch" Binding="{Binding BatchNumber}" Width="100"/>
           <DataGridTemplateColumn Header="Expiry" Width="140">

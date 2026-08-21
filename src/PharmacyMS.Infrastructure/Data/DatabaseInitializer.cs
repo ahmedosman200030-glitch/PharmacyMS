@@ -192,6 +192,7 @@ public class DatabaseInitializer
         await conn.ExecuteAsync($@"
             CREATE TABLE IF NOT EXISTS Categories (
                 Id {pk},
+                Code TEXT,
                 Name TEXT NOT NULL,
                 Description TEXT,
                 IsActive INTEGER NOT NULL DEFAULT 1,
@@ -358,6 +359,10 @@ public class DatabaseInitializer
                 await conn.ExecuteAsync("ALTER TABLE GoodsReceipts ADD COLUMN ApprovalStatus INTEGER NOT NULL DEFAULT 1");
             if (!goodsReceiptCols.Contains("RejectionReason"))
                 await conn.ExecuteAsync("ALTER TABLE GoodsReceipts ADD COLUMN RejectionReason TEXT");
+
+            var categoryCols = (await conn.QueryAsync<string>("SELECT name FROM pragma_table_info('Categories')")).ToHashSet();
+            if (!categoryCols.Contains("Code"))
+                await conn.ExecuteAsync("ALTER TABLE Categories ADD COLUMN Code TEXT");
 
             var medicineCols = (await conn.QueryAsync<string>("SELECT name FROM pragma_table_info('Medicines')")).ToHashSet();
             if (!medicineCols.Contains("Barcode"))

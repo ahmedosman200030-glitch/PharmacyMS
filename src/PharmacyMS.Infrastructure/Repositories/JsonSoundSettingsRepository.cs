@@ -15,13 +15,13 @@ public class JsonSoundSettingsRepository : ISoundSettingsRepository
     {
         var appDataDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "PharmacyMS");
+            "PharmaPro");
 
         if (OperatingSystem.IsMacOS())
         {
             appDataDir = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
-                "Library", "Application Support", "PharmacyMS");
+                "Library", "Application Support", "PharmaPro");
         }
 
         Directory.CreateDirectory(appDataDir);

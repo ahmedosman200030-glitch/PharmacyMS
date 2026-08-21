@@ -8,6 +8,7 @@
   <DockPanel Margin="20">
     <TextBlock DockPanel.Dock="Top" Text="Categories" FontSize="22" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,0,16"/>
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,16">
+      <TextBox x:Name="CodeBox" Width="100" Height="34" PlaceholderText="Code (e.g. CAT-001)"/>
       <TextBox x:Name="NameBox" Width="200" Height="34" PlaceholderText="Category name"/>
       <TextBox x:Name="DescBox" Width="280" Height="34" PlaceholderText="Description"/>
       <Button x:Name="AddButton" Content="Add" Height="34" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="14,4"/>
@@ -20,6 +21,7 @@
                 GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
                 RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
         <DataGrid.Columns>
+          <DataGridTextColumn Header="Code" Binding="{Binding Code}" Width="100"/>
           <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="220"/>
           <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="360"/>
         </DataGrid.Columns>

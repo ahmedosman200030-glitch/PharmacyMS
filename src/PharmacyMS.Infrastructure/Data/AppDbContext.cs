@@ -61,7 +61,7 @@ public class AppDbContext
     {
         var folder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "PharmacyMS");
+            "PharmaPro");
         Directory.CreateDirectory(folder);
         var dbPath = Path.Combine(folder, "pharmacyms.db");
         return $"Data Source={dbPath}";

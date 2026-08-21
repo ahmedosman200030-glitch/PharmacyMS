@@ -30,7 +30,7 @@ public class BrandingService : IBrandingService
         var dict = rows.ToDictionary(r => r.Key, r => r.Value);
         return new BrandingSettings
         {
-            AppName = dict.TryGetValue(AppNameKey, out var name) ? name : "PharmacyMS",
+            AppName = dict.TryGetValue(AppNameKey, out var name) ? name : "PharmaPro",
             LogoPath = dict.TryGetValue(LogoPathKey, out var logo) ? logo : null,
             IconPath = dict.TryGetValue(IconPathKey, out var icon) ? icon : null,
             PharmacyName = dict.TryGetValue(PharmacyNameKey, out var pn) ? pn : null,
@@ -79,7 +79,7 @@ public class BrandingService : IBrandingService
 
     private static async Task<string> SaveBrandingFileAsync(Stream fileStream, string originalFileName, string prefix)
     {
-        var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PharmacyMS", "Branding");
+        var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PharmaPro", "Branding");
         Directory.CreateDirectory(folder);
         var ext = Path.GetExtension(originalFileName);
         if (string.IsNullOrWhiteSpace(ext)) ext = ".png";

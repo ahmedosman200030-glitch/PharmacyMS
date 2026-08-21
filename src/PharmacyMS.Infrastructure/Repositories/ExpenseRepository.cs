@@ -31,7 +31,7 @@ public class ExpenseRepository : IExpenseRepository
         using var conn = _context.CreateConnection();
         return await conn.ExecuteScalarAsync<int>($@"
             INSERT INTO Expenses (Date, Category, Description, Amount, CreatedBy, CreatedAt)
-            VALUES (@Date, @Category, @Description, @Amount, @CreatedBy, {_context.NowExpr()})
+            VALUES (@Date, @Category, @Description, @Amount, @CreatedBy, @CreatedAt)
             {_context.InsertIdSuffix()};", expense);
     }
 

@@ -31,7 +31,7 @@ public class PurchaseOrderPdfService : IPurchaseOrderPdfService
 
         var folder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "PharmacyMS", "PurchaseOrders");
+            "PharmaPro", "PurchaseOrders");
         Directory.CreateDirectory(folder);
         var path = Path.Combine(folder, $"{order.OrderNumber}.pdf");
 

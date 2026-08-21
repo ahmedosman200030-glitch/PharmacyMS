@@ -272,16 +272,47 @@ public partial class InventoryView : UserControl
 
         var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "Export Inventory",
-            SuggestedFileName = $"inventory-{DateTime.Now:yyyyMMdd}.csv",
-            FileTypeChoices = new[] { new FilePickerFileType("CSV") { Patterns = new[] { "*.csv" } } }
+            Title = "Export Inventory as Excel",
+            SuggestedFileName = $"inventory-{DateTime.Now:yyyyMMdd}.xlsx",
+            FileTypeChoices = new[]
+            {
+                new FilePickerFileType("Excel Workbook") { Patterns = new[] { "*.xlsx" } },
+                new FilePickerFileType("CSV") { Patterns = new[] { "*.csv" } }
+            }
         });
 
         if (file == null) return;
 
-        var csv = _vm.ExportToCsv();
+        var fileName = file.Name.ToLowerInvariant();
         await using var stream = await file.OpenWriteAsync();
-        await using var writer = new StreamWriter(stream);
-        await writer.WriteAsync(csv);
+
+        if (fileName.EndsWith(".xlsx"))
+        {
+            var wb = _vm.ExportToExcelWorkbook();
+            wb.SaveAs(stream);
+        }
+        else
+        {
+            var csv = _vm.ExportToCsv();
+            await using var writer = new StreamWriter(stream);
+            await writer.WriteAsync(csv);
+        }
+
+        // Show success
+        var dialog = new Avalonia.Controls.Window
+        {
+            Title = "Export Complete",
+            Width = 340,
+            Height = 140,
+            WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterOwner,
+            Content = new Avalonia.Controls.TextBlock
+            {
+                Text = $"✅ Inventory exported successfully to:\n{file.Name}",
+                Margin = new Avalonia.Thickness(20),
+                TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+                VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
+            }
+        };
+        await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Avalonia.Controls.Window);
     }
 }

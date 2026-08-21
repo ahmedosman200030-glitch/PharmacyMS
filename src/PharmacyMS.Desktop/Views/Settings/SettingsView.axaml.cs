@@ -97,6 +97,7 @@ public partial class SettingsView : UserControl
         BackupButton.Click += async (_, _) => await BackupAsync();
         RestoreButton.Click += async (_, _) => await RestoreAsync();
         SaveButton.Click += async (_, _) => await SaveAsync();
+        CheckUpdateButton.Click += async (_, _) => await CheckForUpdatesAsync();
 
         TestCloudConnectionButton.Click += async (_, _) => await TestCloudConnectionAsync();
         SaveCloudSyncButton.Click += async (_, _) => await SaveCloudSyncAsync();
@@ -567,6 +568,23 @@ public partial class SettingsView : UserControl
         {
             MigrateToCloudButton.IsEnabled = true;
         }
+    }
+
+    private async Task CheckForUpdatesAsync()
+    {
+        CheckUpdateButton.IsEnabled = false;
+        UpdateStatusText.IsVisible = true;
+        UpdateStatusText.Foreground = Avalonia.Media.Brush.Parse("#64748B");
+        UpdateStatusText.Text = "Checking for updates...";
+
+        var result = await PharmacyMS.Desktop.Services.UpdateService.CheckForUpdatesAsync();
+
+        UpdateStatusText.Text = result.Message ?? "";
+        UpdateStatusText.Foreground = result.Status == PharmacyMS.Desktop.Services.UpdateCheckStatus.Error
+            ? Avalonia.Media.Brush.Parse("#DC2626")
+            : Avalonia.Media.Brush.Parse("#16A34A");
+
+        CheckUpdateButton.IsEnabled = true;
     }
 
     private void RestartApp()

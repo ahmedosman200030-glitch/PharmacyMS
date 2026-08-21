@@ -20,8 +20,8 @@ public class CategoryRepository : ICategoryRepository
     {
         using var conn = _context.CreateConnection();
         return await conn.ExecuteScalarAsync<int>($@"
-            INSERT INTO Categories (Name, Description, IsActive, CreatedAt)
-            VALUES (@Name, @Description, 1, {_context.NowExpr()})
+            INSERT INTO Categories (Code, Name, Description, IsActive, CreatedAt)
+            VALUES (@Code, @Name, @Description, 1, {_context.NowExpr()})
             {_context.InsertIdSuffix()};", category);
     }
 
@@ -29,7 +29,7 @@ public class CategoryRepository : ICategoryRepository
     {
         using var conn = _context.CreateConnection();
         await conn.ExecuteAsync(
-            "UPDATE Categories SET Name=@Name, Description=@Description WHERE Id=@Id", category);
+            "UPDATE Categories SET Code=@Code, Name=@Name, Description=@Description WHERE Id=@Id", category);
     }
 
     public async Task DeleteAsync(int id)

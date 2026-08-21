@@ -2,7 +2,7 @@ namespace PharmacyMS.Application.Interfaces.Services;
 
 public class BrandingSettings
 {
-    public string AppName { get; set; } = "PharmacyMS";
+    public string AppName { get; set; } = "PharmaPro";
     public string? LogoPath { get; set; }
     public string? IconPath { get; set; }
 

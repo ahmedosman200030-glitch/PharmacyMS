@@ -429,6 +429,102 @@ public partial class MainWindow : Window
             OpenSettings();
         };
 
+        GlobalSearchBox.TextChanged += async (_, _) => await RunGlobalSearchAsync();
+
+    }
+
+    private async Task RunGlobalSearchAsync()
+    {
+        var term = GlobalSearchBox.Text?.Trim() ?? "";
+        if (term.Length < 2)
+        {
+            SearchResultsPopup.IsOpen = false;
+            return;
+        }
+
+        var results = new List<PharmacyMS.Desktop.ViewModels.SearchResultItem>();
+
+        try
+        {
+            var medicineRepo = Program.Services.GetRequiredService<IMedicineRepository>();
+            var medicines = await medicineRepo.SearchAsync(term);
+            foreach (var m in medicines.Take(5))
+            {
+                results.Add(new PharmacyMS.Desktop.ViewModels.SearchResultItem
+                {
+                    Icon = "💊",
+                    Title = m.Name,
+                    Subtitle = "Medicine — Stock: " + m.QuantityInStock,
+                    NavigateCommand = new PharmacyMS.Desktop.ViewModels.RelayCommand(() =>
+                    {
+                        SearchResultsPopup.IsOpen = false;
+                        GlobalSearchBox.Text = "";
+                        NavigateToInventory(null);
+                        return Task.CompletedTask;
+                    })
+                });
+            }
+
+            var customerRepo = Program.Services.GetRequiredService<ICustomerRepository>();
+            var customers = await customerRepo.SearchAsync(term);
+            foreach (var c in customers.Take(5))
+            {
+                results.Add(new PharmacyMS.Desktop.ViewModels.SearchResultItem
+                {
+                    Icon = "👤",
+                    Title = c.Name,
+                    Subtitle = "Customer" + (string.IsNullOrWhiteSpace(c.Phone) ? "" : " — " + c.Phone),
+                    NavigateCommand = new PharmacyMS.Desktop.ViewModels.RelayCommand(() =>
+                    {
+                        SearchResultsPopup.IsOpen = false;
+                        GlobalSearchBox.Text = "";
+                        CustomersButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+                        return Task.CompletedTask;
+                    })
+                });
+            }
+
+            var saleRepo = Program.Services.GetRequiredService<ISaleRepository>();
+            var allSales = await saleRepo.GetAllAsync();
+            var sales = allSales
+                .Where(s => s.InvoiceNumber.Contains(term, StringComparison.OrdinalIgnoreCase)
+                         || s.CustomerName.Contains(term, StringComparison.OrdinalIgnoreCase))
+                .Take(5);
+            foreach (var s in sales)
+            {
+                results.Add(new PharmacyMS.Desktop.ViewModels.SearchResultItem
+                {
+                    Icon = "🧾",
+                    Title = s.InvoiceNumber,
+                    Subtitle = "Invoice — " + s.CustomerName + " — $" + s.TotalAmount.ToString("0.00"),
+                    NavigateCommand = new PharmacyMS.Desktop.ViewModels.RelayCommand(() =>
+                    {
+                        SearchResultsPopup.IsOpen = false;
+                        GlobalSearchBox.Text = "";
+                        SalesHistoryButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
+                        return Task.CompletedTask;
+                    })
+                });
+            }
+
+            if (results.Count == 0)
+            {
+                results.Add(new PharmacyMS.Desktop.ViewModels.SearchResultItem
+                {
+                    Icon = "🚫",
+                    Title = "No results found",
+                    Subtitle = "Try a different search term",
+                    NavigateCommand = new PharmacyMS.Desktop.ViewModels.RelayCommand(() => Task.CompletedTask)
+                });
+            }
+
+            SearchResultsList.ItemsSource = results;
+            SearchResultsPopup.IsOpen = true;
+        }
+        catch
+        {
+            SearchResultsPopup.IsOpen = false;
+        }
     }
 
 
@@ -522,7 +618,7 @@ public partial class MainWindow : Window
 
         var folder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "PharmacyMS", "Avatars");
+            "PharmaPro", "Avatars");
         Directory.CreateDirectory(folder);
 
         var ext = Path.GetExtension(files[0].Name);
@@ -762,6 +858,7 @@ public partial class MainWindow : Window
         {
             LogoImage.Source = new Avalonia.Media.Imaging.Bitmap(branding.LogoPath);
             LogoImage.IsVisible = true;
+            DefaultLogoBorder.IsVisible = false;
         }
     }
 }

@@ -81,7 +81,7 @@ public class ReceiptService : IReceiptService
     {
         var folder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "PharmacyMS", "Receipts");
+            "PharmaPro", "Receipts");
         Directory.CreateDirectory(folder);
         var path = Path.Combine(folder, $"Receipt-{receipt.InvoiceNumber}.pdf");
 

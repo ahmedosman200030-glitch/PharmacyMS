@@ -444,9 +444,9 @@ public static class ReportExportService
 
     private static string GetPharmacyName(BrandingSettings? branding)
     {
-        if (branding == null) return "PharmacyMS";
+        if (branding == null) return "PharmaPro";
         if (!string.IsNullOrWhiteSpace(branding.PharmacyName)) return branding.PharmacyName!;
-        return string.IsNullOrWhiteSpace(branding.AppName) ? "PharmacyMS" : branding.AppName;
+        return string.IsNullOrWhiteSpace(branding.AppName) ? "PharmaPro" : branding.AppName;
     }
 
     private static string GetContactLine(BrandingSettings? branding)

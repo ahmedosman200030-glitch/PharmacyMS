@@ -89,7 +89,7 @@ public class SaleRepository : ISaleRepository
             INSERT INTO Sales (InvoiceNumber, CashierId, Subtotal, TaxRate, TaxAmount, TotalAmount,
             CustomerId, CustomerName, PaymentMethod, TotalDiscount, AmountPaid, ChangeDue, CreatedAt)
             VALUES (@InvoiceNumber, @CashierId, @Subtotal, @TaxRate, @TaxAmount, @TotalAmount,
-            @CustomerId, @CustomerName, @PaymentMethod, @TotalDiscount, @AmountPaid, @ChangeDue, {_context.NowExpr()})
+            @CustomerId, @CustomerName, @PaymentMethod, @TotalDiscount, @AmountPaid, @ChangeDue, @CreatedAt)
             {_context.InsertIdSuffix()};", sale, tx);
         foreach (var item in sale.Items)
         {

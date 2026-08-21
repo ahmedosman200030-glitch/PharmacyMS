@@ -22,9 +22,9 @@ public partial class CategoriesView : UserControl
         {
             if (!string.IsNullOrWhiteSpace(NameBox.Text))
             {
-                var cat = new Category { Name = NameBox.Text.Trim(), Description = DescBox.Text?.Trim() ?? "" };
+                var cat = new Category { Code = CodeBox.Text?.Trim(), Name = NameBox.Text.Trim(), Description = DescBox.Text?.Trim() ?? "" };
                 await _vm.AddAsync(cat);
-                NameBox.Text = ""; DescBox.Text = "";
+                CodeBox.Text = ""; NameBox.Text = ""; DescBox.Text = "";
             }
         };
 
@@ -130,7 +130,8 @@ public partial class CategoriesView : UserControl
             colMap[cell.GetString().Trim()] = cell.Address.ColumnNumber;
         int Col(params string[] names) { foreach (var n in names) if (colMap.TryGetValue(n, out var c)) return c; return -1; }
 
-        var nameCol = Col("Name");
+        var codeCol = Col("Code", "Category ID", "CategoryID", "ID");
+        var nameCol = Col("Name", "Medicine Category");
         var descCol = Col("Description");
         if (nameCol == -1)
         {
@@ -144,9 +145,13 @@ public partial class CategoriesView : UserControl
         {
             var name = row.Cell(nameCol).GetString().Trim();
             if (string.IsNullOrWhiteSpace(name)) continue;
+            var code = codeCol != -1 ? row.Cell(codeCol).GetString().Trim() : "";
             var desc = descCol != -1 ? row.Cell(descCol).GetString().Trim() : "";
-            await _vm.AddAsync(new Category { Name = name, Description = desc });
-            if (_vm.Categories.Any(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase)))
+
+            // Check for duplicates BEFORE inserting — previously this checked AFTER
+            // the row was already saved, so duplicates were never actually prevented.
+            if (_vm.Categories.Any(x => string.Equals(x.Name, name, StringComparison.OrdinalIgnoreCase))
+                || (!string.IsNullOrWhiteSpace(code) && _vm.Categories.Any(x => string.Equals(x.Code, code, StringComparison.OrdinalIgnoreCase))))
             {
                 skipped++;
                 continue;
@@ -157,6 +162,8 @@ public partial class CategoriesView : UserControl
                 flagged.Add($"\"{name}\" (similar to existing \"{similar.Name}\")");
                 continue;
             }
+
+            await _vm.AddAsync(new Category { Code = code, Name = name, Description = desc });
             added++;
         }
 
@@ -182,8 +189,9 @@ public partial class CategoriesView : UserControl
 
         using var wb = new XLWorkbook();
         var ws = wb.Worksheets.Add("Categories");
-        ws.Cell(1, 1).Value = "Name";
-        ws.Cell(1, 2).Value = "Description";
+        ws.Cell(1, 1).Value = "Code";
+        ws.Cell(1, 2).Value = "Name";
+        ws.Cell(1, 3).Value = "Description";
         ws.Row(1).Style.Font.Bold = true;
         ws.Row(1).Style.Fill.BackgroundColor = XLColor.FromHtml("#8B0000");
         ws.Row(1).Style.Font.FontColor = XLColor.White;
@@ -191,8 +199,9 @@ public partial class CategoriesView : UserControl
         int row = 2;
         foreach (var c in _vm.Categories.OrderBy(x => x.Name))
         {
-            ws.Cell(row, 1).Value = c.Name;
-            ws.Cell(row, 2).Value = c.Description;
+            ws.Cell(row, 1).Value = c.Code;
+            ws.Cell(row, 2).Value = c.Name;
+            ws.Cell(row, 3).Value = c.Description;
             row++;
         }
         ws.Columns().AdjustToContents();

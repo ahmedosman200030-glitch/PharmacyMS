@@ -211,7 +211,7 @@ public partial class SalesHistoryView : UserControl
             }
         });
 
-        var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PharmacyMS", "Statements");
+        var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PharmaPro", "Statements");
         Directory.CreateDirectory(folder);
         var fileName = sales.Count == 1
             ? $"Statement-{sales[0].InvoiceNumber}.pdf"

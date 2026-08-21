@@ -68,6 +68,7 @@ public class PurchaseViewModel
             SupplierName = supplier.Name,
             InvoiceNumber = invoiceNumber,
             TotalAmount = Total,
+            CreatedAt = DateTime.Now,
             ApprovalStatus = PharmacyMS.Application.Services.SessionManager.IsAdmin
                 ? PharmacyMS.Domain.Enums.ApprovalStatus.Approved
                 : PharmacyMS.Domain.Enums.ApprovalStatus.Pending,

@@ -21,6 +21,7 @@ public class MedicineRow
         ? Math.Round((UnitPrice - CostPrice) / UnitPrice * 100, 1) : 0;
     public int QuantityInStock => Medicine.QuantityInStock;
     public int ReorderLevel => Medicine.ReorderLevel;
+    public string Unit => Medicine.Unit ?? "Box";
     public string BatchNumber => Medicine.BatchNumber ?? "";
     public DateTime? ExpiryDate => Medicine.ExpiryDate;
 
@@ -186,11 +187,11 @@ public class InventoryViewModel
     public string ExportToCsv()
     {
         var sb = new System.Text.StringBuilder();
-        sb.AppendLine("Name,Generic Name,Category,Supplier,Unit Price,Cost Price,Margin %,Stock,Reorder Level,Batch,Expiry,Status");
+        sb.AppendLine("Name,Generic Name,Category,Supplier,Unit,Unit Price,Cost Price,Margin %,Stock,Reorder Level,Batch,Expiry,Status");
         foreach (var r in _allRows.OrderBy(x => x.Name))
         {
             sb.AppendLine($"\"{r.Name}\",\"{r.GenericName}\",\"{r.Category}\",\"{r.Supplier}\"," +
-                          $"{r.UnitPrice},{r.CostPrice},{r.MarginPercent}," +
+                          $"{r.Unit},{r.UnitPrice},{r.CostPrice},{r.MarginPercent}," +
                           $"{r.QuantityInStock},{r.ReorderLevel}," +
                           $"\"{r.BatchNumber}\",\"{r.ExpiryDate?.ToString("yyyy-MM-dd")}\",\"{r.StatusLabel}\"");
         }
@@ -202,7 +203,7 @@ public class InventoryViewModel
         var wb = new XLWorkbook();
         var ws = wb.Worksheets.Add("Inventory");
 
-        var headers = new[] { "Name", "Generic Name", "Category", "Supplier", "Unit Price", "Cost Price",
+        var headers = new[] { "Name", "Generic Name", "Category", "Supplier", "Unit", "Unit Price", "Cost Price",
             "Margin %", "Stock", "Reorder Level", "Batch", "Expiry", "Status" };
         for (int i = 0; i < headers.Length; i++)
             ws.Cell(1, i + 1).Value = headers[i];
@@ -217,14 +218,15 @@ public class InventoryViewModel
             ws.Cell(row, 2).Value = r.GenericName;
             ws.Cell(row, 3).Value = r.Category;
             ws.Cell(row, 4).Value = r.Supplier;
-            ws.Cell(row, 5).Value = r.UnitPrice;
-            ws.Cell(row, 6).Value = r.CostPrice;
-            ws.Cell(row, 7).Value = r.MarginPercent;
-            ws.Cell(row, 8).Value = r.QuantityInStock;
-            ws.Cell(row, 9).Value = r.ReorderLevel;
-            ws.Cell(row, 10).Value = r.BatchNumber;
-            ws.Cell(row, 11).Value = r.ExpiryDate?.ToString("yyyy-MM-dd") ?? "";
-            ws.Cell(row, 12).Value = r.StatusLabel;
+            ws.Cell(row, 5).Value = r.Unit;
+            ws.Cell(row, 6).Value = r.UnitPrice;
+            ws.Cell(row, 7).Value = r.CostPrice;
+            ws.Cell(row, 8).Value = r.MarginPercent;
+            ws.Cell(row, 9).Value = r.QuantityInStock;
+            ws.Cell(row, 10).Value = r.ReorderLevel;
+            ws.Cell(row, 11).Value = r.BatchNumber;
+            ws.Cell(row, 12).Value = r.ExpiryDate?.ToString("yyyy-MM-dd") ?? "";
+            ws.Cell(row, 13).Value = r.StatusLabel;
 
             var statusColor = r.Status switch
             {
@@ -233,7 +235,7 @@ public class InventoryViewModel
                 StockStatus.LowStock => XLColor.FromArgb(254, 243, 199),
                 _ => XLColor.White
             };
-            ws.Range(row, 1, row, 12).Style.Fill.BackgroundColor = statusColor;
+            ws.Range(row, 1, row, 13).Style.Fill.BackgroundColor = statusColor;
             row++;
         }
 
@@ -273,6 +275,7 @@ public class InventoryViewModel
         var costCol = Col("Cost Price", "CostPrice", "Cost");
         var stockCol = Col("Stock", "Quantity In Stock", "QuantityInStock");
         var reorderCol = Col("Reorder Level", "ReorderLevel");
+        var unitCol = Col("Unit");
         var batchCol = Col("Batch", "Batch Number", "BatchNumber");
         var expiryCol = Col("Expiry", "Expiry Date", "ExpiryDate");
 
@@ -311,6 +314,7 @@ public class InventoryViewModel
                     Category = categoryCol > 0 ? ws.Cell(r, categoryCol).GetString().Trim() : null,
                     Supplier = supplierCol > 0 ? ws.Cell(r, supplierCol).GetString().Trim() : null,
                     Manufacturer = manufacturerCol > 0 ? ws.Cell(r, manufacturerCol).GetString().Trim() : null,
+                    Unit = unitCol > 0 ? ws.Cell(r, unitCol).GetString().Trim() : "Box",
                     UnitPrice = priceCol > 0 ? ws.Cell(r, priceCol).GetValue<decimal>() : 0,
                     CostPrice = costCol > 0 ? ws.Cell(r, costCol).GetValue<decimal>() : 0,
                     QuantityInStock = stockCol > 0 ? ws.Cell(r, stockCol).GetValue<int>() : 0,

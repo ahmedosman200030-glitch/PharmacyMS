@@ -19,7 +19,7 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
 
         var orderId = await conn.ExecuteScalarAsync<int>($@"
             INSERT INTO PurchaseOrders (SupplierId, SupplierName, OrderNumber, Status, ExpectedDate, Notes, CreatedAt, CreatedByUserId)
-            VALUES (@SupplierId, @SupplierName, @OrderNumber, @Status, @ExpectedDate, @Notes, {_context.NowExpr()}, @CreatedByUserId)
+            VALUES (@SupplierId, @SupplierName, @OrderNumber, @Status, @ExpectedDate, @Notes, @CreatedAt, @CreatedByUserId)
             {_context.InsertIdSuffix()};", order, tx);
 
         foreach (var item in order.Items)

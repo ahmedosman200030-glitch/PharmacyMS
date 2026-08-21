@@ -10,7 +10,7 @@ public class DbConfigService
     {
         var folder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "PharmacyMS");
+            "PharmaPro");
         Directory.CreateDirectory(folder);
         _configPath = Path.Combine(folder, "db-config.json");
     }

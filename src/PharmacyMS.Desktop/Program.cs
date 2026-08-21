@@ -2,6 +2,7 @@ using Avalonia;
 using Microsoft.Extensions.DependencyInjection;
 using PharmacyMS.Infrastructure.DependencyInjection;
 using Velopack;
+using Velopack.Sources;
 
 namespace PharmacyMS.Desktop;
 
@@ -17,6 +18,8 @@ internal sealed class Program
     public static void Main(string[] args)
     {
         VelopackApp.Build().Run();
+
+        _ = CheckForUpdatesAsync(); // fire-and-forget, won't block startup
 
         var services = new ServiceCollection();
         services.AddInfrastructure();
@@ -48,6 +51,11 @@ internal sealed class Program
         }
 
         BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+    }
+
+    private static async Task CheckForUpdatesAsync()
+    {
+        await PharmacyMS.Desktop.Services.UpdateService.CheckForUpdatesAsync();
     }
 
     public static AppBuilder BuildAvaloniaApp()

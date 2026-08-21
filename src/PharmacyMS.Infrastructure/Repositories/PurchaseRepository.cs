@@ -44,7 +44,7 @@ public class PurchaseRepository : IPurchaseRepository
         using var tx = conn.BeginTransaction();
         var purchaseId = await conn.ExecuteScalarAsync<int>($@"
             INSERT INTO Purchases (SupplierId, SupplierName, InvoiceNumber, TotalAmount, AmountPaid, CreatedAt, ApprovalStatus)
-            VALUES (@SupplierId, @SupplierName, @InvoiceNumber, @TotalAmount, @AmountPaid, {_context.NowExpr()}, @ApprovalStatus)
+            VALUES (@SupplierId, @SupplierName, @InvoiceNumber, @TotalAmount, @AmountPaid, @CreatedAt, @ApprovalStatus)
             {_context.InsertIdSuffix()};", purchase, tx);
         foreach (var item in purchase.Items)
         {
@@ -80,7 +80,7 @@ public class PurchaseRepository : IPurchaseRepository
 
         var purchaseId = await conn.ExecuteScalarAsync<int>($@"
             INSERT INTO Purchases (SupplierId, SupplierName, InvoiceNumber, TotalAmount, AmountPaid, CreatedAt, ApprovalStatus, PurchaseOrderId, GoodsReceiptId)
-            VALUES (@SupplierId, @SupplierName, @InvoiceNumber, @TotalAmount, 0, {_context.NowExpr()}, @ApprovalStatus, @PurchaseOrderId, @GoodsReceiptId)
+            VALUES (@SupplierId, @SupplierName, @InvoiceNumber, @TotalAmount, 0, @CreatedAt, @ApprovalStatus, @PurchaseOrderId, @GoodsReceiptId)
             {_context.InsertIdSuffix()};",
             new
             {
@@ -88,6 +88,7 @@ public class PurchaseRepository : IPurchaseRepository
                 SupplierName = (string)order.SupplierName,
                 InvoiceNumber = invoiceNumber,
                 TotalAmount = total,
+                CreatedAt = DateTime.Now,
                 ApprovalStatus = 1,
                 PurchaseOrderId = (int)order.Id,
                 GoodsReceiptId = goodsReceiptId

@@ -9,7 +9,7 @@
   <Border Padding="32" VerticalAlignment="Center">
     <StackPanel Spacing="16">
       <TextBlock Text="🔒 License Required" FontSize="20" FontWeight="Bold" Foreground="#0F172A" HorizontalAlignment="Center"/>
-      <TextBlock x:Name="StatusText" Text="Please enter your PharmacyMS license key to continue."
+      <TextBlock x:Name="StatusText" Text="Please enter your PharmaPro license key to continue."
                  FontSize="13" Foreground="#64748B" TextWrapping="Wrap" HorizontalAlignment="Center" TextAlignment="Center"/>
 
       <TextBox x:Name="LicenseKeyBox" Watermark="PMS-XXXXXXXX-XXXXXXXX" FontSize="14" Padding="10"/>
