@@ -31,11 +31,12 @@ public class CloudMigrationService
         public int RowsCopied { get; set; }
     }
 
-    // Wraps an identifier (table or column name) in double quotes so Postgres
-    // preserves the exact case that EF Core used when creating the schema.
-    // Without this, Postgres lowercases unquoted identifiers (e.g. "Users" -> users)
-    // and the query fails with "relation ... does not exist".
-    private static string Quote(string identifier) => $"\"{identifier}\"";
+    // Wraps a TABLE name in double quotes so Postgres preserves the exact
+    // PascalCase used elsewhere in the schema (e.g. "Users", "Sales").
+    // Column names are intentionally left unquoted, matching the convention
+    // already used in DatabaseInitializer.cs (see the OtherIncomes/Expenses
+    // ALTER TABLE statements there).
+    private static string QuoteTable(string tableName) => $"\"{tableName}\"";
 
     public async Task<List<MigrationProgress>> MigrateAsync(
         string postgresConnectionString,
@@ -60,18 +61,17 @@ public class CloudMigrationService
                 var rows = (await sqlite.QueryAsync(
                     $"SELECT {colList} FROM {table}")).ToList();
 
-                // Postgres identifiers must be quoted to preserve PascalCase.
-                var quotedTable = Quote(table);
-                var quotedColList = string.Join(", ", columns.Select(Quote));
+                // Only the table name needs quoting for Postgres; columns stay unquoted.
+                var quotedTable = QuoteTable(table);
 
                 int count = 0;
                 foreach (var row in rows)
                 {
                     var rowDict = (IDictionary<string, object>)row;
                     var paramNames = columns.Select(c => "@" + c);
-                    var insertSql = $@"INSERT INTO {quotedTable} ({quotedColList})
+                    var insertSql = $@"INSERT INTO {quotedTable} ({colList})
                                         VALUES ({string.Join(", ", paramNames)})
-                                        ON CONFLICT ({Quote("Id")}) DO NOTHING";
+                                        ON CONFLICT (Id) DO NOTHING";
 
                     var dp = new DynamicParameters();
                     foreach (var col in columns)
@@ -81,13 +81,13 @@ public class CloudMigrationService
                     count++;
                 }
 
-                // pg_get_serial_sequence takes the table/column names as text arguments
-                // (not raw identifiers), so the case must be quoted *inside* the string
-                // to match exactly, e.g. '"Users"' and 'Id'.
+                // pg_get_serial_sequence takes the table name as a text argument
+                // (not a raw identifier), so the case must be quoted *inside* the
+                // string to match, e.g. '"Users"'. The column name stays unquoted.
                 await pg.ExecuteAsync($@"
                     SELECT setval(
-                        pg_get_serial_sequence('{Quote(table)}', 'Id'),
-                        COALESCE((SELECT MAX({Quote("Id")}) FROM {quotedTable}), 0) + 1,
+                        pg_get_serial_sequence('{quotedTable}', 'id'),
+                        COALESCE((SELECT MAX(Id) FROM {quotedTable}), 0) + 1,
                         false)", transaction: tx);
 
                 var p = new MigrationProgress { Table = table, RowsCopied = count };
@@ -102,8 +102,8 @@ public class CloudMigrationService
             {
                 var rowDict = (IDictionary<string, object>)row;
                 await pg.ExecuteAsync(
-                    $@"INSERT INTO {Quote("Settings")} ({Quote("Key")}, {Quote("Value")}) VALUES (@Key, @Value)
-                      ON CONFLICT ({Quote("Key")}) DO NOTHING",
+                    $@"INSERT INTO {QuoteTable("Settings")} (Key, Value) VALUES (@Key, @Value)
+                      ON CONFLICT (Key) DO NOTHING",
                     new { Key = rowDict["Key"], Value = rowDict["Value"] }, tx);
                 settingsCount++;
             }
