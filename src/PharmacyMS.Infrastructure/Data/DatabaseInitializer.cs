@@ -12,6 +12,17 @@ public class DatabaseInitializer
         _context = context;
     }
 
+    // Wraps a TABLE name in double quotes when running against Postgres, so
+    // CREATE TABLE preserves PascalCase (e.g. "Users") instead of Postgres
+    // silently folding an unquoted name to lowercase ("users"). SQLite table
+    // names are left unquoted/unchanged, since SQLite is case-insensitive and
+    // this avoids touching existing SQLite behavior. Column names inside each
+    // CREATE TABLE are intentionally left unquoted on both providers — this
+    // matches the existing convention already used below (see the
+    // ALTER TABLE "OtherIncomes" / "Expenses" statements, which quote only
+    // the table name and leave columns like PaymentMethod unquoted).
+    private string T(string tableName) => _context.IsPostgres ? $"\"{tableName}\"" : tableName;
+
     public async Task InitializeAsync()
     {
         using var conn = _context.CreateConnection();
@@ -21,7 +32,7 @@ public class DatabaseInitializer
         var now = _context.NowExpr();
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS Users (
+            CREATE TABLE IF NOT EXISTS {T("Users")} (
                 Id {pk},
                 Username TEXT NOT NULL UNIQUE,
                 PasswordHash TEXT NOT NULL,
@@ -38,7 +49,7 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS Medicines (
+            CREATE TABLE IF NOT EXISTS {T("Medicines")} (
                 Id {pk},
                 Name TEXT NOT NULL,
                 GenericName TEXT,
@@ -62,12 +73,12 @@ public class DatabaseInitializer
         // Migration: add Unit column to Medicines if missing
         try
         {
-            await conn.ExecuteAsync("ALTER TABLE Medicines ADD COLUMN Unit TEXT NOT NULL DEFAULT 'Box'");
+            await conn.ExecuteAsync($"ALTER TABLE {T("Medicines")} ADD COLUMN Unit TEXT NOT NULL DEFAULT 'Box'");
         }
         catch { /* column already exists */ }
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS Sales (
+            CREATE TABLE IF NOT EXISTS {T("Sales")} (
                 Id {pk},
                 InvoiceNumber TEXT NOT NULL,
                 CashierId INTEGER NOT NULL,
@@ -85,7 +96,7 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS SaleItems (
+            CREATE TABLE IF NOT EXISTS {T("SaleItems")} (
                 Id {pk},
                 SaleId INTEGER NOT NULL,
                 MedicineId INTEGER NOT NULL,
@@ -98,12 +109,12 @@ public class DatabaseInitializer
         // Migration: add Unit column to SaleItems if missing
         try
         {
-            await conn.ExecuteAsync("ALTER TABLE SaleItems ADD COLUMN Unit TEXT NOT NULL DEFAULT 'Box'");
+            await conn.ExecuteAsync($"ALTER TABLE {T("SaleItems")} ADD COLUMN Unit TEXT NOT NULL DEFAULT 'Box'");
         }
         catch { /* column already exists */ }
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS Purchases (
+            CREATE TABLE IF NOT EXISTS {T("Purchases")} (
                 Id {pk},
                 SupplierName TEXT NOT NULL,
                 InvoiceNumber TEXT,
@@ -117,7 +128,7 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS PurchaseItems (
+            CREATE TABLE IF NOT EXISTS {T("PurchaseItems")} (
                 Id {pk},
                 PurchaseId INTEGER NOT NULL,
                 MedicineId INTEGER NOT NULL,
@@ -129,7 +140,7 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS PurchaseOrders (
+            CREATE TABLE IF NOT EXISTS {T("PurchaseOrders")} (
                 Id {pk},
                 SupplierId INTEGER,
                 SupplierName TEXT NOT NULL,
@@ -142,7 +153,7 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS PurchaseOrderItems (
+            CREATE TABLE IF NOT EXISTS {T("PurchaseOrderItems")} (
                 Id {pk},
                 PurchaseOrderId INTEGER NOT NULL,
                 MedicineId INTEGER NOT NULL,
@@ -156,12 +167,12 @@ public class DatabaseInitializer
         // Migration: add Unit column to PurchaseOrderItems if missing
         try
         {
-            await conn.ExecuteAsync("ALTER TABLE PurchaseOrderItems ADD COLUMN Unit TEXT NOT NULL DEFAULT 'Box'");
+            await conn.ExecuteAsync($"ALTER TABLE {T("PurchaseOrderItems")} ADD COLUMN Unit TEXT NOT NULL DEFAULT 'Box'");
         }
         catch { /* column already exists */ }
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS GoodsReceipts (
+            CREATE TABLE IF NOT EXISTS {T("GoodsReceipts")} (
                 Id {pk},
                 PurchaseOrderId INTEGER NOT NULL,
                 ReceivedAt TEXT NOT NULL,
@@ -170,7 +181,7 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS GoodsReceiptItems (
+            CREATE TABLE IF NOT EXISTS {T("GoodsReceiptItems")} (
                 Id {pk},
                 GoodsReceiptId INTEGER NOT NULL,
                 PurchaseOrderItemId INTEGER NOT NULL,
@@ -183,14 +194,14 @@ public class DatabaseInitializer
                 UnitCost REAL NOT NULL
             );");
 
-        await conn.ExecuteAsync(@"
-            CREATE TABLE IF NOT EXISTS Settings (
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS {T("Settings")} (
                 Key TEXT PRIMARY KEY,
                 Value TEXT NOT NULL
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS Categories (
+            CREATE TABLE IF NOT EXISTS {T("Categories")} (
                 Id {pk},
                 Code TEXT,
                 Name TEXT NOT NULL,
@@ -200,7 +211,7 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS Customers (
+            CREATE TABLE IF NOT EXISTS {T("Customers")} (
                 Id {pk},
                 Name TEXT NOT NULL,
                 Phone TEXT,
@@ -215,7 +226,7 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS Suppliers (
+            CREATE TABLE IF NOT EXISTS {T("Suppliers")} (
                 Id {pk},
                 Name TEXT NOT NULL,
                 ContactPerson TEXT,
@@ -230,7 +241,7 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS StockAdjustments (
+            CREATE TABLE IF NOT EXISTS {T("StockAdjustments")} (
                 Id {pk},
                 MedicineId INTEGER NOT NULL,
                 MedicineName TEXT NOT NULL,
@@ -242,7 +253,31 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS SalePayments (
+            CREATE TABLE IF NOT EXISTS {T("CodeCounters")} (
+                Prefix TEXT NOT NULL,
+                Year INTEGER NOT NULL,
+                Counter INTEGER NOT NULL DEFAULT 0,
+                PRIMARY KEY (Prefix, Year)
+            );");
+
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS {T("SaleReturns")} (
+                Id {pk},
+                MedicineId INTEGER NOT NULL,
+                MedicineName TEXT NOT NULL,
+                Quantity INTEGER NOT NULL,
+                UnitPrice REAL NOT NULL,
+                RefundAmount REAL NOT NULL,
+                PaymentMethod TEXT NOT NULL,
+                Reason TEXT NOT NULL,
+                OriginalSaleId INTEGER NULL,
+                ProcessedByUserId INTEGER NOT NULL,
+                ProcessedByName TEXT NOT NULL,
+                CreatedAt TEXT NOT NULL
+            );");
+
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS {T("SalePayments")} (
                 Id {pk},
                 SaleId INTEGER NOT NULL,
                 Amount REAL NOT NULL,
@@ -251,7 +286,7 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS PurchasePayments (
+            CREATE TABLE IF NOT EXISTS {T("PurchasePayments")} (
                 Id {pk},
                 PurchaseId INTEGER NOT NULL,
                 Amount REAL NOT NULL,
@@ -260,7 +295,7 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS DailyClosings (
+            CREATE TABLE IF NOT EXISTS {T("DailyClosings")} (
                 Id {pk},
                 ClosingDate TEXT NOT NULL,
                 CashSales REAL NOT NULL DEFAULT 0,
@@ -277,7 +312,7 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS PendingSalePayments (
+            CREATE TABLE IF NOT EXISTS {T("PendingSalePayments")} (
                 Id {pk},
                 SaleId INTEGER NOT NULL,
                 CustomerName TEXT NOT NULL DEFAULT '',
@@ -291,7 +326,7 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS PendingExpenses (
+            CREATE TABLE IF NOT EXISTS {T("PendingExpenses")} (
                 Id {pk},
                 Date TEXT NOT NULL,
                 Category TEXT NOT NULL,
@@ -305,8 +340,34 @@ public class DatabaseInitializer
             );");
 
         await conn.ExecuteAsync($@"
-            CREATE TABLE IF NOT EXISTS Expenses (
+            CREATE TABLE IF NOT EXISTS {T("Expenses")} (
                 Id {pk},
+                Code TEXT,
+                Date TEXT NOT NULL,
+                Category TEXT NOT NULL,
+                Description TEXT,
+                Amount REAL NOT NULL DEFAULT 0,
+                CreatedBy TEXT,
+                CreatedAt TEXT NOT NULL
+            );");
+
+        // Other Income — non-sale income sources (service fees, consultations,
+        // delivery charges, etc). Kept intentionally separate from Sales revenue:
+        // P&L, Dashboard and Accounting Overview do NOT include this table.
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS {T("UserSessions")} (
+                Id {pk},
+                UserId INTEGER NOT NULL,
+                UserName TEXT NOT NULL DEFAULT '',
+                LoginTime TEXT NOT NULL,
+                LogoutTime TEXT,
+                CreatedAt TEXT NOT NULL
+            );");
+
+        await conn.ExecuteAsync($@"
+            CREATE TABLE IF NOT EXISTS {T("OtherIncomes")} (
+                Id {pk},
+                Code TEXT,
                 Date TEXT NOT NULL,
                 Category TEXT NOT NULL,
                 Description TEXT,
@@ -405,17 +466,40 @@ public class DatabaseInitializer
 
             if (!saleCols.Contains("ChangeDue"))
                 await conn.ExecuteAsync("ALTER TABLE Sales ADD COLUMN ChangeDue REAL NOT NULL DEFAULT 0");
+
+            // Migration: add PaymentMethod to Expenses
+            var expenseCols = (await conn.QueryAsync<string>("SELECT name FROM pragma_table_info('Expenses')")).ToHashSet();
+            if (!expenseCols.Contains("PaymentMethod"))
+                await conn.ExecuteAsync("ALTER TABLE Expenses ADD COLUMN PaymentMethod TEXT NOT NULL DEFAULT 'Cash'");
+            if (!expenseCols.Contains("Code"))
+                await conn.ExecuteAsync("ALTER TABLE Expenses ADD COLUMN Code TEXT");
+
+            // Migration: add PaymentMethod to OtherIncomes
+            var otherIncomeCols = (await conn.QueryAsync<string>("SELECT name FROM pragma_table_info('OtherIncomes')")).ToHashSet();
+            if (!otherIncomeCols.Contains("PaymentMethod"))
+                await conn.ExecuteAsync("ALTER TABLE OtherIncomes ADD COLUMN PaymentMethod TEXT NOT NULL DEFAULT 'Cash'");
+            if (!otherIncomeCols.Contains("Code"))
+                await conn.ExecuteAsync("ALTER TABLE OtherIncomes ADD COLUMN Code TEXT");
         }
+        else
+        {
+            // Postgres: ADD COLUMN IF NOT EXISTS is safe to run unconditionally every startup.
+            await conn.ExecuteAsync($"ALTER TABLE {T("Expenses")} ADD COLUMN IF NOT EXISTS PaymentMethod TEXT NOT NULL DEFAULT 'Cash';");
+            await conn.ExecuteAsync($"ALTER TABLE {T("Expenses")} ADD COLUMN IF NOT EXISTS Code TEXT;");
+            await conn.ExecuteAsync($"ALTER TABLE {T("OtherIncomes")} ADD COLUMN IF NOT EXISTS PaymentMethod TEXT NOT NULL DEFAULT 'Cash';");
+            await conn.ExecuteAsync($"ALTER TABLE {T("OtherIncomes")} ADD COLUMN IF NOT EXISTS Code TEXT;");
+        }
+
         // ── End auto-migrate ──
 
         var existingAdmin = await conn.QueryFirstOrDefaultAsync<int?>(
-            "SELECT Id FROM Users WHERE Username = 'admin'");
+            $"SELECT Id FROM {T("Users")} WHERE Username = 'admin'");
 
         if (existingAdmin == null)
         {
             var hash = BCrypt.Net.BCrypt.HashPassword("Admin@123");
             await conn.ExecuteAsync($@"
-                INSERT INTO Users (Username, PasswordHash, FullName, Role, IsActive, Permissions, CreatedAt)
+                INSERT INTO {T("Users")} (Username, PasswordHash, FullName, Role, IsActive, Permissions, CreatedAt)
                 VALUES ('admin', @Hash, 'System Administrator', 0, 1, @Perms, {now});",
                 new { Hash = hash, Perms = (long)Permission.All });
         }
