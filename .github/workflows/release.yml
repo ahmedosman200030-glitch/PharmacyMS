@@ -1,0 +1,41 @@
+name: Release Windows Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. 1.1.5)'
+        required: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Install vpk
+        run: dotnet tool install -g vpk
+
+      - name: Publish
+        run: dotnet publish src/PharmacyMS.Desktop/PharmacyMS.Desktop.csproj -c Release -r win-x64 --self-contained -o ./publish
+
+      - name: Pack with vpk
+        run: vpk pack --packId PharmacyMS --packVersion ${{ github.event.inputs.version }} --packDir ./publish --outputDir ./Releases --mainExe PharmacyMS.Desktop.exe
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create v${{ github.event.inputs.version }} `
+            ./Releases/PharmacyMS-${{ github.event.inputs.version }}-delta.nupkg `
+            ./Releases/PharmacyMS-${{ github.event.inputs.version }}-full.nupkg `
+            ./Releases/PharmacyMS-win-Setup.exe `
+            ./Releases/releases.win.json `
+            --title "v${{ github.event.inputs.version }}" `
+            --notes "Version ${{ github.event.inputs.version }} release" `
+            --latest
