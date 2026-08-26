@@ -1,0 +1,158 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PharmacyMS.Desktop.Views.Accounting.OtherIncomeFormWindow"
+        Title="Add Income"
+        Width="620" Height="720"
+        MinWidth="560" MinHeight="640"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="White">
+
+  <Window.Styles>
+    <Style Selector="TextBlock.fieldLabel">
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Foreground" Value="#0F172A"/>
+      <Setter Property="Margin" Value="0,0,0,8"/>
+    </Style>
+    <Style Selector="TextBlock.required">
+      <Setter Property="Foreground" Value="#DC2626"/>
+    </Style>
+    <Style Selector="TextBox, ComboBox, DatePicker">
+      <Setter Property="Background" Value="White"/>
+      <Setter Property="BorderBrush" Value="#D1D5DB"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="8"/>
+      <Setter Property="Foreground" Value="#0F172A"/>
+      <Setter Property="Padding" Value="12,10"/>
+      <Setter Property="Height" Value="44"/>
+    </Style>
+    <Style Selector="TextBox:focus, ComboBox:focus, DatePicker:focus">
+      <Setter Property="BorderBrush" Value="#DC2626"/>
+    </Style>
+    <Style Selector="Button.footerPrimary">
+      <Setter Property="Background" Value="#DC2626"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+      <Setter Property="CornerRadius" Value="8"/>
+    </Style>
+    <Style Selector="Button.footerPrimary:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#B91C1C"/>
+    </Style>
+    <Style Selector="Button.footerCancel">
+      <Setter Property="Background" Value="White"/>
+      <Setter Property="Foreground" Value="#0F172A"/>
+      <Setter Property="BorderBrush" Value="#D1D5DB"/>
+      <Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="CornerRadius" Value="8"/>
+    </Style>
+  </Window.Styles>
+
+  <DockPanel>
+
+    <!-- Header -->
+    <Border DockPanel.Dock="Top" Background="#DC2626" Padding="24,18">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+          <TextBlock Text="💰" FontSize="24" VerticalAlignment="Center"/>
+          <TextBlock Text="Add Income" FontSize="22" FontWeight="Bold" Foreground="White" VerticalAlignment="Center"/>
+        </StackPanel>
+        <Button x:Name="CloseButton" Grid.Column="2" Content="✕" Background="Transparent"
+                Foreground="White" FontSize="18" Padding="6" BorderThickness="0"
+                VerticalAlignment="Center" HorizontalAlignment="Right"/>
+      </Grid>
+    </Border>
+
+    <!-- Sticky footer -->
+    <Border DockPanel.Dock="Bottom" Background="White" Padding="24,16" BoxShadow="0 -1 4 0 #14000000">
+      <StackPanel Spacing="8">
+        <TextBlock x:Name="ErrorText" Foreground="#DC2626" FontSize="12" IsVisible="False" TextWrapping="Wrap"/>
+        <Grid ColumnDefinitions="*,Auto,Auto">
+          <Border Grid.Column="0"/>
+          <Button Grid.Column="1" x:Name="CancelButton" Content="✕  Cancel" Classes="footerCancel"
+                  Height="44" Padding="20,0" Margin="0,0,10,0" HorizontalContentAlignment="Center"/>
+          <Button Grid.Column="2" x:Name="SaveButton" Content="💾  Add Income" Classes="footerPrimary"
+                  Height="44" Padding="20,0" HorizontalContentAlignment="Center"/>
+        </Grid>
+      </StackPanel>
+    </Border>
+
+    <!-- Scrollable form -->
+    <ScrollViewer>
+      <StackPanel Margin="24" Spacing="18">
+
+        <StackPanel Spacing="8">
+          <TextBlock>
+            <Run Text="Income Type" Classes="fieldLabel"/>
+            <Run Text=" *" Classes="required"/>
+          </TextBlock>
+          <ComboBox x:Name="IncomeTypeCombo" HorizontalAlignment="Stretch" PlaceholderText="Select income type"/>
+        </StackPanel>
+
+        <StackPanel Spacing="8">
+          <TextBlock>
+            <Run Text="Service / Description" Classes="fieldLabel"/>
+            <Run Text=" *" Classes="required"/>
+          </TextBlock>
+          <ComboBox x:Name="CategoryCombo" HorizontalAlignment="Stretch" PlaceholderText="Select service"/>
+        </StackPanel>
+
+        <Grid ColumnDefinitions="*,*" Margin="0" >
+          <Grid.Styles>
+            <Style Selector="StackPanel"><Setter Property="Spacing" Value="8"/></Style>
+          </Grid.Styles>
+          <StackPanel Grid.Column="0" Margin="0,0,10,0">
+            <TextBlock>
+              <Run Text="Amount" Classes="fieldLabel"/>
+              <Run Text=" *" Classes="required"/>
+            </TextBlock>
+            <Grid ColumnDefinitions="Auto,*">
+              <Border Grid.Column="0" Background="#F1F5F9" CornerRadius="8,0,0,8" Width="40" Height="44">
+                <TextBlock Text="$" FontWeight="Bold" Foreground="#64748B" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+              </Border>
+              <TextBox Grid.Column="1" x:Name="AmountBox" Watermark="0.00" CornerRadius="0,8,8,0" Margin="-1,0,0,0"/>
+            </Grid>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Margin="10,0,0,0">
+            <TextBlock>
+              <Run Text="Payment Method" Classes="fieldLabel"/>
+              <Run Text=" *" Classes="required"/>
+            </TextBlock>
+            <ComboBox x:Name="PaymentCombo" HorizontalAlignment="Stretch"/>
+          </StackPanel>
+        </Grid>
+
+        <Grid ColumnDefinitions="*,*">
+          <Grid.Styles>
+            <Style Selector="StackPanel"><Setter Property="Spacing" Value="8"/></Style>
+          </Grid.Styles>
+          <StackPanel Grid.Column="0" Margin="0,0,10,0">
+            <TextBlock>
+              <Run Text="Date" Classes="fieldLabel"/>
+              <Run Text=" *" Classes="required"/>
+            </TextBlock>
+            <DatePicker x:Name="DatePickerBox" HorizontalAlignment="Stretch"/>
+          </StackPanel>
+          <StackPanel Grid.Column="1" Margin="10,0,0,0">
+            <TextBlock Text="Reference No." Classes="fieldLabel"/>
+            <TextBox x:Name="ReferenceBox" Text="Auto-generated on save" IsEnabled="False"/>
+          </StackPanel>
+        </Grid>
+
+        <StackPanel Spacing="8">
+          <TextBlock Text="Notes" Classes="fieldLabel"/>
+          <TextBox x:Name="NotesBox" Height="110" AcceptsReturn="True" TextWrapping="Wrap" VerticalContentAlignment="Top"/>
+        </StackPanel>
+
+        <Rectangle Height="1" Fill="#E2E8F0" Margin="0,4,0,0"/>
+
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock Text="Recorded By:" FontWeight="SemiBold" Foreground="#0F172A"/>
+          <TextBlock x:Name="RecordedByText" Text="" Foreground="#DC2626" FontWeight="SemiBold"/>
+        </StackPanel>
+
+      </StackPanel>
+    </ScrollViewer>
+
+  </DockPanel>
+</Window>

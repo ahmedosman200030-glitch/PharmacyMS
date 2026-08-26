@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using PharmacyMS.Application.Services;
 using PharmacyMS.Desktop.ViewModels;
 using PharmacyMS.Domain.Entities;
 
@@ -70,6 +71,7 @@ public partial class ExpensesView : UserControl
         };
 
         ExpenseGrid.AddHandler(Button.ClickEvent, OnDeleteClick, Avalonia.Interactivity.RoutingStrategies.Bubble);
+        ExpenseGrid.AddHandler(Button.ClickEvent, OnViewClick, Avalonia.Interactivity.RoutingStrategies.Bubble);
 
         DonutCanvas.SizeChanged += (_, _) => DrawDonut();
         TrendCanvas.SizeChanged += (_, _) => DrawTrend();
@@ -77,10 +79,40 @@ public partial class ExpensesView : UserControl
         AttachedToVisualTree += async (_, _) => await LoadAndRender();
     }
 
+    private async void OnViewClick(object? sender, RoutedEventArgs e)
+    {
+        if (e.Source is Button { Name: "ViewBtn" } btn && btn.DataContext is Expense expense)
+        {
+            var owner = TopLevel.GetTopLevel(this) as Window;
+            var detail = new TransactionDetailWindow();
+            detail.Configure(
+                icon: "💸",
+                title: expense.Code,
+                subtitle: expense.Category,
+                accentHex: "#DC2626",
+                rows: new (string, string)[]
+                {
+                    ("Date", expense.Date.ToString("yyyy-MM-dd")),
+                    ("Category", expense.Category),
+                    ("Description", expense.Description),
+                    ("Amount", $"${expense.Amount:F2}"),
+                    ("Payment Method", expense.PaymentMethod),
+                    ("Added By", expense.CreatedBy),
+                    ("Recorded At", expense.CreatedAt.ToString("yyyy-MM-dd HH:mm")),
+                });
+            if (owner != null) await detail.ShowDialog(owner); else detail.Show();
+        }
+    }
+
     private async void OnDeleteClick(object? sender, RoutedEventArgs e)
     {
         if (e.Source is Button { Name: "DeleteBtn" } btn && btn.DataContext is Expense expense)
         {
+            if (!SessionManager.IsAdmin)
+            {
+                return;
+            }
+
             await _vm.DeleteExpenseAsync(expense);
             await LoadAndRender();
         }

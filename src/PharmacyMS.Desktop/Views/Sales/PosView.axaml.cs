@@ -1,6 +1,8 @@
 using Avalonia.VisualTree;
 using System.Collections.Generic;
 using Avalonia.Controls;
+using Microsoft.Extensions.DependencyInjection;
+using PharmacyMS.Application.Interfaces.Services;
 using PharmacyMS.Desktop.ViewModels;
 using PharmacyMS.Domain.Entities;
 
@@ -10,12 +12,15 @@ public partial class PosView : UserControl
 {
     private readonly PosViewModel _vm;
     private string? _selectedCategory = "All";
+    private decimal _slshRate = 0;
 
     public PosView() { InitializeComponent(); }
     public PosView(PosViewModel vm)
     {
         InitializeComponent();
         _vm = vm;
+
+        _ = LoadSlshRateAsync();
 
         MedicineGrid.ItemsSource = _vm.AvailableMedicines;
         CartGrid.ItemsSource = _vm.Cart;
@@ -51,12 +56,24 @@ public partial class PosView : UserControl
         CustomerCombo.DisplayMemberBinding = new Avalonia.Data.Binding("Name");
         CustomerCombo.SelectionChanged += (_, _) =>
         {
-            if (_vm.IsCreditSale && CustomerCombo.SelectedItem is PharmacyMS.Domain.Entities.Customer c)
+            var selected = CustomerCombo.SelectedItem as PharmacyMS.Domain.Entities.Customer;
+            var isRealCustomer = selected != null && selected.Id != 0 && selected.Name != "Walk-in Customer";
+
+            // Only allow credit sale if a real customer is selected
+            CreditSaleCheck.IsEnabled = isRealCustomer;
+            if (!isRealCustomer)
+            {
+                CreditSaleCheck.IsChecked = false;
+                _vm.IsCreditSale = false;
+                CreditCustomerCombo.IsVisible = false;
+            }
+
+            if (_vm.IsCreditSale && isRealCustomer)
             {
                 // Sync credit combo with main combo
                 for (int i = 0; i < CreditCustomerCombo.Items.Count; i++)
                 {
-                    if (CreditCustomerCombo.Items[i] is PharmacyMS.Domain.Entities.Customer cc && cc.Id == c.Id)
+                    if (CreditCustomerCombo.Items[i] is PharmacyMS.Domain.Entities.Customer cc && cc.Id == selected!.Id)
                     {
                         CreditCustomerCombo.SelectedIndex = i;
                         break;
@@ -182,9 +199,9 @@ public partial class PosView : UserControl
         };
 
         PayCash.IsCheckedChanged += (_, _) => { if (PayCash.IsChecked == true) _vm.PaymentMethod = "Cash"; };
-        PayCard.IsCheckedChanged += (_, _) => { if (PayCard.IsChecked == true) _vm.PaymentMethod = "Card"; };
-        PayMobile.IsCheckedChanged += (_, _) => { if (PayMobile.IsChecked == true) _vm.PaymentMethod = "Mobile Money"; };
-        PayInsurance.IsCheckedChanged += (_, _) => { if (PayInsurance.IsChecked == true) _vm.PaymentMethod = "Insurance"; };
+        PayCard.IsCheckedChanged += (_, _) => { if (PayCard.IsChecked == true) _vm.PaymentMethod = "ZAAD Merchant"; };
+        PayMobile.IsCheckedChanged += (_, _) => { if (PayMobile.IsChecked == true) _vm.PaymentMethod = "E-DAHAB"; };
+        PayInsurance.IsCheckedChanged += (_, _) => { if (PayInsurance.IsChecked == true) _vm.PaymentMethod = "Bank Transfer"; };
 
         ClearCartButton.Click += (_, _) =>
         {
@@ -376,6 +393,13 @@ public partial class PosView : UserControl
 
     private void RunFilter() => _vm.ApplyFilter(SearchBox.Text, _selectedCategory);
 
+    private async Task LoadSlshRateAsync()
+    {
+        var settingsService = Program.Services.GetRequiredService<IAppSettingsService>();
+        _slshRate = await settingsService.GetSlshExchangeRateAsync();
+        RefreshTotals();
+    }
+
     private void RefreshTotals()
     {
         SubtotalText.Text = $"${_vm.Subtotal:F2}";
@@ -383,6 +407,16 @@ public partial class PosView : UserControl
         TaxText.Text = $"${_vm.TaxAmount:F2}";
         TotalText.Text = $"${_vm.Total:F2}";
         ChangeText.Text = $"${_vm.ChangeDue:F2}";
+
+        if (_slshRate > 0)
+        {
+            var localAmount = _vm.Total * _slshRate;
+            TotalLocalText.Text = $"≈ SLSH {localAmount:N0}";
+        }
+        else
+        {
+            TotalLocalText.Text = "";
+        }
     }
 
     private void ShowStatus(string message) => StatusText.Text = message;

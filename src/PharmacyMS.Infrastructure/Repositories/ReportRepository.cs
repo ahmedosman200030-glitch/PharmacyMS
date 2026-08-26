@@ -142,6 +142,39 @@ public class ReportRepository : IReportRepository
             ON CONFLICT(Key) DO UPDATE SET Value=@Value", new { Key = key, Value = value });
     }
 
+    public async Task<IEnumerable<UserActivityRow>> GetUserActivityAsync(DateTime from, DateTime to)
+    {
+        using var conn = _context.CreateConnection();
+        var fromStr = from.ToString("yyyy-MM-dd 00:00:00");
+        var toStr = to.ToString("yyyy-MM-dd 23:59:59");
+
+        var sessions = (await conn.QueryAsync<UserActivityRow>($@"
+            SELECT UserId, UserName, MIN(LoginTime) AS LoginTime, MAX(LogoutTime) AS LogoutTime
+            FROM UserSessions
+            WHERE LoginTime >= @From AND LoginTime <= @To
+            GROUP BY UserId, UserName
+            ORDER BY MIN(LoginTime) DESC",
+            new { From = fromStr, To = toStr })).ToList();
+
+        var salesByUser = (await conn.QueryAsync(
+            @"SELECT CashierId, COUNT(*) AS Txns, COALESCE(SUM(TotalAmount),0) AS Revenue
+              FROM Sales WHERE CreatedAt >= @From AND CreatedAt <= @To
+              GROUP BY CashierId",
+            new { From = fromStr, To = toStr }))
+            .ToDictionary(r => (int)r.CashierId, r => ((int)r.Txns, (double)r.Revenue));
+
+        foreach (var row in sessions)
+        {
+            if (salesByUser.TryGetValue(row.UserId, out var s))
+            {
+                row.Transactions = s.Item1;
+                row.SalesAmount = s.Item2;
+            }
+        }
+
+        return sessions;
+    }
+
     public async Task<IEnumerable<DailySalesSummaryRow>> GetDailySalesAsync(DateTime from, DateTime to)
     {
         using var conn = _context.CreateConnection();

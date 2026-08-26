@@ -1,0 +1,98 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:PharmacyMS.Desktop.Controls"
+             x:Class="PharmacyMS.Desktop.Views.Reports.UserActivityView"
+             Background="#F1F5F9">
+
+  <UserControl.Styles>
+    <Style Selector="Border.card">
+      <Setter Property="Background" Value="White"/>
+      <Setter Property="CornerRadius" Value="16"/>
+      <Setter Property="Padding" Value="16"/>
+      <Setter Property="BoxShadow" Value="0 1 6 0 #14000000"/>
+    </Style>
+    <Style Selector="Border.stat-icon">
+      <Setter Property="Width" Value="48"/>
+      <Setter Property="Height" Value="48"/>
+      <Setter Property="CornerRadius" Value="12"/>
+    </Style>
+    <Style Selector="TextBlock.stat-label">
+      <Setter Property="FontSize" Value="13"/>
+      <Setter Property="Foreground" Value="#6B7280"/>
+    </Style>
+    <Style Selector="TextBlock.stat-value">
+      <Setter Property="FontSize" Value="24"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Foreground" Value="#111827"/>
+    </Style>
+  </UserControl.Styles>
+
+  <ScrollViewer>
+  <StackPanel Margin="24" Spacing="16">
+
+    <Grid ColumnDefinitions="*,Auto">
+      <StackPanel Grid.Column="0">
+        <TextBlock Text="User Activity" Classes="stat-value" Foreground="#0F172A"/>
+        <TextBlock Text="Login/logout history and sales performance per user" FontSize="13" Foreground="#64748B" Margin="0,4,0,0"/>
+      </StackPanel>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <controls:DateRangePicker x:Name="RangePicker"/>
+        <Button x:Name="RefreshButton" Content="🔄 Refresh" Background="#2563EB" Foreground="White" CornerRadius="8" Padding="12,6" FontSize="13"/>
+      </StackPanel>
+    </Grid>
+
+    <!-- Stat cards -->
+    <Grid ColumnDefinitions="*,*,*">
+      <Border Grid.Column="0" Classes="card" Margin="0,0,10,0">
+        <StackPanel Spacing="8" HorizontalAlignment="Center">
+          <Border Classes="stat-icon" Background="#ECFDF5" HorizontalAlignment="Center">
+            <Path Data="M12 6 L12 12 L16 14" Stroke="#10B981" StrokeThickness="2"
+                  StrokeLineCap="Round" StrokeJoin="Round" Fill="Transparent" Width="18" Height="18" Stretch="Uniform"/>
+          </Border>
+          <TextBlock Text="HOURS ONLINE (TOTAL)" Classes="stat-label" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="TotalHoursText" Text="0h 00m" Classes="stat-value" HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="1" Classes="card" Margin="0,0,10,0">
+        <StackPanel Spacing="8" HorizontalAlignment="Center">
+          <Border Classes="stat-icon" Background="#EFF6FF" HorizontalAlignment="Center">
+            <Path Data="M4 15 L9 9 L13 12 L20 5" Stroke="#3B82F6" StrokeThickness="2"
+                  StrokeLineCap="Round" StrokeJoin="Round" Fill="Transparent" Width="18" Height="18" Stretch="Uniform"/>
+          </Border>
+          <TextBlock Text="TOTAL SALES" Classes="stat-label" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="TotalSalesText" Text="$0.00" Classes="stat-value" HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="2" Classes="card" Padding="16">
+        <StackPanel Spacing="8" HorizontalAlignment="Center">
+          <Border Classes="stat-icon" Background="#FFF7ED" HorizontalAlignment="Center">
+            <Ellipse Width="18" Height="18" Stroke="#F59E0B" StrokeThickness="2"/>
+          </Border>
+          <TextBlock Text="AVG. SALES" Classes="stat-label" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="AvgSalesText" Text="$0.00" Classes="stat-value" HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+    </Grid>
+
+    <!-- Table -->
+    <Border Classes="card" Padding="16">
+      <StackPanel Spacing="10">
+        <DataGrid x:Name="ActivityGrid" HeadersVisibility="Column"
+                  AutoGenerateColumns="False" IsReadOnly="True"
+                  GridLinesVisibility="Horizontal"
+                  x:CompileBindings="False">
+          <DataGrid.Columns>
+            <DataGridTextColumn Header="User" Binding="{Binding UserName}" Width="140"/>
+            <DataGridTextColumn Header="Login" Binding="{Binding LoginDisplay}" Width="90"/>
+            <DataGridTextColumn Header="Logout" Binding="{Binding LogoutDisplay}" Width="90"/>
+            <DataGridTextColumn Header="Hours" Binding="{Binding HoursDisplay}" Width="100"/>
+            <DataGridTextColumn Header="Sales" Binding="{Binding SalesDisplay}" Width="110"/>
+            <DataGridTextColumn Header="Transactions" Binding="{Binding Transactions}" Width="*"/>
+          </DataGrid.Columns>
+        </DataGrid>
+      </StackPanel>
+    </Border>
+
+  </StackPanel>
+  </ScrollViewer>
+</UserControl>

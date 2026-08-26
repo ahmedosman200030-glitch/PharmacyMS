@@ -29,17 +29,52 @@ public partial class MainWindow : Window
     private DispatcherTimer? _statsTimer;
     private bool _posExpanded = false;
     private bool _purchasesExpanded = false;
+    private bool _usersExpanded = false;
 
     private Button[] NavButtons => new[]
     {
-        DashboardButton, InventoryButton, CategoriesButton, SuppliersButton,
+        DashboardButton, InventoryButton, SalesReturnButton, CategoriesButton, SuppliersButton,
         NewPurchaseButton, PurchaseHistoryButton, PurchaseInvoicesButton, PurchaseReportsButton,
-        PointOfSaleButton, DailyClosingButton, SalesHistoryButton, CreditSalesButton, CustomersButton, SettingsButton, UsersButton
+        PointOfSaleButton, DailyClosingButton, SalesHistoryButton, CreditSalesButton, CustomersButton, SettingsButton, AllUsersButton, UserActivityButton
     };
 
     public MainWindow()
     {
         InitializeComponent();
+
+        Opened += (_, _) =>
+        {
+            var screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
+            if (screen != null)
+            {
+                // Working area excludes taskbars/docks. Clamp so the window
+                // never opens larger than what the client's screen can show,
+                // but never smaller than the MinWidth/MinHeight set in XAML.
+                var area = screen.WorkingArea;
+                double scaling = screen.Scaling;
+                double usableWidth = area.Width / scaling;
+                double usableHeight = area.Height / scaling;
+
+                double targetWidth = Math.Min(Width, usableWidth * 0.95);
+                double targetHeight = Math.Min(Height, usableHeight * 0.95);
+
+                targetWidth = Math.Max(targetWidth, MinWidth);
+                targetHeight = Math.Max(targetHeight, MinHeight);
+
+                Width = targetWidth;
+                Height = targetHeight;
+            }
+        };
+
+        Closing += async (_, _) =>
+        {
+            if (SessionManager.CurrentSessionId is int sid)
+            {
+                var sessionRepo = Program.Services.GetRequiredService<IUserSessionRepository>();
+                await sessionRepo.CloseSessionAsync(sid, DateTime.Now);
+                SessionManager.CurrentSessionId = null;
+            }
+        };
 
         var user = SessionManager.CurrentUser;
         if (user != null)
@@ -143,6 +178,7 @@ public partial class MainWindow : Window
             MainContent.Content = new PharmacyMS.Desktop.Views.Inventory.InventoryView(vm);
         };
 
+
         CategoriesButton.Click += (_, _) =>
         {
             SetActive(CategoriesButton);
@@ -223,6 +259,16 @@ public partial class MainWindow : Window
             PosSubPanel.IsVisible = _posExpanded;
         };
 
+        SalesReturnButton.Click += (_, _) =>
+        {
+            SetActive(SalesReturnButton);
+            PageTitleText.Text = "Sales Returns";
+            var saleRepo = Program.Services.GetRequiredService<ISaleRepository>();
+            var returnRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.ISaleReturnRepository>();
+            var vm = new PharmacyMS.Desktop.ViewModels.SalesReturnViewModel(saleRepo, returnRepo);
+            MainContent.Content = new PharmacyMS.Desktop.Views.Sales.SalesReturnView(vm);
+        };
+
         PointOfSaleButton.Click += (_, _) =>
         {
             SetActive(PointOfSaleButton);
@@ -288,7 +334,8 @@ public partial class MainWindow : Window
             var expenseRepo = Program.Services.GetRequiredService<IExpenseRepository>();
             var customerRepo = Program.Services.GetRequiredService<ICustomerRepository>();
             var medicineRepo = Program.Services.GetRequiredService<IMedicineRepository>();
-            var vm = new PharmacyMS.Desktop.ViewModels.AccountingViewModel(saleRepo, purchaseRepo, expenseRepo, customerRepo, medicineRepo);
+            var saleReturnRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.ISaleReturnRepository>();
+            var vm = new PharmacyMS.Desktop.ViewModels.AccountingViewModel(saleRepo, purchaseRepo, expenseRepo, customerRepo, medicineRepo, saleReturnRepo);
             var view = new AccountingView(vm, tab);
             MainContent.Content = view;
         }
@@ -299,7 +346,8 @@ public partial class MainWindow : Window
             SetActive(AccIncomeButton);
             PageTitleText.Text = "Income";
             var saleRepoForIncome = Program.Services.GetRequiredService<ISaleRepository>();
-            var incomeVm = new PharmacyMS.Desktop.ViewModels.IncomeViewModel(saleRepoForIncome);
+            var otherIncomeRepoForIncome = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IOtherIncomeRepository>();
+            var incomeVm = new PharmacyMS.Desktop.ViewModels.IncomeViewModel(saleRepoForIncome, otherIncomeRepoForIncome);
             MainContent.Content = new IncomeView(incomeVm);
         };
         AccExpensesButton.Click += (_, _) =>
@@ -348,7 +396,8 @@ public partial class MainWindow : Window
             var purchaseRepoForPL = Program.Services.GetRequiredService<IPurchaseRepository>();
             var expenseRepoForPL = Program.Services.GetRequiredService<IExpenseRepository>();
             var reportRepoForPL = Program.Services.GetRequiredService<IReportRepository>();
-            var plVm = new PharmacyMS.Desktop.ViewModels.PLViewModel(saleRepoForPL, purchaseRepoForPL, expenseRepoForPL, reportRepoForPL);
+            var saleReturnRepoForPL = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.ISaleReturnRepository>();
+            var plVm = new PharmacyMS.Desktop.ViewModels.PLViewModel(saleRepoForPL, purchaseRepoForPL, expenseRepoForPL, reportRepoForPL, saleReturnRepoForPL);
             MainContent.Content = new PLView(plVm);
         };
         AccReportsButton.Click += (_, _) =>
@@ -386,11 +435,24 @@ public partial class MainWindow : Window
 
         UsersButton.Click += (_, _) =>
         {
-            SetActive(UsersButton);
+            _usersExpanded = !_usersExpanded;
+            UsersSubPanel.IsVisible = _usersExpanded;
+        };
+
+        AllUsersButton.Click += (_, _) =>
+        {
+            SetActive(AllUsersButton);
             PageTitleText.Text = "Users";
             var repo = Program.Services.GetRequiredService<IUserRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.UsersViewModel(repo);
             MainContent.Content = new PharmacyMS.Desktop.Views.Users.UsersView(vm);
+        };
+
+        UserActivityButton.Click += (_, _) =>
+        {
+            SetActive(UserActivityButton);
+            PageTitleText.Text = "User Activity";
+            MainContent.Content = new PharmacyMS.Desktop.Views.Reports.UserActivityView();
         };
 
         PendingApprovalsButton.Click += async (_, _) =>
@@ -528,8 +590,15 @@ public partial class MainWindow : Window
     }
 
 
-    private void DoLogout()
+    private async void DoLogout()
     {
+        if (SessionManager.CurrentSessionId is int sid)
+        {
+            var sessionRepo = Program.Services.GetRequiredService<IUserSessionRepository>();
+            await sessionRepo.CloseSessionAsync(sid, DateTime.Now);
+            SessionManager.CurrentSessionId = null;
+        }
+
         SessionManager.Logout();
         if (Avalonia.Application.Current?.ApplicationLifetime
                 is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
@@ -644,8 +713,13 @@ public partial class MainWindow : Window
         var medicineRepo = Program.Services.GetRequiredService<IMedicineRepository>();
         var reportRepo = Program.Services.GetRequiredService<IReportRepository>();
         var saleRepo = Program.Services.GetRequiredService<ISaleRepository>();
-        var vm = new PharmacyMS.Desktop.ViewModels.DashboardViewModel(medicineRepo, reportRepo, saleRepo);
-        MainContent.Content = new PharmacyMS.Desktop.Views.Dashboard.DashboardView(vm);
+        var dashExpenseRepo = Program.Services.GetRequiredService<IExpenseRepository>();
+        var vm = new PharmacyMS.Desktop.ViewModels.DashboardViewModel(medicineRepo, reportRepo, saleRepo, dashExpenseRepo);
+        MainContent.Content = new PharmacyMS.Desktop.Views.Dashboard.DashboardView(
+            vm,
+            onViewAllTopMedicines: () => NavigateToInventory(null),
+            onViewAllRecentTransactions: () =>
+                SalesHistoryButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent)));
     }
 
     private async Task LoadHeaderStatsAsync()
@@ -659,7 +733,8 @@ public partial class MainWindow : Window
             var userRepo = Program.Services.GetRequiredService<IUserRepository>();
             var reportRepo = Program.Services.GetRequiredService<IReportRepository>();
             var saleRepo = Program.Services.GetRequiredService<ISaleRepository>();
-            var statsVm = new PharmacyMS.Desktop.ViewModels.DashboardViewModel(medicineRepo, reportRepo, saleRepo);
+            var statsExpenseRepo = Program.Services.GetRequiredService<IExpenseRepository>();
+            var statsVm = new PharmacyMS.Desktop.ViewModels.DashboardViewModel(medicineRepo, reportRepo, saleRepo, statsExpenseRepo);
             await statsVm.LoadAsync();
 
             var allMedicines = (await medicineRepo.GetAllAsync()).ToList();

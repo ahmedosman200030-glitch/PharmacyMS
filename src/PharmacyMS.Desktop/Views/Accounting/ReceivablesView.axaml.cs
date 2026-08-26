@@ -52,7 +52,11 @@ public partial class ReceivablesView : UserControl
         DonutCanvas.SizeChanged += (_, _) => DrawDonut();
         TrendCanvas.SizeChanged += (_, _) => DrawTrend();
 
-        AttachedToVisualTree += async (_, _) => await LoadAndRender();
+        AttachedToVisualTree += async (_, _) =>
+        {
+            try { await LoadAndRender(); }
+            catch (Exception ex) { Console.WriteLine($"[RECEIVABLES ERROR] {ex}"); }
+        };
     }
 
     private async Task OpenPickerAndPay()

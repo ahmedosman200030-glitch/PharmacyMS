@@ -15,7 +15,7 @@
     </Grid>
 
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="10" Margin="0,0,0,10">
-      <CheckBox x:Name="CreditSaleCheck" Content="Partial / Credit Sale" VerticalAlignment="Center"/>
+      <CheckBox x:Name="CreditSaleCheck" Content="Partial / Credit Sale" VerticalAlignment="Center" IsEnabled="False" ToolTip.Tip="Select a customer first to enable credit sale"/>
       <ComboBox x:Name="CreditCustomerCombo" Width="280" Height="34" IsVisible="False"
                 Background="White" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="6"
                 PlaceholderText="Select customer for credit..."/>
@@ -133,6 +133,7 @@
             <StackPanel>
               <TextBlock Text="GRAND TOTAL" FontSize="11" Foreground="#94A3B8" FontWeight="Bold"/>
               <TextBlock x:Name="TotalText" Text="$0.00" FontSize="26" FontWeight="Bold" Foreground="White"/>
+              <TextBlock x:Name="TotalLocalText" Text="" FontSize="13" Foreground="#94A3B8" Margin="0,2,0,0"/>
             </StackPanel>
           </Border>
 
@@ -144,9 +145,9 @@
 
           <TextBlock Text="Payment Method" FontSize="12" Foreground="#64748B" FontWeight="Bold"/>
           <RadioButton x:Name="PayCash" Content="Cash" GroupName="PayMethod" IsChecked="True"/>
-          <RadioButton x:Name="PayCard" Content="Card" GroupName="PayMethod"/>
-          <RadioButton x:Name="PayMobile" Content="Mobile Money" GroupName="PayMethod"/>
-          <RadioButton x:Name="PayInsurance" Content="Insurance" GroupName="PayMethod"/>
+          <RadioButton x:Name="PayCard" Content="ZAAD Merchant" GroupName="PayMethod"/>
+          <RadioButton x:Name="PayMobile" Content="E-DAHAB" GroupName="PayMethod"/>
+          <RadioButton x:Name="PayInsurance" Content="Bank Transfer" GroupName="PayMethod"/>
 
           <Grid ColumnDefinitions="*,Auto" Margin="0,10,0,0">
             <TextBlock Text="Amount Paid" Foreground="#64748B" FontSize="13" VerticalAlignment="Center"/>

@@ -16,6 +16,7 @@ public class PLViewModel
     private readonly IPurchaseRepository _purchaseRepo;
     private readonly IExpenseRepository _expenseRepo;
     private readonly IReportRepository _reportRepo;
+    private readonly PharmacyMS.Application.Interfaces.Repositories.ISaleReturnRepository _saleReturnRepo;
 
     public DateTime FromDate { get; set; } = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
     public DateTime ToDate { get; set; } = DateTime.Today;
@@ -49,12 +50,14 @@ public class PLViewModel
     public List<TrendPoint> TrendPoints { get; private set; } = new();
 
     public PLViewModel(ISaleRepository saleRepo, IPurchaseRepository purchaseRepo,
-        IExpenseRepository expenseRepo, IReportRepository reportRepo)
+        IExpenseRepository expenseRepo, IReportRepository reportRepo,
+        PharmacyMS.Application.Interfaces.Repositories.ISaleReturnRepository saleReturnRepo)
     {
         _saleRepo = saleRepo;
         _purchaseRepo = purchaseRepo;
         _expenseRepo = expenseRepo;
         _reportRepo = reportRepo;
+        _saleReturnRepo = saleReturnRepo;
     }
 
     public async Task LoadAsync()
@@ -104,7 +107,8 @@ public class PLViewModel
     {
         var sales = await _saleRepo.GetByDateRangeAsync(from, to);
         var grossRevenue = sales.Sum(s => s.Subtotal);
-        var discounts = sales.Sum(s => s.TotalDiscount);
+        var salesReturns = (await _saleReturnRepo.GetByDateRangeAsync(from, to)).Sum(r => r.RefundAmount);
+        var discounts = sales.Sum(s => s.TotalDiscount) + salesReturns;
         var netRevenue = grossRevenue - discounts;
 
         var purchasesInRange = (await _purchaseRepo.GetAllAsync())

@@ -29,8 +29,22 @@ public partial class IncomeView : UserControl
         AllFilterBtn.Click += (_, _) => { _vm.ActiveFilter = "All"; _vm.CurrentPage = 1; RenderTable(); UpdateFilterHighlight(); };
         CashFilterBtn.Click += (_, _) => { _vm.ActiveFilter = "Cash Sales"; _vm.CurrentPage = 1; RenderTable(); UpdateFilterHighlight(); };
         PaymentFilterBtn.Click += (_, _) => { _vm.ActiveFilter = "Customer Payment"; _vm.CurrentPage = 1; RenderTable(); UpdateFilterHighlight(); };
+        OtherFilterBtn.Click += (_, _) => { _vm.ActiveFilter = "Other Income"; _vm.CurrentPage = 1; RenderTable(); UpdateFilterHighlight(); };
+
+        AddIncomeBtn.Click += async (_, _) =>
+        {
+            var dialog = new OtherIncomeFormWindow();
+            await dialog.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+            if (dialog.Result != null)
+            {
+                await _vm.AddOtherIncomeAsync(dialog.Result);
+                await LoadAndRender();
+            }
+        };
 
         SearchBox.TextChanged += (_, _) => { _vm.SearchText = SearchBox.Text ?? string.Empty; _vm.CurrentPage = 1; RenderTable(); };
+
+        IncomeGrid.AddHandler(Button.ClickEvent, OnViewIncomeClick, Avalonia.Interactivity.RoutingStrategies.Bubble);
 
         PrevPageBtn.Click += (_, _) => { if (_vm.CurrentPage > 1) { _vm.CurrentPage--; RenderTable(); } };
         NextPageBtn.Click += (_, _) =>
@@ -43,6 +57,43 @@ public partial class IncomeView : UserControl
         TrendCanvas.SizeChanged += (_, _) => DrawTrend();
 
         AttachedToVisualTree += async (_, _) => await LoadAndRender();
+    }
+
+    private async void OnViewIncomeClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (e.Source is Button { Name: "ViewIncomeBtn" } btn && btn.DataContext is IncomeRow row)
+        {
+            var owner = TopLevel.GetTopLevel(this) as Window;
+            var accent = row.Type switch
+            {
+                "Cash Sales" => "#10B981",
+                "Customer Payment" => "#F59E0B",
+                _ => "#14B8A6"
+            };
+            var icon = row.Type switch
+            {
+                "Cash Sales" => "\U0001F4B5",
+                "Customer Payment" => "\U0001F464",
+                _ => "\U00002795"
+            };
+            var detail = new Views.Accounting.TransactionDetailWindow();
+            detail.Configure(
+                icon: icon,
+                title: row.Type,
+                subtitle: row.Reference,
+                accentHex: accent,
+                rows: new (string, string)[]
+                {
+                    ("Date", row.Date.ToString("yyyy-MM-dd")),
+                    ("Type", row.Type),
+                    ("Description", row.Description),
+                    ("Reference", row.Reference),
+                    ("Amount", $"${row.Amount:F2}"),
+                    ("Payment Method", row.PaymentMethod),
+                    ("Received By", row.ReceivedBy),
+                });
+            if (owner != null) await detail.ShowDialog(owner); else detail.Show();
+        }
     }
 
     private async Task LoadAndRender()
@@ -60,12 +111,14 @@ public partial class IncomeView : UserControl
         TotalIncomeText.Text = $"${_vm.TotalIncome:F2}";
         CashSalesText.Text = $"${_vm.CashSalesTotal:F2}";
         CustomerPaymentsText.Text = $"${_vm.CustomerPaymentsTotal:F2}";
+        OtherIncomeText.Text = $"${_vm.OtherIncomeTotal:F2}";
         TxnCountText.Text = _vm.TransactionCount.ToString();
 
         var period = $"{_vm.FromDate:MMM d} - {_vm.ToDate:MMM d}";
         TotalIncomePeriodText.Text = period;
         CashSalesPeriodText.Text = period;
         CustomerPaymentsPeriodText.Text = period;
+        OtherIncomePeriodText.Text = period;
         TxnCountPeriodText.Text = period;
 
         var total = _vm.TotalIncome == 0 ? 1 : _vm.TotalIncome;
@@ -73,6 +126,8 @@ public partial class IncomeView : UserControl
         TopCashPctText.Text = $"{_vm.CashSalesTotal / total:P1}";
         TopPaymentsText.Text = $"${_vm.CustomerPaymentsTotal:F2}";
         TopPaymentsPctText.Text = $"{_vm.CustomerPaymentsTotal / total:P1}";
+        TopOtherText.Text = $"${_vm.OtherIncomeTotal:F2}";
+        TopOtherPctText.Text = $"{_vm.OtherIncomeTotal / total:P1}";
         TopTotalText.Text = $"${_vm.TotalIncome:F2}";
     }
 
@@ -110,6 +165,8 @@ public partial class IncomeView : UserControl
         CashFilterBtn.Foreground = _vm.ActiveFilter == "Cash Sales" ? Brushes.White : Brushes.Black;
         PaymentFilterBtn.Background = _vm.ActiveFilter == "Customer Payment" ? active : inactive;
         PaymentFilterBtn.Foreground = _vm.ActiveFilter == "Customer Payment" ? Brushes.White : Brushes.Black;
+        OtherFilterBtn.Background = _vm.ActiveFilter == "Other Income" ? active : inactive;
+        OtherFilterBtn.Foreground = _vm.ActiveFilter == "Other Income" ? Brushes.White : Brushes.Black;
     }
 
     private void DrawDonut()
@@ -120,7 +177,7 @@ public partial class IncomeView : UserControl
         double h = canvas.Bounds.Height > 0 ? canvas.Bounds.Height : 160;
         double cx = w / 2 - 60, cy = h / 2, radius = Math.Min(h, w / 2) / 2 - 8, thickness = 18;
 
-        var total = _vm.CashSalesTotal + _vm.CustomerPaymentsTotal;
+        var total = _vm.CashSalesTotal + _vm.CustomerPaymentsTotal + _vm.OtherIncomeTotal;
         if (total <= 0)
         {
             var empty = new TextBlock { Text = "No income yet", Foreground = Brushes.Gray, FontSize = 12 };
@@ -130,12 +187,16 @@ public partial class IncomeView : UserControl
         }
 
         double cashFrac = (double)(_vm.CashSalesTotal / total);
+        double paymentsFrac = (double)(_vm.CustomerPaymentsTotal / total);
+        double otherFrac = (double)(_vm.OtherIncomeTotal / total);
         DrawArcSegment(canvas, cx, cy, radius, thickness, 0, cashFrac * 360, Color.Parse("#10B981"));
-        DrawArcSegment(canvas, cx, cy, radius, thickness, cashFrac * 360, 360, Color.Parse("#F59E0B"));
+        DrawArcSegment(canvas, cx, cy, radius, thickness, cashFrac * 360, (cashFrac + paymentsFrac) * 360, Color.Parse("#F59E0B"));
+        DrawArcSegment(canvas, cx, cy, radius, thickness, (cashFrac + paymentsFrac) * 360, 360, Color.Parse("#14B8A6"));
 
-        double lx = w - 110, ly = h / 2 - 24;
+        double lx = w - 110, ly = h / 2 - 36;
         AddDonutLegendItem(canvas, lx, ly, "#10B981", "Cash Sales", $"{cashFrac:P0}");
-        AddDonutLegendItem(canvas, lx, ly + 24, "#F59E0B", "Customer Pay.", $"{(1 - cashFrac):P0}");
+        AddDonutLegendItem(canvas, lx, ly + 24, "#F59E0B", "Customer Pay.", $"{paymentsFrac:P0}");
+        AddDonutLegendItem(canvas, lx, ly + 48, "#14B8A6", "Other Income", $"{otherFrac:P0}");
     }
 
     private static void AddDonutLegendItem(Canvas canvas, double x, double y, string colorHex, string label, string pct)

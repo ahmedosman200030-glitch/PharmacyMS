@@ -49,10 +49,14 @@ public static class InfrastructureExtensions
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<ISupplierRepository, SupplierRepository>();
         services.AddScoped<IStockAdjustmentRepository, StockAdjustmentRepository>();
+        services.AddScoped<ISaleReturnRepository, SaleReturnRepository>();
+        services.AddScoped<PharmacyMS.Infrastructure.Services.CodeGeneratorService>();
         services.AddScoped<IExpenseRepository, ExpenseRepository>();
+        services.AddScoped<IOtherIncomeRepository, OtherIncomeRepository>();
         services.AddScoped<IDailyClosingRepository, DailyClosingRepository>();
         services.AddScoped<IPendingSalePaymentRepository, PendingSalePaymentRepository>();
         services.AddScoped<IPendingExpenseRepository, PendingExpenseRepository>();
+        services.AddScoped<IUserSessionRepository, UserSessionRepository>();
 
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IReceiptService, ReceiptService>();

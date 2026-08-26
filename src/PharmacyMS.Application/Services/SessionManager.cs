@@ -7,6 +7,8 @@ public static class SessionManager
 {
     public static User? CurrentUser { get; private set; }
 
+    public static int? CurrentSessionId { get; set; }
+
     public static bool IsLoggedIn => CurrentUser != null;
 
     public static bool IsAdmin => CurrentUser?.Role == UserRole.Admin;

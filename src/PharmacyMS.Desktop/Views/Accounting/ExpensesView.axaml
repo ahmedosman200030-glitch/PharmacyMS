@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:PharmacyMS.Desktop.ViewModels"
              xmlns:controls="clr-namespace:PharmacyMS.Desktop.Controls"
+             xmlns:app="clr-namespace:PharmacyMS.Application.Services;assembly=PharmacyMS.Application"
              x:Class="PharmacyMS.Desktop.Views.Accounting.ExpensesView"
              x:DataType="vm:ExpensesViewModel"
              Background="#F1F5F9">
@@ -114,11 +115,21 @@
             <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
             <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat=$\{0:F2\}}" Width="100"/>
             <DataGridTextColumn Header="Added By" Binding="{Binding CreatedBy}" Width="120"/>
+            <DataGridTemplateColumn Header="" Width="50">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Button Content="👁" Name="ViewBtn" FontSize="13" Padding="8,3"
+                          Background="#EFF6FF" Foreground="#2563EB" CornerRadius="4"
+                          ToolTip.Tip="View details"/>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
             <DataGridTemplateColumn Header="" Width="80">
               <DataGridTemplateColumn.CellTemplate>
                 <DataTemplate>
                   <Button Content="Delete" Name="DeleteBtn" FontSize="11" Padding="8,3"
-                          Background="#FEF2F2" Foreground="#DC2626" CornerRadius="4"/>
+                          Background="#FEF2F2" Foreground="#DC2626" CornerRadius="4"
+                          IsVisible="{x:Static app:SessionManager.IsAdmin}"/>
                 </DataTemplate>
               </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>

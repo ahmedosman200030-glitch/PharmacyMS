@@ -35,6 +35,7 @@ public class AccountingViewModel
     private readonly IExpenseRepository _expenseRepo;
     private readonly ICustomerRepository _customerRepo;
     private readonly IMedicineRepository _medicineRepo;
+    private readonly PharmacyMS.Application.Interfaces.Repositories.ISaleReturnRepository _saleReturnRepo;
 
     public DateTime FromDate { get; set; } = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
     public DateTime ToDate { get; set; } = DateTime.Today;
@@ -44,7 +45,8 @@ public class AccountingViewModel
     public decimal TotalPurchases { get; private set; }
     public decimal GrossProfit => TotalRevenue - TotalPurchases;
     public decimal TotalExpenses { get; private set; }
-    public decimal NetProfit => GrossProfit - TotalExpenses;
+    public decimal TotalReturns { get; private set; }
+    public decimal NetProfit => GrossProfit - TotalExpenses - TotalReturns;
 
     // Stat cards row 2
     public decimal CashBalance { get; private set; }
@@ -77,13 +79,15 @@ public class AccountingViewModel
         IPurchaseRepository purchaseRepo,
         IExpenseRepository expenseRepo,
         ICustomerRepository customerRepo,
-        IMedicineRepository medicineRepo)
+        IMedicineRepository medicineRepo,
+        PharmacyMS.Application.Interfaces.Repositories.ISaleReturnRepository saleReturnRepo)
     {
         _saleRepo = saleRepo;
         _purchaseRepo = purchaseRepo;
         _expenseRepo = expenseRepo;
         _customerRepo = customerRepo;
         _medicineRepo = medicineRepo;
+        _saleReturnRepo = saleReturnRepo;
     }
 
     public async Task LoadAsync()
@@ -94,15 +98,17 @@ public class AccountingViewModel
             .Where(p => p.CreatedAt >= FromDate && p.CreatedAt <= ToDate.AddDays(1)).ToList();
         var expenses = (await _expenseRepo.GetByDateRangeAsync(FromDate, ToDate)).ToList();
         var medicines = (await _medicineRepo.GetAllAsync()).ToList();
+        var returns = (await _saleReturnRepo.GetByDateRangeAsync(FromDate, ToDate)).ToList();
 
         // Row 1
         TotalRevenue = sales.Sum(s => s.TotalAmount);
         TotalPurchases = purchases.Sum(p => p.TotalAmount);
         TotalExpenses = expenses.Sum(e => e.Amount);
+        TotalReturns = returns.Sum(r => r.RefundAmount);
 
         // Row 2
         CashIn = sales.Sum(s => s.AmountPaid);
-        CashOut = purchases.Sum(p => p.AmountPaid) + TotalExpenses;
+        CashOut = purchases.Sum(p => p.AmountPaid) + TotalExpenses + TotalReturns;
         CashBalance = CashIn - CashOut;
         // Customer credit = total sales amount minus total paid across all credit sales
         var creditSales = await _saleRepo.GetCreditSalesAsync();
@@ -123,6 +129,8 @@ public class AccountingViewModel
             txns.Add(new AccountingTransaction { Type = "Purchase", Description = $"Purchase from {p.SupplierName}", Amount = p.TotalAmount, Date = p.CreatedAt });
         foreach (var e in expenses.OrderByDescending(x => x.Date).Take(3))
             txns.Add(new AccountingTransaction { Type = "Expense", Description = $"{e.Category}: {e.Description}", Amount = e.Amount, Date = e.Date });
+        foreach (var r in returns.OrderByDescending(x => x.CreatedAt).Take(3))
+            txns.Add(new AccountingTransaction { Type = "Return", Description = $"Return: {r.MedicineName} x{r.Quantity}", Amount = r.RefundAmount, Date = r.CreatedAt });
         foreach (var t in txns.OrderByDescending(x => x.Date).Take(10))
             RecentTransactions.Add(t);
 
@@ -143,12 +151,14 @@ public class AccountingViewModel
         var allDates = sales.Select(s => s.CreatedAt.Date)
             .Concat(purchases.Select(p => p.CreatedAt.Date))
             .Concat(expenses.Select(e => e.Date.Date))
+            .Concat(returns.Select(r => r.CreatedAt.Date))
             .Distinct().OrderByDescending(d => d);
         foreach (var date in allDates)
         {
             var dayIn = sales.Where(s => s.CreatedAt.Date == date).Sum(s => s.AmountPaid);
             var dayOut = purchases.Where(p => p.CreatedAt.Date == date).Sum(p => p.AmountPaid)
-                       + expenses.Where(e => e.Date.Date == date).Sum(e => e.Amount);
+                       + expenses.Where(e => e.Date.Date == date).Sum(e => e.Amount)
+                       + returns.Where(r => r.CreatedAt.Date == date).Sum(r => r.RefundAmount);
             CashFlowRows.Add(new CashFlowRow { Date = date, CashIn = dayIn, CashOut = dayOut, Net = dayIn - dayOut });
         }
 

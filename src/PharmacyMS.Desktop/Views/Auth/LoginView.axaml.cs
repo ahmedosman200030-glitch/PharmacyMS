@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Microsoft.Extensions.DependencyInjection;
 using PharmacyMS.Application.Enums;
+using PharmacyMS.Application.Interfaces.Repositories;
 using PharmacyMS.Application.Interfaces.Services;
 using PharmacyMS.Application.Services;
 using PharmacyMS.Desktop.Views.Shell;
@@ -77,6 +78,16 @@ public partial class LoginView : Window
 
         SessionManager.Login(user);
         soundService.Play(SoundEvent.AppStart);
+
+        var sessionRepo = Program.Services.GetRequiredService<IUserSessionRepository>();
+        var now = DateTime.Now;
+        SessionManager.CurrentSessionId = await sessionRepo.CreateAsync(new PharmacyMS.Domain.Entities.UserSession
+        {
+            UserId = user.Id,
+            UserName = user.FullName,
+            LoginTime = now,
+            CreatedAt = now
+        });
 
         var mainWindow = new MainWindow();
 

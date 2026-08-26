@@ -1,0 +1,540 @@
+<UserControl
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="using:PharmacyMS.Desktop.ViewModels"
+    x:Class="PharmacyMS.Desktop.Views.Dashboard.DashboardView">
+
+    <UserControl.Resources>
+        <!-- Icon badge gradients (diagonal, light-to-dark for a soft 3D pop) -->
+        <LinearGradientBrush x:Key="RedGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#FB7185" Offset="0"/>
+            <GradientStop Color="#E11D48" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="RoseGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#F87171" Offset="0"/>
+            <GradientStop Color="#B91C1C" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="BlueGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#60A5FA" Offset="0"/>
+            <GradientStop Color="#2563EB" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="PurpleGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#C084FC" Offset="0"/>
+            <GradientStop Color="#9333EA" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GreenGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#4ADE80" Offset="0"/>
+            <GradientStop Color="#16A34A" Offset="1"/>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="RoseTint" Color="#FFF1F2"/>
+        <SolidColorBrush x:Key="GreenTint" Color="#F0FDF4"/>
+        <SolidColorBrush x:Key="BlueTint" Color="#EFF6FF"/>
+        <SolidColorBrush x:Key="PurpleTint" Color="#FAF5FF"/>
+        <SolidColorBrush x:Key="AmberTint" Color="#FFFBEB"/>
+        <LinearGradientBrush x:Key="BlueHeaderGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#6366F1" Offset="0"/>
+            <GradientStop Color="#8B5CF6" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GreenHeaderGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#22C55E" Offset="0"/>
+            <GradientStop Color="#16A34A" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="PurpleHeaderGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#A855F7" Offset="0"/>
+            <GradientStop Color="#7C3AED" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="AmberSoftGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#FEF3C7" Offset="0"/>
+            <GradientStop Color="#FDE68A" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="RoseHeaderGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#F43F5E" Offset="0"/>
+            <GradientStop Color="#E11D48" Offset="1"/>
+        </LinearGradientBrush>
+        <!-- Card surface gradient - barely-there lift so it doesn't feel flat -->
+        <LinearGradientBrush x:Key="CardGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#FFFFFF" Offset="0"/>
+            <GradientStop Color="#FBFCFF" Offset="1"/>
+        </LinearGradientBrush>
+        <!-- Page backdrop -->
+        <LinearGradientBrush x:Key="PageGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#F9FAFB" Offset="0"/>
+            <GradientStop Color="#F3F4F6" Offset="1"/>
+        </LinearGradientBrush>
+    </UserControl.Resources>
+
+    <UserControl.Styles>
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="{StaticResource CardGradient}"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Padding" Value="11"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#F1F1F7"/>
+            <Setter Property="BoxShadow" Value="0 1 2 0 #0A1E293B, 0 12 28 -8 #1F1E293B, 0 24 48 -20 #141E293B"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.18"/>
+                    <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.18"/>
+                </Transitions>
+            </Setter>
+            <Setter Property="RenderTransform" Value="translateY(0px)"/>
+        </Style>
+        <Style Selector="Border.card:pointerover">
+            <Setter Property="BoxShadow" Value="0 2 4 0 #0F1E293B, 0 20 40 -10 #281E293B, 0 32 64 -24 #1C1E293B"/>
+            <Setter Property="RenderTransform" Value="translateY(-3px)"/>
+        </Style>
+
+        <Style Selector="Border.stat-icon">
+            <Setter Property="Width" Value="38"/>
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="CornerRadius" Value="12"/>
+        </Style>
+
+        <Style Selector="TextBlock.stat-label">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#6B7280"/>
+        </Style>
+        <Style Selector="TextBlock.stat-value">
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#111827"/>
+        </Style>
+        <Style Selector="TextBlock.panel-title">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#111827"/>
+        </Style>
+        <Style Selector="TextBlock.view-all">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Foreground" Value="#EF4444"/>
+        </Style>
+        <Style Selector="TextBlock.header-title">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style Selector="TextBlock.header-view-all">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Opacity" Value="0.9"/>
+        </Style>
+        <Style Selector="TextBlock.soft-header-title">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#92400E"/>
+        </Style>
+        <Style Selector="TextBlock.soft-header-viewall">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Foreground" Value="#D97706"/>
+        </Style>
+
+        <Style Selector="ListBox.plain">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="ListBoxItem.plain">
+            <Setter Property="Padding" Value="3,2"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.12"/>
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="ListBoxItem.plain:selected /template/ ContentPresenter">
+            <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <Style Selector="ListBoxItem.plain:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#F8FAFC"/>
+        </Style>
+
+        <Style Selector="Border.row-icon">
+            <Setter Property="Width" Value="32"/>
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Background" Value="#F3F4F6"/>
+        </Style>
+        <Style Selector="Border.level-pill">
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="9,3"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Background="{StaticResource PageGradient}">
+        <Grid Margin="14" RowDefinitions="Auto,Auto,1.15*,*,Auto">
+
+            <!-- Title + date -->
+            <Grid Grid.Row="0" Margin="0,0,0,8" ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Dashboard" FontSize="21" FontWeight="Bold" Foreground="#111827"/>
+                    <TextBlock x:Name="WelcomeText" FontSize="12" Foreground="#6B7280" Margin="0,1,0,0"/>
+                </StackPanel>
+                <Border Grid.Column="1" Background="{StaticResource CardGradient}" CornerRadius="10" Padding="10,7"
+                        VerticalAlignment="Center" BorderThickness="1" BorderBrush="#F1F1F7"
+                        BoxShadow="0 1 2 0 #0A1E293B, 0 8 20 -6 #1A1E293B">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="&#128197;" FontSize="12" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TodayDateText" FontSize="12" FontWeight="Medium" Foreground="#374151" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Stat cards -->
+            <Grid Grid.Row="1" Margin="0,0,0,8" ColumnDefinitions="*,*,*,*">
+                <Border Grid.Column="0" Classes="card" Margin="0,0,10,0" Background="{StaticResource RoseTint}">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Classes="stat-icon" Background="{StaticResource RoseGradient}"
+                                    BoxShadow="0 8 16 -6 #66E11D48">
+                                <Viewbox Width="22" Height="22">
+                                  <Canvas Width="24" Height="24">
+                                    <Path Stroke="White" StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                          Data="M6,2 L3,6 L3,20 C3,21.1 3.9,22 5,22 L19,22 C20.1,22 21,21.1 21,20 L21,6 L18,2 Z M3,6 L21,6 M16,10 C16,12.2 14.2,14 12,14 C9.8,14 8,12.2 8,10"/>
+                                  </Canvas>
+                                </Viewbox>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Classes="stat-label" Text="Total Sales"/>
+                                <TextBlock x:Name="RevenueText" Classes="stat-value"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,3,0,0">
+                                    <TextBlock x:Name="RevenueTrendText" FontSize="11" FontWeight="Bold"/>
+                                    <TextBlock Text="vs yesterday" FontSize="11" Foreground="#9CA3AF"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                        <Canvas x:Name="RevenueSparkCanvas" Height="18"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Classes="card" Margin="0,0,10,0" Background="{StaticResource GreenTint}">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Classes="stat-icon" Background="{StaticResource GreenGradient}"
+                                    BoxShadow="0 8 16 -6 #6616A34A">
+                                <Viewbox Width="22" Height="22">
+                                  <Canvas Width="24" Height="24">
+                                    <Path Stroke="White" StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                          Data="M2,12 L6,12 L8,6 L11,18 L14,9 L16,14 L18,12 L22,12"/>
+                                  </Canvas>
+                                </Viewbox>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Classes="stat-label" Text="Total Profit"/>
+                                <TextBlock x:Name="ProfitText" Classes="stat-value"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,3,0,0">
+                                    <TextBlock x:Name="ProfitTrendText" FontSize="11" FontWeight="Bold"/>
+                                    <TextBlock Text="vs yesterday" FontSize="11" Foreground="#9CA3AF"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                        <Canvas x:Name="ProfitSparkCanvas" Height="18"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="2" Classes="card" Margin="0,0,10,0" Background="{StaticResource BlueTint}">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Classes="stat-icon" Background="{StaticResource BlueGradient}"
+                                    BoxShadow="0 8 16 -6 #663B82F6">
+                                <Viewbox Width="22" Height="22">
+                                  <Canvas Width="24" Height="24">
+                                    <Path Stroke="White" StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                          Data="M21,16 L12,21 L3,16 L3,8 L12,3 L21,8 Z M3,8 L12,13 L21,8 M12,21 L12,13"/>
+                                  </Canvas>
+                                </Viewbox>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Classes="stat-label" Text="Total Transactions"/>
+                                <TextBlock x:Name="TransactionsText" Classes="stat-value"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,3,0,0">
+                                    <TextBlock x:Name="TransactionsTrendText" FontSize="11" FontWeight="Bold"/>
+                                    <TextBlock Text="vs yesterday" FontSize="11" Foreground="#9CA3AF"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                        <Canvas x:Name="TransactionsSparkCanvas" Height="18"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="3" Classes="card" Background="{StaticResource PurpleTint}">
+                    <StackPanel Spacing="6">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Classes="stat-icon" Background="{StaticResource PurpleGradient}"
+                                    BoxShadow="0 8 16 -6 #66A855F7">
+                                <Viewbox Width="22" Height="22">
+                                  <Canvas Width="24" Height="24">
+                                    <Path Stroke="White" StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                          Data="M17,21 L17,19 C17,16.8 15.2,15 13,15 L5,15 C2.8,15 1,16.8 1,19 L1,21 M9,11 C11.2,11 13,9.2 13,7 C13,4.8 11.2,3 9,3 C6.8,3 5,4.8 5,7 C5,9.2 6.8,11 9,11 Z M23,21 L23,19 C23,17.1 21.7,15.5 20,15.1 M16,3.1 C17.7,3.5 19,5.1 19,7 C19,8.9 17.7,10.5 16,10.9"/>
+                                  </Canvas>
+                                </Viewbox>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Classes="stat-label" Text="New Customers"/>
+                                <TextBlock x:Name="NewCustomersText" Classes="stat-value"/>
+                                <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,3,0,0">
+                                    <TextBlock x:Name="NewCustomersTrendText" FontSize="11" FontWeight="Bold"/>
+                                    <TextBlock Text="vs yesterday" FontSize="11" Foreground="#9CA3AF"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                        <Canvas x:Name="NewCustomersSparkCanvas" Height="18"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Sales overview + low stock alert -->
+            <Grid Grid.Row="2" Margin="0,0,0,8" ColumnDefinitions="2*,1*">
+                <Border Grid.Column="0" Classes="card" Margin="0,0,10,0" Padding="0">
+                    <Grid RowDefinitions="Auto,*">
+                        <Border Grid.Row="0" Background="{StaticResource RoseHeaderGradient}" CornerRadius="20,20,0,0" Padding="12,9">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Classes="header-title" Text="Sales Overview" VerticalAlignment="Center"/>
+                                <ComboBox Grid.Column="1" x:Name="ChartRangeCombo" Width="150" SelectedIndex="0" CornerRadius="10">
+                                    <ComboBoxItem Content="Last 7 Days"/>
+                                    <ComboBoxItem Content="Last 4 Weeks"/>
+                                    <ComboBoxItem Content="Last 6 Months"/>
+                                </ComboBox>
+                            </Grid>
+                        </Border>
+                        <Grid Grid.Row="1" ColumnDefinitions="40,*" Margin="11">
+                            <Canvas Grid.Column="0" x:Name="YAxisCanvas"/>
+                            <Grid Grid.Column="1" RowDefinitions="*,Auto">
+                                <Canvas Grid.Row="0" x:Name="SalesChartCanvas" ClipToBounds="False" Background="Transparent"/>
+                                <Canvas Grid.Row="1" x:Name="XAxisCanvas" Height="16" Margin="0,4,0,0"/>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card" Padding="0">
+                    <StackPanel>
+                        <Border Background="{StaticResource AmberSoftGradient}" CornerRadius="20,20,0,0" Padding="12,9">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <TextBlock Grid.Column="0" Text="&#9888;" FontSize="15" Margin="0,0,8,0" VerticalAlignment="Center" Foreground="#D97706"/>
+                                <TextBlock Grid.Column="1" Classes="soft-header-title" Text="Low Stock Alert" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" x:Name="ViewAllLowStockText" Classes="soft-header-viewall" Text="View all" Cursor="Hand" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                        <ListBox x:Name="LowStockList" Classes="plain" Margin="10">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:LowStockRow">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0">
+                                        <!-- Medicine image -->
+                                        <Border Grid.Column="0" Width="36" Height="36" CornerRadius="10"
+                                                Background="{Binding FallbackColor}" Margin="0,0,10,0"
+                                                ClipToBounds="True"
+                                                BoxShadow="0 3 6 -2 #331E293B">
+                                            <Panel>
+                                                <TextBlock Text="💊" FontSize="14"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                           IsVisible="{Binding !HasImage}"/>
+                                                <Image Source="{Binding MedicineImage}"
+                                                       Stretch="Uniform" Width="32" Height="32"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       IsVisible="{Binding HasImage}"/>
+                                            </Panel>
+                                        </Border>
+                                        <!-- Name + remaining -->
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
+                                            <TextBlock Text="{Binding Name}" FontSize="12" FontWeight="Medium"
+                                                       Foreground="#111827" TextWrapping="Wrap"/>
+                                            <TextBlock Text="{Binding RemainingText}" FontSize="10"
+                                                       Foreground="#9CA3AF"/>
+                                        </StackPanel>
+                                        <!-- Status badge -->
+                                        <Border Grid.Column="2" CornerRadius="8" Padding="7,3"
+                                                Background="{Binding StatusBgColor}" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding StatusText}" FontSize="9" FontWeight="Bold"
+                                                       Foreground="{Binding StatusTextColor}"/>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Payment methods + top medicines + recent transactions -->
+            <Grid Grid.Row="3" Margin="0,0,0,8" ColumnDefinitions="*,*,*">
+                <Border Grid.Column="0" Classes="card" Margin="0,0,10,0" Padding="0">
+                    <StackPanel>
+                        <Border Background="{StaticResource BlueHeaderGradient}" CornerRadius="20,20,0,0" Padding="12,9">
+                            <TextBlock Classes="header-title" Text="Sales by Payment Method"/>
+                        </Border>
+                        <Grid ColumnDefinitions="Auto,*" Margin="10">
+                            <Canvas Grid.Column="0" x:Name="PaymentDonutCanvas" Width="200" Height="200">
+                                <TextBlock x:Name="PaymentTotalText" FontSize="18" FontWeight="Bold" Foreground="#111827"
+                                           Canvas.Left="60" Canvas.Top="85" Width="80" TextAlignment="Center"/>
+                                <TextBlock Text="Total" FontSize="10" Foreground="#9CA3AF"
+                                           Canvas.Left="60" Canvas.Top="107" Width="80" TextAlignment="Center"/>
+                            </Canvas>
+                            <ItemsControl Grid.Column="1" x:Name="PaymentLegendList" Margin="8,0,0,0" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:PaymentMethodSlice">
+                                        <Grid ColumnDefinitions="Auto,Auto,Auto" Margin="0,4">
+                                            <Ellipse Grid.Column="0" Width="8" Height="8" Fill="{Binding Color}" Margin="0,0,7,0" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="11" Foreground="#6B7280" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding AmountText}" FontSize="11" FontWeight="Bold" Foreground="#111827" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card" Margin="0,0,10,0" Padding="0" ClipToBounds="True">
+                    <Grid RowDefinitions="Auto,*">
+                        <Border Grid.Row="0" Background="{StaticResource GreenHeaderGradient}" CornerRadius="20,20,0,0" Padding="12,9">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Classes="header-title" Text="Top Selling Medicines"/>
+                                <TextBlock Grid.Column="1" x:Name="ViewAllTopMedicinesText" Classes="header-view-all" Text="View all" Cursor="Hand"/>
+                            </Grid>
+                        </Border>
+                        <ListBox Grid.Row="1" x:Name="TopMedicinesList" Classes="plain" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:TopMedicineRow">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,1">
+                                        <Border Grid.Column="0" Width="32" Height="32" CornerRadius="10"
+                                                Background="{Binding FallbackColor}" Margin="0,0,8,0"
+                                                ClipToBounds="True"
+                                                BoxShadow="0 3 6 -2 #331E293B">
+                                            <Panel>
+                                                <TextBlock Text="{Binding FallbackEmoji}" FontSize="14"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                           IsVisible="{Binding !HasImage}"/>
+                                                <Image Source="{Binding MedicineImage}"
+                                                       Stretch="Uniform" Width="28" Height="28"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                       IsVisible="{Binding HasImage}"/>
+                                            </Panel>
+                                        </Border>
+                                        <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="12" FontWeight="Medium"
+                                                   Foreground="#111827" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                        <Border Grid.Column="2" Background="#FEF2F2" CornerRadius="8"
+                                                Padding="5,2" VerticalAlignment="Center" MinWidth="36">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <TextBlock Text="{Binding QuantitySold}" FontSize="11" FontWeight="Bold"
+                                                           Foreground="#EF4444" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="QTY" FontSize="8" Foreground="#EF4444"
+                                                           HorizontalAlignment="Center" FontWeight="Medium"/>
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
+
+                <Border Grid.Column="2" Classes="card" Padding="0" ClipToBounds="True">
+                    <Grid RowDefinitions="Auto,*">
+                        <Border Grid.Row="0" Background="{StaticResource PurpleHeaderGradient}" CornerRadius="20,20,0,0" Padding="12,9">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Classes="header-title" Text="Recent Transactions"/>
+                                <TextBlock Grid.Column="1" x:Name="ViewAllRecentTransactionsText" Classes="header-view-all" Text="View all" Cursor="Hand"/>
+                            </Grid>
+                        </Border>
+                        <ListBox Grid.Row="1" x:Name="RecentTransactionsList" Classes="plain" Margin="10" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate x:DataType="vm:RecentTransactionRow">
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Border Grid.Column="0" Width="32" Height="32" CornerRadius="10"
+                                                Background="#DCFCE7" Margin="0,0,10,0"
+                                                BoxShadow="0 3 6 -2 #3316A34A">
+                                            <TextBlock Text="&#128196;" FontSize="14" Foreground="#B91C1C"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding InvoiceNumber}" FontSize="13" FontWeight="Medium" Foreground="#111827"/>
+                                            <TextBlock Text="{Binding CustomerName}" FontSize="11" Foreground="#9CA3AF"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding AmountText}" FontSize="13" FontWeight="Bold" Foreground="#111827" HorizontalAlignment="Right"/>
+                                            <TextBlock Text="{Binding TimeText}" FontSize="11" FontWeight="SemiBold" Foreground="#B91C1C" HorizontalAlignment="Right"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Bottom strip: opening balance / today's expenses / stock items / expired items -->
+            <Grid Grid.Row="4" ColumnDefinitions="*,*,*,*">
+                <Border Grid.Column="0" Classes="card" Margin="0,0,10,0" Background="{StaticResource BlueTint}">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border Width="34" Height="34" CornerRadius="10" Background="#3B82F6">
+                            <Viewbox Width="17" Height="17">
+                              <Canvas Width="24" Height="24">
+                                <Path Stroke="White" StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                      Data="M3,7 C3,5.9 3.9,5 5,5 L18,5 C19.1,5 20,5.9 20,7 L20,17 C20,18.1 19.1,19 18,19 L5,19 C3.9,19 3,18.1 3,17 Z M15,12 C15,10.9 15.9,10 17,10 L21,10 L21,14 L17,14 C15.9,14 15,13.1 15,12 Z"/>
+                                <Path Fill="White" Data="M17.5,12 C17.5,11.7 17.7,11.5 18,11.5 C18.3,11.5 18.5,11.7 18.5,12 C18.5,12.3 18.3,12.5 18,12.5 C17.7,12.5 17.5,12.3 17.5,12 Z"/>
+                              </Canvas>
+                            </Viewbox>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Classes="stat-label" Text="Opening Balance"/>
+                            <TextBlock x:Name="OpeningBalanceText" Classes="stat-value" FontSize="16"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Classes="card" Margin="0,0,10,0" Background="{StaticResource AmberTint}">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border Width="34" Height="34" CornerRadius="10" Background="#F59E0B">
+                            <Viewbox Width="17" Height="17">
+                              <Canvas Width="24" Height="24">
+                                <Path Stroke="White" StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                      Data="M12,3 L12,15 M6,9 L12,15 L18,9 M4,19 L20,19"/>
+                              </Canvas>
+                            </Viewbox>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Classes="stat-label" Text="Today's Expenses"/>
+                            <TextBlock x:Name="TodayExpensesText" Classes="stat-value" FontSize="16"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Classes="card" Margin="0,0,10,0" Background="{StaticResource GreenTint}">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border Width="34" Height="34" CornerRadius="10" Background="#22C55E">
+                            <Viewbox Width="17" Height="17">
+                              <Canvas Width="24" Height="24">
+                                <Path Stroke="White" StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                      Data="M21,16 L12,21 L3,16 L3,8 L12,3 L21,8 Z M3,8 L12,13 L21,8 M12,21 L12,13"/>
+                              </Canvas>
+                            </Viewbox>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Classes="stat-label" Text="Stock Items"/>
+                            <TextBlock x:Name="StockItemsText" Classes="stat-value" FontSize="16"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="3" Classes="card" Background="{StaticResource RoseTint}">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border Width="34" Height="34" CornerRadius="10" Background="#EF4444">
+                            <Viewbox Width="17" Height="17">
+                              <Canvas Width="24" Height="24">
+                                <Path Stroke="White" StrokeThickness="1.8" StrokeLineCap="Round" Fill="Transparent"
+                                      Data="M12,9 L12,13 M12,17 L12.01,17 M10.29,3.86 L1.82,18 C1.64,18.32 1.55,18.68 1.56,19.05 C1.57,19.42 1.68,19.77 1.87,20.08 C2.07,20.39 2.35,20.65 2.68,20.82 C3.01,20.99 3.38,21.08 3.75,21.08 L20.25,21.08 C20.62,21.08 20.99,20.99 21.32,20.82 C21.65,20.65 21.93,20.39 22.13,20.08 C22.32,19.77 22.43,19.42 22.44,19.05 C22.45,18.68 22.36,18.32 22.18,18 L13.71,3.86 C13.53,3.56 13.27,3.31 12.96,3.14 C12.65,2.96 12.31,2.87 11.96,2.87 C11.6,2.87 11.26,2.96 10.96,3.14 C10.65,3.31 10.39,3.56 10.29,3.86 Z"/>
+                              </Canvas>
+                            </Viewbox>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Classes="stat-label" Text="Expired Items"/>
+                            <TextBlock x:Name="ExpiredItemsText" Classes="stat-value" FontSize="16"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+        </Grid>
+    </Grid>
+
+</UserControl>

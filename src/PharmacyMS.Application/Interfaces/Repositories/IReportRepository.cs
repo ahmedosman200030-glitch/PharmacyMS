@@ -23,4 +23,5 @@ public interface IReportRepository
     Task<IEnumerable<InventoryValuationRow>> GetInventoryValuationAsync();
     Task<IEnumerable<PurchaseVsSalesRow>> GetPurchaseVsSalesAsync(DateTime from, DateTime to);
     Task<IEnumerable<SupplierPaymentRow>> GetSupplierPaymentsAsync();
+    Task<IEnumerable<UserActivityRow>> GetUserActivityAsync(DateTime from, DateTime to);
 }

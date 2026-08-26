@@ -1,0 +1,58 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PharmacyMS.Desktop.Views.Accounting.TransactionDetailWindow"
+        Title="Transaction Details"
+        Width="480" Height="560"
+        MinWidth="420" MinHeight="420"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="White">
+
+  <Window.Styles>
+    <Style Selector="TextBlock.rowLabel">
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Foreground" Value="#64748B"/>
+    </Style>
+    <Style Selector="TextBlock.rowValue">
+      <Setter Property="FontSize" Value="15"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Foreground" Value="#0F172A"/>
+      <Setter Property="TextWrapping" Value="Wrap"/>
+    </Style>
+    <Style Selector="Button.footerClose">
+      <Setter Property="Background" Value="#0F172A"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+      <Setter Property="CornerRadius" Value="8"/>
+    </Style>
+  </Window.Styles>
+
+  <DockPanel>
+
+    <Border DockPanel.Dock="Top" x:Name="HeaderBorder" Background="#0F172A" Padding="24,18">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+          <TextBlock x:Name="HeaderIcon" Text="📄" FontSize="24" VerticalAlignment="Center"/>
+          <StackPanel>
+            <TextBlock x:Name="HeaderTitle" Text="Transaction Details" FontSize="20" FontWeight="Bold" Foreground="White"/>
+            <TextBlock x:Name="HeaderSubtitle" Text="" Foreground="#CBD5E1" FontSize="12" Margin="0,2,0,0"/>
+          </StackPanel>
+        </StackPanel>
+        <Button x:Name="CloseButton" Grid.Column="2" Content="✕" Background="Transparent"
+                Foreground="White" FontSize="18" Padding="6" BorderThickness="0"
+                VerticalAlignment="Center" HorizontalAlignment="Right"/>
+      </Grid>
+    </Border>
+
+    <Border DockPanel.Dock="Bottom" Background="White" Padding="24,16" BoxShadow="0 -1 4 0 #14000000">
+      <Button x:Name="CloseFooterButton" Content="Close" Classes="footerClose" Height="42"
+              HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+    </Border>
+
+    <ScrollViewer>
+      <StackPanel x:Name="RowsPanel" Margin="24" Spacing="16"/>
+    </ScrollViewer>
+
+  </DockPanel>
+</Window>

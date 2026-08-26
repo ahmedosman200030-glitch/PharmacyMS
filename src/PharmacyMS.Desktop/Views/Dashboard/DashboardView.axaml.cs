@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
@@ -22,6 +23,10 @@ public partial class DashboardView : UserControl
     private static readonly IBrush GridLineBrush = new SolidColorBrush(Color.Parse("#F1F1F1"));
     private static readonly IBrush TooltipBackground = new SolidColorBrush(Color.Parse("#111827"));
     private static readonly IBrush GuideLineBrush = new SolidColorBrush(Color.Parse("#D1D5DB"));
+    private static readonly IBrush RoseSparkColor = new SolidColorBrush(Color.Parse("#FB7185"));
+    private static readonly IBrush GreenSparkColor = new SolidColorBrush(Color.Parse("#4ADE80"));
+    private static readonly IBrush BlueSparkColor = new SolidColorBrush(Color.Parse("#60A5FA"));
+    private static readonly IBrush PurpleSparkColor = new SolidColorBrush(Color.Parse("#C084FC"));
 
     private List<Point> _chartPoints = new();
     private List<double> _chartValues = new();
@@ -34,10 +39,19 @@ public partial class DashboardView : UserControl
 
     public DashboardView() { InitializeComponent(); }
 
-    public DashboardView(DashboardViewModel vm)
+    private Action? _onViewAllTopMedicines;
+    private Action? _onViewAllRecentTransactions;
+
+    public DashboardView(
+        DashboardViewModel vm,
+        Action? onViewAllTopMedicines = null,
+        Action? onViewAllRecentTransactions = null)
     {
         InitializeComponent();
         _vm = vm;
+        _onViewAllTopMedicines = onViewAllTopMedicines;
+        _onViewAllRecentTransactions = onViewAllRecentTransactions;
+
         LowStockList.ItemsSource = _vm.LowStockRows;
         PaymentLegendList.ItemsSource = _vm.PaymentBreakdown;
         TopMedicinesList.ItemsSource = _vm.TopMedicines;
@@ -47,7 +61,15 @@ public partial class DashboardView : UserControl
         SalesChartCanvas.PointerMoved += SalesChartCanvas_PointerMoved;
         SalesChartCanvas.PointerExited += SalesChartCanvas_PointerExited;
 
+        RevenueSparkCanvas.SizeChanged += (_, _) => DrawStatSparkline(RevenueSparkCanvas, RoseSparkColor, _vm.SalesSeries.Select(p => (double)p.Amount).ToList(), _vm.RevenueTrendUp, 0);
+        ProfitSparkCanvas.SizeChanged += (_, _) => DrawStatSparkline(ProfitSparkCanvas, GreenSparkColor, null, _vm.ProfitTrendUp, 1.2);
+        TransactionsSparkCanvas.SizeChanged += (_, _) => DrawStatSparkline(TransactionsSparkCanvas, BlueSparkColor, null, _vm.TransactionsTrendUp, 2.4);
+        NewCustomersSparkCanvas.SizeChanged += (_, _) => DrawStatSparkline(NewCustomersSparkCanvas, PurpleSparkColor, null, _vm.NewCustomersTrendUp, 3.6);
+
         ChartRangeCombo.SelectionChanged += async (_, _) => await OnChartRangeChanged();
+
+        ViewAllTopMedicinesText.PointerPressed += (_, _) => _onViewAllTopMedicines?.Invoke();
+        ViewAllRecentTransactionsText.PointerPressed += (_, _) => _onViewAllRecentTransactions?.Invoke();
 
         AttachedToVisualTree += async (_, _) => await LoadAsync();
     }
@@ -69,12 +91,27 @@ public partial class DashboardView : UserControl
         SetTrend(TransactionsTrendText, _vm.TransactionsTrendText, _vm.TransactionsTrendUp);
         SetTrend(NewCustomersTrendText, _vm.NewCustomersTrendText, _vm.NewCustomersTrendUp);
 
+        OpeningBalanceText.Text = "$" + _vm.OpeningBalance.ToString("N2", CultureInfo.InvariantCulture);
+        TodayExpensesText.Text = "$" + _vm.TodayExpenses.ToString("N2", CultureInfo.InvariantCulture);
+        StockItemsText.Text = _vm.StockItemsCount.ToString("N0", CultureInfo.InvariantCulture);
+        ExpiredItemsText.Text = _vm.ExpiredItemsCount.ToString("N0", CultureInfo.InvariantCulture);
+
+        DrawStatSparkline(RevenueSparkCanvas, RoseSparkColor, _vm.SalesSeries.Select(p => (double)p.Amount).ToList(), _vm.RevenueTrendUp, 0);
+        DrawStatSparkline(ProfitSparkCanvas, GreenSparkColor, null, _vm.ProfitTrendUp, 1.2);
+        DrawStatSparkline(TransactionsSparkCanvas, BlueSparkColor, null, _vm.TransactionsTrendUp, 2.4);
+        DrawStatSparkline(NewCustomersSparkCanvas, PurpleSparkColor, null, _vm.NewCustomersTrendUp, 3.6);
+
         DrawSalesChart();
         DrawPaymentDonut();
 
         decimal totalPayments = 0;
         foreach (var p in _vm.PaymentBreakdown) totalPayments += p.Amount;
         PaymentTotalText.Text = $"${totalPayments:N2}";
+
+        // Most used payment method footer
+        var mostUsed = _vm.PaymentBreakdown.OrderByDescending(p => p.Amount).FirstOrDefault();
+        if (MostUsedPaymentText != null && mostUsed != null)
+            MostUsedPaymentText.Text = $"Most used: {mostUsed.Name}  {mostUsed.Percent:0.#}%";
     }
 
     private async Task OnChartRangeChanged()
@@ -127,7 +164,7 @@ public partial class DashboardView : UserControl
         foreach (var v in _chartValues) if (v > maxValue) maxValue = v;
         maxValue *= 1.15; // headroom so the peak isn't glued to the top
 
-        const int gridLines = 4;
+        const int gridLines = 8;
         for (int i = 0; i <= gridLines; i++)
         {
             double y = height / gridLines * i;
@@ -205,8 +242,11 @@ public partial class DashboardView : UserControl
                 Width = 60,
                 TextAlignment = TextAlignment.Center
             };
-            double cx = count > 1 ? (stepX * i) : (xAxisWidth / 2);
-            Canvas.SetLeft(lbl, cx - 30);
+            double labelCenterX = count > 1 ? (stepX * i) : (xAxisWidth / 2);
+            double labelLeft = labelCenterX - 30;
+            if (labelLeft < 0) labelLeft = 0;
+            if (labelLeft + 60 > xAxisWidth) labelLeft = Math.Max(0, xAxisWidth - 60);
+            Canvas.SetLeft(lbl, labelLeft);
             Canvas.SetTop(lbl, 0);
             XAxisCanvas.Children.Add(lbl);
         }
@@ -304,6 +344,69 @@ public partial class DashboardView : UserControl
         if (_tooltip != null) _tooltip.IsVisible = false;
     }
 
+    /// <summary>
+    /// Draws a small filled sparkline in a stat card. When realValues has at least 2 points
+    /// (currently only Total Sales has real daily history via _vm.SalesSeries) it plots that
+    /// data. Otherwise it draws a decorative wave leaning up or down to match the trend arrow -
+    /// it is NOT real historical data for that stat, just a visual accent like the reference design.
+    /// </summary>
+    private void DrawStatSparkline(Canvas canvas, IBrush color, List<double>? realValues, bool trendUp, double seedOffset)
+    {
+        canvas.Children.Clear();
+        double width = canvas.Bounds.Width;
+        double height = canvas.Bounds.Height;
+        if (width <= 0 || height <= 0) return;
+
+        List<double> values;
+        if (realValues != null && realValues.Count >= 2)
+        {
+            values = realValues;
+        }
+        else
+        {
+            values = new List<double>();
+            const int pointCount = 8;
+            for (int i = 0; i < pointCount; i++)
+            {
+                double t = i / (double)(pointCount - 1);
+                double wave = Math.Sin(t * Math.PI * 2 + seedOffset) * 0.25;
+                double trend = trendUp ? t * 0.6 : (1 - t) * 0.6;
+                values.Add(0.3 + wave + trend);
+            }
+        }
+
+        double min = double.MaxValue, max = double.MinValue;
+        foreach (var v in values) { if (v < min) min = v; if (v > max) max = v; }
+        if (max - min < 0.0001) max = min + 1;
+
+        var points = new List<Point>();
+        double stepX = values.Count > 1 ? width / (values.Count - 1) : 0;
+        for (int i = 0; i < values.Count; i++)
+        {
+            double x = stepX * i;
+            double norm = (values[i] - min) / (max - min);
+            double y = height - (norm * height) * 0.85 - height * 0.05;
+            points.Add(new Point(x, y));
+        }
+
+        var areaPoints = new List<Point> { new Point(0, height) };
+        areaPoints.AddRange(points);
+        areaPoints.Add(new Point(width, height));
+
+        var fillColor = color is SolidColorBrush scb ? scb.Color : Colors.Gray;
+        canvas.Children.Add(new Polygon
+        {
+            Points = areaPoints,
+            Fill = new SolidColorBrush(fillColor, 0.18)
+        });
+        canvas.Children.Add(new Polyline
+        {
+            Points = points,
+            Stroke = color,
+            StrokeThickness = 2
+        });
+    }
+
     private static string FormatAxisValue(double value)
     {
         if (value >= 1000)
@@ -326,7 +429,7 @@ public partial class DashboardView : UserControl
 
         if (_vm.PaymentBreakdown.Count == 0) return;
 
-        const double cx = 90, cy = 90, r = 64, strokeThickness = 36;
+        const double cx = 75, cy = 75, r = 54, strokeThickness = 32;
         double startAngle = 0;
 
         foreach (var slice in _vm.PaymentBreakdown)

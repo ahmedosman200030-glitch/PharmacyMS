@@ -21,7 +21,13 @@ public class IncomeTrendPoint
 
 public class IncomeViewModel
 {
+    public static readonly string[] PredefinedIncomeCategories =
+    {
+        "Service Income", "Consultation Fee", "Delivery Charge", "Rental Income", "Other Income"
+    };
+
     private readonly ISaleRepository _saleRepo;
+    private readonly IOtherIncomeRepository _otherIncomeRepo;
 
     public DateTime FromDate { get; set; } = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
     public DateTime ToDate { get; set; } = DateTime.Today;
@@ -29,19 +35,21 @@ public class IncomeViewModel
     public decimal TotalIncome { get; private set; }
     public decimal CashSalesTotal { get; private set; }
     public decimal CustomerPaymentsTotal { get; private set; }
+    public decimal OtherIncomeTotal { get; private set; }
     public int TransactionCount { get; private set; }
 
     public List<IncomeRow> AllRows { get; private set; } = new();
     public List<IncomeTrendPoint> TrendPoints { get; private set; } = new();
 
-    public string ActiveFilter { get; set; } = "All"; // All | Cash Sales | Customer Payment
+    public string ActiveFilter { get; set; } = "All"; // All | Cash Sales | Customer Payment | Other Income
     public string SearchText { get; set; } = string.Empty;
     public int PageSize { get; } = 8;
     public int CurrentPage { get; set; } = 1;
 
-    public IncomeViewModel(ISaleRepository saleRepo)
+    public IncomeViewModel(ISaleRepository saleRepo, IOtherIncomeRepository otherIncomeRepo)
     {
         _saleRepo = saleRepo;
+        _otherIncomeRepo = otherIncomeRepo;
     }
 
     public async Task LoadAsync()
@@ -85,11 +93,30 @@ public class IncomeViewModel
             }
         }
 
+        // Other Income — non-sale sources (service fees, consultations, delivery
+        // charges, etc). Intentionally NOT included in P&L / Dashboard / Accounting
+        // Overview revenue — this total only feeds this Income screen.
+        var otherIncome = await _otherIncomeRepo.GetByDateRangeAsync(FromDate, ToDate);
+        foreach (var oi in otherIncome)
+        {
+            rows.Add(new IncomeRow
+            {
+                Date = oi.Date,
+                Type = "Other Income",
+                Description = string.IsNullOrWhiteSpace(oi.Description) ? oi.Category : $"{oi.Category} — {oi.Description}",
+                Reference = oi.Category,
+                Amount = oi.Amount,
+                PaymentMethod = "—",
+                ReceivedBy = oi.CreatedBy
+            });
+        }
+
         AllRows = rows.OrderByDescending(r => r.Date).ToList();
 
         CashSalesTotal = rows.Where(r => r.Type == "Cash Sales").Sum(r => r.Amount);
         CustomerPaymentsTotal = rows.Where(r => r.Type == "Customer Payment").Sum(r => r.Amount);
-        TotalIncome = CashSalesTotal + CustomerPaymentsTotal;
+        OtherIncomeTotal = rows.Where(r => r.Type == "Other Income").Sum(r => r.Amount);
+        TotalIncome = CashSalesTotal + CustomerPaymentsTotal + OtherIncomeTotal;
         TransactionCount = rows.Count;
 
         TrendPoints = new List<IncomeTrendPoint>();
@@ -128,4 +155,7 @@ public class IncomeViewModel
         if (CurrentPage < 1) CurrentPage = 1;
         return filtered.Skip((CurrentPage - 1) * PageSize).Take(PageSize).ToList();
     }
+
+    public async Task<int> AddOtherIncomeAsync(PharmacyMS.Domain.Entities.OtherIncome income) =>
+        await _otherIncomeRepo.CreateAsync(income);
 }

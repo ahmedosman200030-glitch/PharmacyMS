@@ -1,5 +1,15 @@
 namespace PharmacyMS.Application.DTOs;
 
+public class UserActivityRow
+{
+    public int UserId { get; set; }
+    public string UserName { get; set; } = "";
+    public DateTime LoginTime { get; set; }
+    public DateTime? LogoutTime { get; set; }
+    public double SalesAmount { get; set; }
+    public int Transactions { get; set; }
+}
+
 public class DailySalesSummaryRow
 {
     public string Date { get; set; } = "";

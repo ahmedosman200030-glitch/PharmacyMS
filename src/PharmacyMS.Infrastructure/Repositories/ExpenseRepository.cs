@@ -2,13 +2,19 @@ using Dapper;
 using PharmacyMS.Application.Interfaces.Repositories;
 using PharmacyMS.Domain.Entities;
 using PharmacyMS.Infrastructure.Data;
+using PharmacyMS.Infrastructure.Services;
 
 namespace PharmacyMS.Infrastructure.Repositories;
 
 public class ExpenseRepository : IExpenseRepository
 {
     private readonly AppDbContext _context;
-    public ExpenseRepository(AppDbContext context) => _context = context;
+    private readonly CodeGeneratorService _codeGen;
+    public ExpenseRepository(AppDbContext context, CodeGeneratorService codeGen)
+    {
+        _context = context;
+        _codeGen = codeGen;
+    }
 
     public async Task<IEnumerable<Expense>> GetAllAsync()
     {
@@ -28,10 +34,11 @@ public class ExpenseRepository : IExpenseRepository
 
     public async Task<int> CreateAsync(Expense expense)
     {
+        expense.Code = await _codeGen.GetNextCodeAsync("EXP");
         using var conn = _context.CreateConnection();
         return await conn.ExecuteScalarAsync<int>($@"
-            INSERT INTO Expenses (Date, Category, Description, Amount, CreatedBy, CreatedAt)
-            VALUES (@Date, @Category, @Description, @Amount, @CreatedBy, @CreatedAt)
+            INSERT INTO Expenses (Code, Date, Category, Description, Amount, PaymentMethod, CreatedBy, CreatedAt)
+            VALUES (@Code, @Date, @Category, @Description, @Amount, @PaymentMethod, @CreatedBy, @CreatedAt)
             {_context.InsertIdSuffix()};", expense);
     }
 
@@ -39,7 +46,7 @@ public class ExpenseRepository : IExpenseRepository
     {
         using var conn = _context.CreateConnection();
         await conn.ExecuteAsync(
-            "UPDATE Expenses SET Date=@Date, Category=@Category, Description=@Description, Amount=@Amount WHERE Id=@Id",
+            "UPDATE Expenses SET Date=@Date, Category=@Category, Description=@Description, Amount=@Amount, PaymentMethod=@PaymentMethod WHERE Id=@Id",
             expense);
     }
 

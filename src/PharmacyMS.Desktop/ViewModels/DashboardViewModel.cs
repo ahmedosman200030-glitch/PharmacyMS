@@ -166,6 +166,7 @@ public class DashboardViewModel
     private readonly IMedicineRepository _medicineRepo;
     private readonly IReportRepository _reportRepo;
     private readonly ISaleRepository _saleRepo;
+    private readonly IExpenseRepository _expenseRepo;
 
     private static readonly string[] PaymentColors = { "#EF4444", "#3B82F6", "#22C55E", "#A855F7", "#F59E0B", "#0891B2" };
 
@@ -191,14 +192,24 @@ public class DashboardViewModel
     public string NewCustomersTrendText { get; private set; } = "";
     public bool NewCustomersTrendUp { get; private set; } = true;
 
+    // Bottom strip stats. OpeningBalance is read from the generic settings store (key
+    // "OpeningBalance") since there's no dedicated cash-balance feature yet - it will show
+    // 0 until something (e.g. Daily Closing or Settings) writes that setting.
+    public decimal OpeningBalance { get; private set; }
+    public decimal TodayExpenses { get; private set; }
+    public int StockItemsCount { get; private set; }
+    public int ExpiredItemsCount { get; private set; }
+
     public DashboardViewModel(
         IMedicineRepository medicineRepo,
         IReportRepository reportRepo,
-        ISaleRepository saleRepo)
+        ISaleRepository saleRepo,
+        IExpenseRepository expenseRepo)
     {
         _medicineRepo = medicineRepo;
         _reportRepo = reportRepo;
         _saleRepo = saleRepo;
+        _expenseRepo = expenseRepo;
     }
 
     public async Task LoadAsync()
@@ -239,6 +250,11 @@ public class DashboardViewModel
         NewCustomersToday = firstPurchaseByCustomer.Count(d => d.Date == todayStart);
         var newCustomersYesterday = firstPurchaseByCustomer.Count(d => d.Date == yestStart);
         (NewCustomersTrendText, NewCustomersTrendUp) = ComputeTrend(NewCustomersToday, newCustomersYesterday);
+
+        // --- Bottom strip: opening balance, today's expenses, stock items, expired items ---
+        var openingBalanceSetting = await _reportRepo.GetSettingAsync("OpeningBalance");
+        OpeningBalance = decimal.TryParse(openingBalanceSetting, out var ob) ? ob : 0m;
+        TodayExpenses = await _expenseRepo.GetTotalByDateRangeAsync(todayStart, todayEnd);
 
         // --- Sales overview chart (default range) ---
         await LoadSalesSeriesAsync(CurrentChartRange);
@@ -289,6 +305,9 @@ public class DashboardViewModel
         // --- Low stock alert: show actual low stock, or fallback to 5 lowest if none ---
         var allMeds = await _medicineRepo.GetAllAsync();
         var allMedsList = allMeds.ToList();
+
+        StockItemsCount = allMedsList.Count;
+        ExpiredItemsCount = allMedsList.Count(m => m.ExpiryDate.HasValue && m.ExpiryDate.Value.Date < DateTime.Today);
         var lowStockMeds = allMedsList
             .Where(m => m.QuantityInStock <= m.ReorderLevel && m.QuantityInStock > 0)
             .OrderBy(m => m.QuantityInStock)

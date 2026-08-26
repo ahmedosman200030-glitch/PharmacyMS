@@ -22,9 +22,26 @@ public class ExpensesViewModel
 
     public static readonly string[] PredefinedCategories =
     {
-        "Rent", "Salaries", "Utilities", "Transport",
-        "Maintenance", "Marketing", "Office Supplies",
-        "Insurance", "Taxes", "Other"
+        "Rent",
+        "Staff Salaries",
+        "Electricity",
+        "Water",
+        "Internet & Telephone",
+        "Transport",
+        "Fuel",
+        "Office Supplies",
+        "Cleaning",
+        "Maintenance & Repairs",
+        "Equipment & Furniture",
+        "Bank / Mobile Money Fees",
+        "Licenses & Permits",
+        "Marketing & Advertising",
+        "Security",
+        "Professional Services",
+        "Delivery / Courier",
+        "Taxes & Government Fees",
+        "Staff Training",
+        "Other Expense"
     };
 
     public DateTime FromDate { get; set; } = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);

@@ -40,12 +40,12 @@
         <controls:DateRangePicker x:Name="RangePicker"/>
         <Button x:Name="RefreshButton" Content="🔄 Refresh" Background="#2563EB" Foreground="White" CornerRadius="8" Padding="12,6" FontSize="13"/>
         <Button x:Name="AddIncomeBtn" Content="+ Add Income" Background="#2563EB" Foreground="White" CornerRadius="8" Padding="12,6" FontSize="13"
-                ToolTip.Tip="Income is generated from Sales (POS) and Customer Payments. Record one there and it will appear here."/>
+                ToolTip.Tip="Record income from a non-sale source, like a service fee, consultation, or delivery charge."/>
       </StackPanel>
     </Grid>
 
     <!-- Stat cards -->
-    <Grid ColumnDefinitions="*,*,*,*">
+    <Grid ColumnDefinitions="*,*,*,*,*">
       <Border Grid.Column="0" Classes="card" Margin="0,0,10,0">
         <StackPanel Spacing="8" HorizontalAlignment="Center">
           <Border Classes="stat-icon" Background="#EFF6FF" HorizontalAlignment="Center">
@@ -79,7 +79,18 @@
           <TextBlock x:Name="CustomerPaymentsPeriodText" Text="" FontSize="11" Foreground="#F59E0B" HorizontalAlignment="Center"/>
         </StackPanel>
       </Border>
-      <Border Grid.Column="3" Classes="card" Padding="16">
+      <Border Grid.Column="3" Classes="card" Margin="0,0,10,0">
+        <StackPanel Spacing="8" HorizontalAlignment="Center">
+          <Border Classes="stat-icon" Background="#F0FDFA" HorizontalAlignment="Center">
+            <Path Data="M10 2 L10 18 M4 6 L16 6 M4 14 L16 14" Stroke="#14B8A6" StrokeThickness="1.8"
+                  StrokeLineCap="Round" Width="18" Height="18" Stretch="Uniform"/>
+          </Border>
+          <TextBlock Text="OTHER INCOME" Classes="stat-label" HorizontalAlignment="Center" TextAlignment="Center"/>
+          <TextBlock x:Name="OtherIncomeText" Text="$0.00" Classes="stat-value" HorizontalAlignment="Center"/>
+          <TextBlock x:Name="OtherIncomePeriodText" Text="" FontSize="11" Foreground="#14B8A6" HorizontalAlignment="Center"/>
+        </StackPanel>
+      </Border>
+      <Border Grid.Column="4" Classes="card" Padding="16">
         <StackPanel Spacing="8" HorizontalAlignment="Center">
           <Border Classes="stat-icon" Background="#F5F3FF" HorizontalAlignment="Center">
             <Path Data="M4 6 L16 6 M4 10 L16 10 M4 14 L12 14" Stroke="#8B5CF6" StrokeThickness="2"
@@ -99,6 +110,7 @@
           <Button x:Name="AllFilterBtn" Content="All Income" CornerRadius="8" Padding="12,6" FontSize="13"/>
           <Button x:Name="CashFilterBtn" Content="Cash Sales" CornerRadius="8" Padding="12,6" FontSize="13"/>
           <Button x:Name="PaymentFilterBtn" Content="Customer Payments" CornerRadius="8" Padding="12,6" FontSize="13"/>
+          <Button x:Name="OtherFilterBtn" Content="Other Income" CornerRadius="8" Padding="12,6" FontSize="13"/>
         </StackPanel>
         <TextBox x:Name="SearchBox" DockPanel.Dock="Right" Width="220" Watermark="Search income..."/>
       </DockPanel>
@@ -118,6 +130,15 @@
             <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat=$\{0:F2\}}" Width="100"/>
             <DataGridTextColumn Header="Payment Method" Binding="{Binding PaymentMethod}" Width="160"/>
             <DataGridTextColumn Header="Received By" Binding="{Binding ReceivedBy}" Width="110"/>
+            <DataGridTemplateColumn Header="" Width="50">
+              <DataGridTemplateColumn.CellTemplate>
+                <DataTemplate>
+                  <Button Content="👁" Name="ViewIncomeBtn" FontSize="13" Padding="8,3"
+                          Background="#EFF6FF" Foreground="#2563EB" CornerRadius="4"
+                          ToolTip.Tip="View details"/>
+                </DataTemplate>
+              </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
           </DataGrid.Columns>
         </DataGrid>
 
@@ -158,6 +179,11 @@
             <TextBlock Text="Customer Payments" Foreground="#334155" FontSize="13"/>
             <TextBlock x:Name="TopPaymentsText" Grid.Column="1" Text="$0.00" FontSize="13" FontWeight="SemiBold" Margin="10,0" Foreground="#F59E0B"/>
             <TextBlock x:Name="TopPaymentsPctText" Grid.Column="2" Text="0%" FontSize="12" Foreground="#64748B"/>
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto,Auto">
+            <TextBlock Text="Other Income" Foreground="#334155" FontSize="13"/>
+            <TextBlock x:Name="TopOtherText" Grid.Column="1" Text="$0.00" FontSize="13" FontWeight="SemiBold" Margin="10,0" Foreground="#14B8A6"/>
+            <TextBlock x:Name="TopOtherPctText" Grid.Column="2" Text="0%" FontSize="12" Foreground="#64748B"/>
           </Grid>
           <Separator/>
           <Grid ColumnDefinitions="*,Auto">
