@@ -47,25 +47,10 @@ public partial class MainWindow : Window
             var screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
             if (screen != null)
             {
-                // Working area excludes taskbars/docks. Clamp so the window
-                // never opens larger than what the client's screen can show,
-                // but never smaller than the MinWidth/MinHeight set in XAML.
-                var area = screen.WorkingArea;
-                double scaling = screen.Scaling;
-                double usableWidth = area.Width / scaling;
-                double usableHeight = area.Height / scaling;
-
-                // Scale relative to the actual screen instead of clamping
-                // down from a fixed XAML default, so the window looks
-                // appropriately sized on both small laptops and large/4K displays.
-                double targetWidth = usableWidth * 0.82;
-                double targetHeight = usableHeight * 0.82;
-
-                targetWidth = Math.Clamp(targetWidth, MinWidth, usableWidth * 0.95);
-                targetHeight = Math.Clamp(targetHeight, MinHeight, usableHeight * 0.95);
-
-                Width = targetWidth;
-                Height = targetHeight;
+                WindowState = WindowState.Normal;
+                Width = screen.WorkingArea.Width;
+                Height = screen.WorkingArea.Height;
+                Position = screen.WorkingArea.Position;
             }
         };
 
