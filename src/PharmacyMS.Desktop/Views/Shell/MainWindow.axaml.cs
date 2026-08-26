@@ -55,11 +55,14 @@ public partial class MainWindow : Window
                 double usableWidth = area.Width / scaling;
                 double usableHeight = area.Height / scaling;
 
-                double targetWidth = Math.Min(Width, usableWidth * 0.95);
-                double targetHeight = Math.Min(Height, usableHeight * 0.95);
+                // Scale relative to the actual screen instead of clamping
+                // down from a fixed XAML default, so the window looks
+                // appropriately sized on both small laptops and large/4K displays.
+                double targetWidth = usableWidth * 0.82;
+                double targetHeight = usableHeight * 0.82;
 
-                targetWidth = Math.Max(targetWidth, MinWidth);
-                targetHeight = Math.Max(targetHeight, MinHeight);
+                targetWidth = Math.Clamp(targetWidth, MinWidth, usableWidth * 0.95);
+                targetHeight = Math.Clamp(targetHeight, MinHeight, usableHeight * 0.95);
 
                 Width = targetWidth;
                 Height = targetHeight;
