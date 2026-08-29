@@ -32,19 +32,16 @@ jobs:
           echo "Resolved pack version: $VERSION"
 
       - name: Inject Resend API key
-        shell: pwsh
+        shell: bash
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: |
-          $key = $env:RESEND_API_KEY
-          $cs = @"
-namespace PharmacyMS.Desktop.Services;
+          printf 'namespace PharmacyMS.Desktop.Services;
 internal static class ResendApiKeyProvider
 {
-    internal const string Key = "$key";
+    internal const string Key = "%s";
 }
-"@
-          Set-Content -Path src/PharmacyMS.Desktop/Services/ResendApiKeyProvider.cs -Value $cs -Encoding UTF8
+' "$RESEND_API_KEY" > src/PharmacyMS.Desktop/Services/ResendApiKeyProvider.cs
 
       - name: Publish self-contained win-x64 build
         run: |
