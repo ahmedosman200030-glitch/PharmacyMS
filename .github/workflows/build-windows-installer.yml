@@ -48,7 +48,7 @@ jobs:
             --packVersion ${{ steps.version.outputs.version }} `
             --packDir ./publish/win-x64 `
             --mainExe PharmacyMS.Desktop.exe `
-            --icon ./src/PharmacyMS.Desktop/Assets/pharmacy-logo.ico `
+            --icon ./src/PharmacyMS.Desktop/Assets/pharmapro-icon.ico `
             --packTitle "PharmacyMS" `
             --packAuthors "AL-HIJRA PHARMACY" `
             --outputDir ./release
