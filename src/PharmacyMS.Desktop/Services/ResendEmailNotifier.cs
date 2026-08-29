@@ -155,7 +155,9 @@ public static class ResendEmailNotifier
     {
         var apiKey = Environment.GetEnvironmentVariable("RESEND_API_KEY");
         if (string.IsNullOrWhiteSpace(apiKey))
-            return false; // not configured yet — queue it, retry once it's set
+            apiKey = ResendApiKeyProvider.Key;
+        if (string.IsNullOrWhiteSpace(apiKey))
+            return false;
 
         var html =
             "<p>A pharmacy has completed onboarding in PharmaPro.</p>" +

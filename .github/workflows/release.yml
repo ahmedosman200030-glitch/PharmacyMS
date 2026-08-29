@@ -21,7 +21,24 @@ jobs:
       - name: Install vpk
         run: dotnet tool install -g vpk
 
+      - name: Inject Resend API key
+        shell: pwsh
+        run: |
+          $key = $env:RESEND_API_KEY
+          $cs = @"
+namespace PharmacyMS.Desktop.Services;
+internal static class ResendApiKeyProvider
+{
+    internal const string Key = "$key";
+}
+"@
+          Set-Content -Path src/PharmacyMS.Desktop/Services/ResendApiKeyProvider.cs -Value $cs -Encoding UTF8
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+
       - name: Publish
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: dotnet publish src/PharmacyMS.Desktop/PharmacyMS.Desktop.csproj -c Release -r win-x64 --self-contained -o ./publish -p:Version=${{ github.event.inputs.version }} -p:AssemblyVersion=${{ github.event.inputs.version }}.0 -p:FileVersion=${{ github.event.inputs.version }}.0 -p:InformationalVersion=${{ github.event.inputs.version }}
 
       - name: Pack with vpk
