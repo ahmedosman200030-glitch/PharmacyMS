@@ -12,14 +12,14 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9
         with:
           dotnet-version: '10.0.x'
 
-      - name: Install Velopack CLI (Windows build)
+      - name: Install Velopack CLI
         run: dotnet tool install -g vpk
 
       - name: Derive version from tag
@@ -29,51 +29,47 @@ jobs:
           RAW="${GITHUB_REF_NAME}"
           VERSION="${RAW#v}"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "Resolved pack version: $VERSION"
 
       - name: Inject Resend API key
         shell: bash
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: |
-          printf 'namespace PharmacyMS.Desktop.Services;
-internal static class ResendApiKeyProvider
-{
-    internal const string Key = "%s";
-}
-' "$RESEND_API_KEY" > src/PharmacyMS.Desktop/Services/ResendApiKeyProvider.cs
+          printf 'namespace PharmacyMS.Desktop.Services;\ninternal static class ResendApiKeyProvider\n{\n    internal const string Key = "%s";\n}\n' "$RESEND_API_KEY" > src/PharmacyMS.Desktop/Services/ResendApiKeyProvider.cs
 
-      - name: Publish self-contained win-x64 build
+      - name: Publish
+        shell: bash
         run: |
-          dotnet publish src/PharmacyMS.Desktop/PharmacyMS.Desktop.csproj `
-            -c Release `
-            -r win-x64 `
-            --self-contained true `
-            -p:PublishSingleFile=true `
-            -p:IncludeNativeLibrariesForSelfExtract=true `
+          dotnet publish src/PharmacyMS.Desktop/PharmacyMS.Desktop.csproj \
+            -c Release \
+            -r win-x64 \
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -p:IncludeNativeLibrariesForSelfExtract=true \
             -o ./publish/win-x64
 
-      - name: Pack into Setup.exe with Velopack
+      - name: Pack with Velopack
+        shell: bash
         run: |
-          vpk pack `
-            --packId PharmacyMS `
-            --packVersion ${{ steps.version.outputs.version }} `
-            --packDir ./publish/win-x64 `
-            --mainExe PharmacyMS.Desktop.exe `
-            --icon ./src/PharmacyMS.Desktop/Assets/pharmapro-icon.ico `
-            --packTitle "PharmacyMS" `
-            --packAuthors "AL-HIJRA PHARMACY" `
+          vpk pack \
+            --packId PharmacyMS \
+            --packVersion ${{ steps.version.outputs.version }} \
+            --packDir ./publish/win-x64 \
+            --mainExe PharmacyMS.Desktop.exe \
+            --icon ./src/PharmacyMS.Desktop/Assets/pharmapro-icon.ico \
+            --packTitle "PharmacyMS" \
+            --packAuthors "AL-HIJRA PHARMACY" \
             --outputDir ./release
 
-      - name: Upload installer as build artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+      - name: Upload artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: PharmacyMS-Windows-Installer
           path: ./release/*
 
-      - name: Create GitHub Release and upload assets
+      - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ steps.version.outputs.version }}
