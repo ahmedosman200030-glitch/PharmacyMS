@@ -31,6 +31,21 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Resolved pack version: $VERSION"
 
+      - name: Inject Resend API key
+        shell: pwsh
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: |
+          $key = $env:RESEND_API_KEY
+          $cs = @"
+namespace PharmacyMS.Desktop.Services;
+internal static class ResendApiKeyProvider
+{
+    internal const string Key = "$key";
+}
+"@
+          Set-Content -Path src/PharmacyMS.Desktop/Services/ResendApiKeyProvider.cs -Value $cs -Encoding UTF8
+
       - name: Publish self-contained win-x64 build
         run: |
           dotnet publish src/PharmacyMS.Desktop/PharmacyMS.Desktop.csproj `
