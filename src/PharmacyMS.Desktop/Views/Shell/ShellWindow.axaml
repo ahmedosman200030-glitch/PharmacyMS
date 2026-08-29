@@ -1,0 +1,53 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PharmacyMS.Desktop.Views.Shell.ShellWindow"
+        Title="PharmaPro — Smart Pharmacy Management"
+        Icon="avares://PharmacyMS.Desktop/Assets/pharmapro-icon.ico"
+        Width="1280" Height="800"
+        MinWidth="1024" MinHeight="650"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI, Inter, sans-serif"
+        Background="{DynamicResource BrandBackgroundBrush}">
+  <Window.Styles>
+    <Style Selector="Button.notifRow">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Padding" Value="8,6"/>
+      <Setter Property="CornerRadius" Value="6"/>
+    </Style>
+    <Style Selector="Button.notifRow:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#F1F5F9"/>
+    </Style>
+
+    <Style Selector="Button.navBtn">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="White"/>
+      <Setter Property="Transitions">
+        <Transitions>
+          <BrushTransition Property="Background" Duration="0:0:0.12"/>
+        </Transitions>
+      </Setter>
+    </Style>
+    <Style Selector="Button.navBtn:pointerover">
+      <Setter Property="Background" Value="#1B9C8540"/>
+      <Setter Property="Foreground" Value="#6EE7B7"/>
+    </Style>
+    <Style Selector="Button.navBtn:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1B9C8540"/>
+    </Style>
+    <Style Selector="Button.navBtn:pressed">
+      <Setter Property="Background" Value="#1B9C8570"/>
+    </Style>
+    <Style Selector="Button.navBtn:pressed /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1B9C8570"/>
+    </Style>
+    <Style Selector="Button.navBtn.active">
+      <Setter Property="Background" Value="#DC2626"/>
+      <Setter Property="Foreground" Value="White"/>
+    </Style>
+    <Style Selector="Button.navBtn.active /template/ ContentPresenter">
+      <Setter Property="Background" Value="#DC2626"/>
+    </Style>
+  </Window.Styles>
+
+  <ContentControl x:Name="RootContent"/>
+</Window>

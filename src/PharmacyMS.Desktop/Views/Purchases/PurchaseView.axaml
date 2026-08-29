@@ -11,7 +11,7 @@
       <DockPanel>
         <TextBlock DockPanel.Dock="Top" Text="Medicines" FontSize="18" FontWeight="Bold"
                    Foreground="#0F172A" Margin="0,0,0,14"/>
-        <DataGrid x:Name="MedicineGrid" HeadersVisibility="All" RowHeaderWidth="40"
+        <DataGrid VerticalScrollBarVisibility="Auto" x:Name="MedicineGrid" HeadersVisibility="All" RowHeaderWidth="40"
                   x:DataType="ent:Medicine"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"
@@ -67,7 +67,7 @@
                   HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
         </StackPanel>
 
-        <DataGrid x:Name="LinesGrid" HeadersVisibility="All" RowHeaderWidth="40"
+        <DataGrid VerticalScrollBarVisibility="Auto" x:Name="LinesGrid" HeadersVisibility="All" RowHeaderWidth="40"
                   x:DataType="vm:PurchaseLine"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"

@@ -23,7 +23,7 @@
       <Button x:Name="ExportExcelButton" Content="📤 Export Excel" Height="34" Margin="0,0,0,8" Background="#3B82F6" Foreground="White" CornerRadius="6" Padding="14,4"/>
     </WrapPanel>
     <Border Background="White" CornerRadius="10" Padding="4" BoxShadow="0 1 4 0 #22000000">
-      <DataGrid x:Name="Grid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="ent:Supplier" AutoGenerateColumns="False" IsReadOnly="True"
+      <DataGrid VerticalScrollBarVisibility="Auto" x:Name="Grid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="ent:Supplier" AutoGenerateColumns="False" IsReadOnly="True"
                 GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
                 RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
         <DataGrid.Columns>

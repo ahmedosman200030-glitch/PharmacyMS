@@ -9,24 +9,17 @@ using PharmacyMS.Desktop.Views.Shell;
 
 namespace PharmacyMS.Desktop.Views.Auth;
 
-public partial class LoginView : Window
+public partial class LoginView : UserControl
 {
     private bool _passwordVisible;
+    private readonly Action _onLoginSuccess;
 
-    public LoginView()
+    public LoginView(Action onLoginSuccess)
     {
         InitializeComponent();
-        Opened += (_, _) =>
-        {
-            WindowState = WindowState.Normal;
-            var screen = Screens.Primary;
-            if (screen != null)
-            {
-                Width = screen.WorkingArea.Width;
-                Height = screen.WorkingArea.Height;
-                Position = screen.WorkingArea.Position;
-            }
-        };
+        _onLoginSuccess = onLoginSuccess;
+
+        LoginVersionText.Text = $"v{PharmacyMS.Desktop.Services.AppVersionService.GetVersion()}";
 
         TogglePasswordButton.Click += (_, _) =>
         {
@@ -46,7 +39,10 @@ public partial class LoginView : Window
         {
             var authService = Program.Services.GetRequiredService<IAuthService>();
             var win = new ForgotPasswordWindow(authService);
-            await win.ShowDialog(this);
+            if (TopLevel.GetTopLevel(this) is Window owner)
+                await win.ShowDialog(owner);
+            else
+                win.Show();
         };
     }
 
@@ -89,15 +85,7 @@ public partial class LoginView : Window
             CreatedAt = now
         });
 
-        var mainWindow = new MainWindow();
-
-        if (Avalonia.Application.Current?.ApplicationLifetime is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            desktop.MainWindow = mainWindow;
-        }
-
-        mainWindow.Show();
-        Close();
+        _onLoginSuccess();
     }
 
     private void ShowError(string message)

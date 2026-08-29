@@ -44,6 +44,11 @@ public partial class SettingsView : UserControl
         _soundService = soundService;
         _onBrandingChanged = onBrandingChanged;
 
+        var appVersion = PharmacyMS.Desktop.Services.AppVersionService.GetVersion();
+        SettingsVersionText.Text = appVersion;
+        SettingsAppVersionText.Text = appVersion;
+        SettingsFooterVersionText.Text = $"PharmaPro v{appVersion}";
+
         _soundChecks = new Dictionary<CheckBox, SoundEvent>
         {
             [TransactionSuccessCheck] = SoundEvent.TransactionSuccess,
@@ -75,6 +80,7 @@ public partial class SettingsView : UserControl
             [NavSecurity] = PanelSecurity,
             [NavDatabase]  = PanelDatabase,
             [NavCloudSync] = PanelCloudSync,
+            [NavEmail]     = PanelEmail,
             [NavSounds]    = PanelSounds,
             [NavAbout]     = PanelAbout,
         };
@@ -85,6 +91,7 @@ public partial class SettingsView : UserControl
             {
                 SelectSection(navButton);
                 if (navButton == NavCloudSync) LoadCloudSyncFields();
+                if (navButton == NavEmail) LoadEmailFields();
             };
         }
 
@@ -94,6 +101,7 @@ public partial class SettingsView : UserControl
 
         UploadLogoButton.Click += async (_, _) => await UploadLogoAsync();
         ChangePasswordButton.Click += async (_, _) => await OpenChangePasswordAsync();
+        GenerateRecoveryCodeButton.Click += async (_, _) => await GenerateRecoveryCodeAsync();
         BackupButton.Click += async (_, _) => await BackupAsync();
         RestoreButton.Click += async (_, _) => await RestoreAsync();
         SaveButton.Click += async (_, _) => await SaveAsync();
@@ -102,6 +110,9 @@ public partial class SettingsView : UserControl
         TestCloudConnectionButton.Click += async (_, _) => await TestCloudConnectionAsync();
         SaveCloudSyncButton.Click += async (_, _) => await SaveCloudSyncAsync();
         MigrateToCloudButton.Click += async (_, _) => await MigrateToCloudAsync();
+
+        TestEmailButton.Click += async (_, _) => await TestEmailAsync();
+        SaveEmailButton.Click += async (_, _) => await SaveEmailSettingsAsync();
         CloudSslModeCombo.ItemsSource = new[] { "Require", "Disable", "Prefer" };
         CloudSslModeCombo.SelectedIndex = 0;
 
@@ -286,6 +297,85 @@ public partial class SettingsView : UserControl
         var vm = new ChangePasswordViewModel(authService);
         var window = new ChangePasswordWindow(vm);
         await window.ShowDialog(TopLevel.GetTopLevel(this) as Window);
+    }
+
+    private async Task GenerateRecoveryCodeAsync()
+    {
+        var owner = TopLevel.GetTopLevel(this) as Window;
+        var appSettingsService = Program.Services.GetRequiredService<IAppSettingsService>();
+
+        var requestWindow = new RecoveryCodeRequestWindow(appSettingsService);
+        await requestWindow.LoadDefaultsAsync();
+        var result = await requestWindow.ShowDialog<(string pharmacyName, string email)?>(owner);
+        if (result == null) return;
+
+        var authService = Program.Services.GetRequiredService<IAuthService>();
+        var userId = SessionManager.CurrentUser.Id;
+
+        try
+        {
+            var code = await authService.GenerateRecoveryCodeAsync(userId, result.Value.pharmacyName, result.Value.email);
+            await appSettingsService.SetPharmacyNameAsync(result.Value.pharmacyName);
+            await appSettingsService.SetRecoveryEmailAsync(result.Value.email);
+            var window = new RecoveryCodeDisplayWindow(code);
+            await window.ShowDialog(owner);
+        }
+        catch (InvalidOperationException ex)
+        {
+            ShowError(ex.Message);
+        }
+    }
+
+    private void LoadEmailFields()
+    {
+        var resendConfigService = Program.Services.GetRequiredService<ResendConfigService>();
+        var config = resendConfigService.Load();
+
+        ResendApiKeyBox.Text = config.ApiKey;
+
+        EmailStatusText.IsVisible = false;
+    }
+
+    private Task SaveEmailSettingsAsync()
+    {
+        var resendConfigService = Program.Services.GetRequiredService<ResendConfigService>();
+
+        var config = new ResendConfig
+        {
+            ApiKey = ResendApiKeyBox.Text?.Trim()
+        };
+
+        resendConfigService.Save(config);
+
+        EmailStatusText.Text = "Email settings saved.";
+        EmailStatusText.Foreground = Avalonia.Media.Brush.Parse("#16A34A");
+        EmailStatusText.IsVisible = true;
+
+        return Task.CompletedTask;
+    }
+
+    private async Task TestEmailAsync()
+    {
+        var testAddress = SmtpTestEmailBox.Text?.Trim();
+        if (string.IsNullOrWhiteSpace(testAddress))
+        {
+            EmailStatusText.Text = "Enter an address to send the test email to.";
+            EmailStatusText.Foreground = Avalonia.Media.Brush.Parse("#DC2626");
+            EmailStatusText.IsVisible = true;
+            return;
+        }
+
+        await SaveEmailSettingsAsync();
+
+        var emailService = Program.Services.GetRequiredService<IEmailService>();
+        var sent = await emailService.SendAsync(testAddress, "PharmacyMS Test Email",
+            "This is a test email from PharmacyMS to confirm your email settings are working.");
+
+        EmailStatusText.Text = sent
+            ? "Test email sent successfully."
+            : "Failed to send test email. Check your Resend API key above.";
+        EmailStatusText.Foreground = Avalonia.Media.Brush.Parse(sent ? "#16A34A" : "#DC2626");
+        EmailStatusText.IsVisible = true;
     }
 
     private async Task BackupAsync()

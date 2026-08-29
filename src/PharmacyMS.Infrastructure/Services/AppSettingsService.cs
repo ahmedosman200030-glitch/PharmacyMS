@@ -15,6 +15,12 @@ public class AppSettingsService : IAppSettingsService
     private const string SlshExchangeRateKey = "SlshExchangeRate";
     private const string LanguageKey = "AppLanguage";
     private const string LicenseKeyKey = "LicenseKey";
+    private const string PharmacyNameKey = "PharmacyName";
+    private const string RecoveryEmailKey = "RecoveryEmail";
+    private const string OwnerNameKey = "OwnerName";
+    private const string PhoneNumberKey = "PhoneNumber";
+    private const string PharmacyAddressKey = "PharmacyAddress";
+    private const string PharmacySetupCompletedKey = "PharmacySetupCompleted";
 
     private readonly AppDbContext _context;
     public AppSettingsService(AppDbContext context) => _context = context;
@@ -64,4 +70,26 @@ public class AppSettingsService : IAppSettingsService
 
     public Task<string?> GetLicenseKeyAsync() => GetRawAsync(LicenseKeyKey);
     public Task SetLicenseKeyAsync(string licenseKey) => SetRawAsync(LicenseKeyKey, licenseKey);
+
+    public Task<string?> GetPharmacyNameAsync() => GetRawAsync(PharmacyNameKey);
+    public Task SetPharmacyNameAsync(string name) => SetRawAsync(PharmacyNameKey, name);
+
+    public Task<string?> GetRecoveryEmailAsync() => GetRawAsync(RecoveryEmailKey);
+    public Task SetRecoveryEmailAsync(string email) => SetRawAsync(RecoveryEmailKey, email);
+
+    public Task<string?> GetOwnerNameAsync() => GetRawAsync(OwnerNameKey);
+    public Task SetOwnerNameAsync(string name) => SetRawAsync(OwnerNameKey, name);
+
+    public Task<string?> GetPhoneNumberAsync() => GetRawAsync(PhoneNumberKey);
+    public Task SetPhoneNumberAsync(string phone) => SetRawAsync(PhoneNumberKey, phone);
+
+    public Task<string?> GetPharmacyAddressAsync() => GetRawAsync(PharmacyAddressKey);
+    public Task SetPharmacyAddressAsync(string address) => SetRawAsync(PharmacyAddressKey, address);
+
+    public async Task<bool> GetPharmacySetupCompletedAsync()
+    {
+        var value = await GetRawAsync(PharmacySetupCompletedKey);
+        return value == "true";
+    }
+    public Task SetPharmacySetupCompletedAsync() => SetRawAsync(PharmacySetupCompletedKey, "true");
 }

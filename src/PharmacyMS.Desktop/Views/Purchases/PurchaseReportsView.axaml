@@ -19,7 +19,7 @@
         <DockPanel>
           <TextBlock DockPanel.Dock="Top" Text="Spend by Supplier" FontSize="16" FontWeight="Bold"
                      Foreground="#0F172A" Margin="0,0,0,12"/>
-          <DataGrid x:Name="SupplierGrid" HeadersVisibility="All" RowHeaderWidth="40"
+          <DataGrid VerticalScrollBarVisibility="Auto" x:Name="SupplierGrid" HeadersVisibility="All" RowHeaderWidth="40"
                     x:DataType="ent:SupplierSpend"
                     AutoGenerateColumns="False"
                     IsReadOnly="True"
@@ -36,7 +36,7 @@
         <DockPanel>
           <TextBlock DockPanel.Dock="Top" Text="Spend by Medicine" FontSize="16" FontWeight="Bold"
                      Foreground="#0F172A" Margin="0,0,0,12"/>
-          <DataGrid x:Name="MedicineGrid" HeadersVisibility="All" RowHeaderWidth="40"
+          <DataGrid VerticalScrollBarVisibility="Auto" x:Name="MedicineGrid" HeadersVisibility="All" RowHeaderWidth="40"
                     x:DataType="ent:MedicineSpend"
                     AutoGenerateColumns="False"
                     IsReadOnly="True"

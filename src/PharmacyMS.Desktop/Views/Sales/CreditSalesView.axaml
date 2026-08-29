@@ -55,7 +55,7 @@
       <!-- Tab 1: Invoices -->
       <TabItem Header="📋 Credit Invoices">
         <Border Background="White" CornerRadius="12" Padding="10" BoxShadow="0 1 4 0 #22000000" Margin="0,10,0,0">
-          <DataGrid x:Name="CreditSalesGrid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="vm:CreditSaleRow" AutoGenerateColumns="False" IsReadOnly="True"
+          <DataGrid VerticalScrollBarVisibility="Auto" x:Name="CreditSalesGrid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="vm:CreditSaleRow" AutoGenerateColumns="False" IsReadOnly="True"
                     GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
                     RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
             <DataGrid.Columns>
@@ -82,7 +82,7 @@
       <!-- Tab 2: Customer Summary -->
       <TabItem Header="👥 By Customer">
         <Border Background="White" CornerRadius="12" Padding="10" BoxShadow="0 1 4 0 #22000000" Margin="0,10,0,0">
-          <DataGrid x:Name="CustomerSummaryGrid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="vm:CustomerCreditSummary" AutoGenerateColumns="False" IsReadOnly="True"
+          <DataGrid VerticalScrollBarVisibility="Auto" x:Name="CustomerSummaryGrid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="vm:CustomerCreditSummary" AutoGenerateColumns="False" IsReadOnly="True"
                     GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
                     RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
             <DataGrid.Columns>

@@ -23,6 +23,23 @@ public interface IAppSettingsService
     Task<string> GetLanguageAsync();
     Task SetLanguageAsync(string languageCode);
 
+    Task<string?> GetPharmacyNameAsync();
+    Task SetPharmacyNameAsync(string name);
+
+    Task<string?> GetRecoveryEmailAsync();
+    Task SetRecoveryEmailAsync(string email);
     Task<string?> GetLicenseKeyAsync();
     Task SetLicenseKeyAsync(string licenseKey);
+
+    Task<string?> GetOwnerNameAsync();
+    Task SetOwnerNameAsync(string name);
+
+    Task<string?> GetPhoneNumberAsync();
+    Task SetPhoneNumberAsync(string phone);
+
+    Task<string?> GetPharmacyAddressAsync();
+    Task SetPharmacyAddressAsync(string address);
+
+    Task<bool> GetPharmacySetupCompletedAsync();
+    Task SetPharmacySetupCompletedAsync();
 }

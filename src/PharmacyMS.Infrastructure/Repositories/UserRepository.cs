@@ -43,8 +43,10 @@ public class UserRepository : IUserRepository
         using var conn = _context.CreateConnection();
         await conn.ExecuteAsync($@"
             UPDATE Users SET FullName=@FullName, Role=@Role, IsActive=@IsActive,
+            PasswordHash=@PasswordHash,
             SecurityQuestion=@SecurityQuestion, SecurityAnswerHash=@SecurityAnswerHash,
-            AvatarPath=@AvatarPath, Permissions=@Permissions, UpdatedAt={_context.NowExpr()}
+            RecoveryCodeHash=@RecoveryCodeHash,
+            AvatarPath=@AvatarPath, Permissions=@Permissions, Email=@Email, UpdatedAt={_context.NowExpr()}
             WHERE Id=@Id", user);
     }
 

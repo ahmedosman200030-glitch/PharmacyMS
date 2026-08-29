@@ -16,6 +16,11 @@ public static class InfrastructureExtensions
         var dbConfigService = new DbConfigService();
         services.AddSingleton(dbConfigService);
 
+        var smtpConfigService = new SmtpConfigService();
+        services.AddSingleton(smtpConfigService);
+        var resendConfigService = new ResendConfigService();
+        services.AddSingleton(resendConfigService);
+
         AppDbContext dbContext;
         if (connectionString != null)
         {
@@ -59,6 +64,7 @@ public static class InfrastructureExtensions
         services.AddScoped<IUserSessionRepository, UserSessionRepository>();
 
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IEmailService, SmtpEmailService>(); // SmtpEmailService now uses Resend internally
         services.AddScoped<IReceiptService, ReceiptService>();
         services.AddScoped<IPurchaseOrderPdfService, PurchaseOrderPdfService>();
         services.AddScoped<IAppSettingsService, AppSettingsService>();

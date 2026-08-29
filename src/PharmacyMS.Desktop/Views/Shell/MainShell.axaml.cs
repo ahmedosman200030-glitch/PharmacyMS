@@ -15,7 +15,7 @@ using Avalonia.Media;
 
 namespace PharmacyMS.Desktop.Views.Shell;
 
-public partial class MainWindow : Window
+public partial class MainShell : UserControl
 {
     private static readonly IBrush ActiveBrush = new SolidColorBrush(Color.Parse("#DC2626"));
     private static readonly IBrush InactiveBrush = Brushes.Transparent;
@@ -30,6 +30,7 @@ public partial class MainWindow : Window
     private bool _posExpanded = false;
     private bool _purchasesExpanded = false;
     private bool _usersExpanded = false;
+    private readonly Action _onLogout;
 
     private Button[] NavButtons => new[]
     {
@@ -38,31 +39,10 @@ public partial class MainWindow : Window
         PointOfSaleButton, DailyClosingButton, SalesHistoryButton, CreditSalesButton, CustomersButton, SettingsButton, AllUsersButton, UserActivityButton
     };
 
-    public MainWindow()
+    public MainShell(Action onLogout)
     {
         InitializeComponent();
-
-        Opened += (_, _) =>
-        {
-            var screen = Screens.ScreenFromWindow(this) ?? Screens.Primary;
-            if (screen != null)
-            {
-                WindowState = WindowState.Normal;
-                Width = screen.WorkingArea.Width;
-                Height = screen.WorkingArea.Height;
-                Position = screen.WorkingArea.Position;
-            }
-        };
-
-        Closing += async (_, _) =>
-        {
-            if (SessionManager.CurrentSessionId is int sid)
-            {
-                var sessionRepo = Program.Services.GetRequiredService<IUserSessionRepository>();
-                await sessionRepo.CloseSessionAsync(sid, DateTime.Now);
-                SessionManager.CurrentSessionId = null;
-            }
-        };
+        _onLogout = onLogout;
 
         var user = SessionManager.CurrentUser;
         if (user != null)
@@ -588,14 +568,7 @@ public partial class MainWindow : Window
         }
 
         SessionManager.Logout();
-        if (Avalonia.Application.Current?.ApplicationLifetime
-                is Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            var login = new PharmacyMS.Desktop.Views.Auth.LoginView();
-            desktop.MainWindow = login;
-            login.Show();
-        }
-        Close();
+        _onLogout();
     }
 
     private void OpenSettings()

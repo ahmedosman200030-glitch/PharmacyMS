@@ -10,7 +10,8 @@ public partial class MedicineFormWindow : Window
 {
     private readonly Medicine _medicine;
 
-    public MedicineFormWindow(Medicine? existing = null)
+    public MedicineFormWindow() : this(null) { }
+    public MedicineFormWindow(Medicine? existing)
     {
         InitializeComponent();
         _medicine = existing ?? new Medicine();

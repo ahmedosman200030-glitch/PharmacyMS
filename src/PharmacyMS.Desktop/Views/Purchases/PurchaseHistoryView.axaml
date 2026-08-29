@@ -72,7 +72,7 @@
                      Height="34"/>
           </Grid>
 
-          <DataGrid x:Name="HistoryGrid" HeadersVisibility="All" RowHeaderWidth="40"
+          <DataGrid VerticalScrollBarVisibility="Auto" x:Name="HistoryGrid" HeadersVisibility="All" RowHeaderWidth="40"
                     x:DataType="ent:Purchase"
                     AutoGenerateColumns="False"
                     IsReadOnly="True"

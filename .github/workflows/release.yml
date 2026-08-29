@@ -22,7 +22,7 @@ jobs:
         run: dotnet tool install -g vpk
 
       - name: Publish
-        run: dotnet publish src/PharmacyMS.Desktop/PharmacyMS.Desktop.csproj -c Release -r win-x64 --self-contained -o ./publish
+        run: dotnet publish src/PharmacyMS.Desktop/PharmacyMS.Desktop.csproj -c Release -r win-x64 --self-contained -o ./publish -p:Version=${{ github.event.inputs.version }} -p:AssemblyVersion=${{ github.event.inputs.version }}.0 -p:FileVersion=${{ github.event.inputs.version }}.0 -p:InformationalVersion=${{ github.event.inputs.version }}
 
       - name: Pack with vpk
         run: vpk pack --packId PharmacyMS --packVersion ${{ github.event.inputs.version }} --packDir ./publish --outputDir ./Releases --mainExe PharmacyMS.Desktop.exe --icon 

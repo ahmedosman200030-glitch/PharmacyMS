@@ -89,6 +89,16 @@
             </StackPanel>
           </Button>
 
+          <Button x:Name="NavEmail" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" IsVisible="False">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <TextBlock Text="Email" FontSize="16"/>
+              <StackPanel Spacing="1">
+                <TextBlock Text="Email" FontSize="13" FontWeight="SemiBold"/>
+                <TextBlock Text="SMTP settings for recovery codes" FontSize="10.5" Foreground="#94A3B8"/>
+              </StackPanel>
+            </StackPanel>
+          </Button>
+
           <Button x:Name="NavSounds" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
             <StackPanel Orientation="Horizontal" Spacing="10">
               <TextBlock Text="🔊" FontSize="16"/>
@@ -253,6 +263,21 @@
                           Background="#0F2A43" Foreground="White" CornerRadius="6" HorizontalAlignment="Left"/>
                 </StackPanel>
               </Border>
+
+          <!-- Recovery Options -->
+          <Border x:Name="PanelRecovery" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000">
+            <StackPanel Spacing="16">
+              <TextBlock Text="Recovery Options" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+              <Border Background="#F8FAFC" CornerRadius="8" Padding="16">
+                <StackPanel Spacing="10">
+                  <TextBlock Text="Recovery Code" FontSize="13" FontWeight="SemiBold" Foreground="#334155"/>
+                  <TextBlock Text="Generate a one-time recovery code to regain access if you forget your password. Save it somewhere safe — it will only be shown once." FontSize="12" Foreground="#64748B" TextWrapping="Wrap"/>
+                  <Button x:Name="GenerateRecoveryCodeButton" Content="Generate Recovery Code" Height="38" Width="220"
+                          Background="#0F2A43" Foreground="White" CornerRadius="6" HorizontalAlignment="Left"/>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </Border>
             </StackPanel>
           </Border>
 
@@ -335,6 +360,28 @@
             </StackPanel>
           </Border>
 
+          <!-- Email / Resend -->
+          <Border x:Name="PanelEmail" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000" IsVisible="False">
+            <StackPanel Spacing="16">
+              <TextBlock Text="Email" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+              <TextBlock Text="Enter your Resend API key to enable emailing recovery codes. Get one free at resend.com." FontSize="12" Foreground="#64748B" TextWrapping="Wrap"/>
+
+              <StackPanel Spacing="6">
+                <TextBlock Text="Resend API Key" FontSize="12" Foreground="#64748B"/>
+                <TextBox x:Name="ResendApiKeyBox" Height="38" Watermark="re_..." PasswordChar="•"/>
+              </StackPanel>
+
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBox x:Name="SmtpTestEmailBox" Width="220" Height="38" Watermark="send test to..."/>
+                <Button x:Name="TestEmailButton" Content="Send Test Email" Height="38"
+                        Background="#3B82F6" Foreground="White" CornerRadius="6" Padding="16,4"/>
+                <Button x:Name="SaveEmailButton" Content="Save Email Settings" Height="38"
+                        Background="#DC2626" Foreground="White" CornerRadius="6" Padding="16,4"/>
+              </StackPanel>
+              <TextBlock x:Name="EmailStatusText" FontSize="12" IsVisible="False" TextWrapping="Wrap"/>
+            </StackPanel>
+          </Border>
+
           <!-- Sound Effects -->
           <Border x:Name="PanelSounds" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000" IsVisible="False">
             <StackPanel Spacing="16">
@@ -401,7 +448,7 @@
                 <Border Background="#F8FAFC" CornerRadius="8" Padding="16">
                   <StackPanel Spacing="7">
                     <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Application Name" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="PharmaPro" FontSize="12" Foreground="#334155"/></Grid>
-                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Version" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="2.0.0" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Version" FontSize="12" Foreground="#64748B"/><TextBlock Name="SettingsVersionText" Grid.Column="1" Text="2.0.0" FontSize="12" Foreground="#334155"/></Grid>
                     <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Edition" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="Desktop" FontSize="12" Foreground="#334155"/></Grid>
                     <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Platform" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="Windows &amp; macOS" FontSize="12" Foreground="#334155"/></Grid>
                     <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="License" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="Proprietary" FontSize="12" Foreground="#334155"/></Grid>
@@ -417,7 +464,7 @@
                 <TextBlock Text="🛠️ System Information" FontSize="15" FontWeight="Bold" Foreground="#0F172A"/>
                 <Border Background="#F8FAFC" CornerRadius="8" Padding="16">
                   <StackPanel Spacing="7">
-                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Application Version" FontSize="12" Foreground="#64748B"/><TextBlock Grid.Column="1" Text="2.0.0" FontSize="12" Foreground="#334155"/></Grid>
+                    <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Application Version" FontSize="12" Foreground="#64748B"/><TextBlock Name="SettingsAppVersionText" Grid.Column="1" Text="2.0.0" FontSize="12" Foreground="#334155"/></Grid>
                     <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,6,0,0">
                       <Button x:Name="CheckUpdateButton" Content="Check for Updates" Height="32"
                               Background="#3B82F6" Foreground="White" CornerRadius="6" Padding="14,4" FontSize="12"/>
@@ -440,7 +487,7 @@
                   <StackPanel Spacing="4">
                     <TextBlock Text="Ahmed Osman" FontSize="13" FontWeight="SemiBold" Foreground="#0F172A"/>
                     <TextBlock Text="PharmaPro" FontSize="12" Foreground="#64748B"/>
-                    <TextBlock Text="📧 ahmedosman200030@gmail.com" FontSize="12" Foreground="#334155" Margin="0,6,0,0"/>
+                    <TextBlock Text="📧 pharmaprofficial@gmail.com" FontSize="12" Foreground="#334155" Margin="0,6,0,0"/>
                     <TextBlock Text="📞 +252 47 34969" FontSize="12" Foreground="#334155"/>
                     <TextBlock Text="PharmaPro is independently developed by Ahmed Osman as a desktop pharmacy management solution."
                                FontSize="12" Foreground="#64748B" TextWrapping="Wrap" Margin="0,8,0,0"/>
@@ -463,7 +510,7 @@
                         BorderBrush="#E2E8F0" BorderThickness="1" Padding="4" HorizontalAlignment="Center">
                   <Image Source="avares://PharmacyMS.Desktop/Assets/pharmapro-icon.png" Stretch="Uniform"/>
                 </Border>
-                <TextBlock Text="PharmaPro v2.0.0" FontSize="12" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
+                <TextBlock Name="SettingsFooterVersionText" Text="PharmaPro v2.0.0" FontSize="12" FontWeight="SemiBold" Foreground="#334155" HorizontalAlignment="Center"/>
                 <TextBlock Text="Reliable • Secure • Simple" FontSize="11" Foreground="#94A3B8" HorizontalAlignment="Center"/>
               </StackPanel>
 

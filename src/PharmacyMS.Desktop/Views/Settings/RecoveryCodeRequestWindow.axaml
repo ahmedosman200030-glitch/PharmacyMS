@@ -1,0 +1,26 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PharmacyMS.Desktop.Views.Settings.RecoveryCodeRequestWindow"
+        Title="Generate Recovery Code" Width="420" Height="340"
+        CanResize="False" WindowStartupLocation="CenterOwner" Background="#F8FAFC">
+  <StackPanel Margin="28" Spacing="12">
+    <TextBlock Text="Generate Recovery Code" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
+    <TextBlock Text="This requires an internet connection. The code will be emailed to the address below."
+               FontSize="12.5" Foreground="#64748B" TextWrapping="Wrap"/>
+
+    <TextBlock Text="Pharmacy Name" FontSize="12.5" Foreground="#334155" Margin="0,8,0,0"/>
+    <TextBox x:Name="PharmacyNameBox" Watermark="e.g. Al-Shifa Pharmacy" Height="38"/>
+
+    <TextBlock Text="Email" FontSize="12.5" Foreground="#334155" Margin="0,8,0,0"/>
+    <TextBox x:Name="EmailBox" Watermark="you@example.com" Height="38"/>
+
+    <TextBlock x:Name="ErrorText" Foreground="#DC2626" FontSize="12" TextWrapping="Wrap" IsVisible="False"/>
+
+    <Button x:Name="GenerateButton" Content="Generate and Send" Height="40" Margin="0,8,0,0"
+            Background="#DC2626" Foreground="White" CornerRadius="8"
+            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+    <Button x:Name="CancelButton" Content="Cancel" Height="38"
+            Background="Transparent" Foreground="#64748B" CornerRadius="6"
+            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+  </StackPanel>
+</Window>

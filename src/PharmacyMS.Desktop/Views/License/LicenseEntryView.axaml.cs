@@ -1,24 +1,24 @@
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using PharmacyMS.Application.Interfaces.Services;
 using PharmacyMS.Desktop.Services;
-using PharmacyMS.Desktop.Views.Auth;
 
 namespace PharmacyMS.Desktop.Views.License;
 
-public partial class LicenseEntryView : Window
+public partial class LicenseEntryView : UserControl
 {
     private readonly IAppSettingsService? _settingsService;
+    private readonly Action _onActivated;
 
     private TextBox _licenseKeyBox = null!;
     private TextBlock _errorText = null!;
 
-    public LicenseEntryView()
+    public LicenseEntryView(Action onActivated)
     {
         AvaloniaXamlLoader.Load(this);
+        _onActivated = onActivated;
         _settingsService = Program.Services?.GetService<IAppSettingsService>();
 
         _licenseKeyBox = this.FindControl<TextBox>("LicenseKeyBox")!;
@@ -28,7 +28,7 @@ public partial class LicenseEntryView : Window
     private async void OnActivateClick(object? sender, RoutedEventArgs e)
     {
         var key = _licenseKeyBox.Text ?? "";
-        var result = PharmacyMS.Desktop.Services.LicenseService.Validate(key);
+        var result = LicenseService.Validate(key);
 
         if (!result.IsValid)
         {
@@ -40,12 +40,6 @@ public partial class LicenseEntryView : Window
         if (_settingsService != null)
             await _settingsService.SetLicenseKeyAsync(key.Trim());
 
-        if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            desktop.MainWindow = new LoginView();
-            desktop.MainWindow.Show();
-        }
-
-        Close();
+        _onActivated();
     }
 }

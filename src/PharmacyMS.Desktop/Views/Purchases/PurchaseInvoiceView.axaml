@@ -48,7 +48,7 @@
                      Foreground="#0F172A" Margin="0,0,0,10"/>
           <TextBox x:Name="SearchBox" DockPanel.Dock="Top" PlaceholderText="Search invoice # or supplier..."
                     Height="32" Margin="0,0,0,10"/>
-          <DataGrid x:Name="ListGrid" HeadersVisibility="All" RowHeaderWidth="40"
+          <DataGrid VerticalScrollBarVisibility="Auto" x:Name="ListGrid" HeadersVisibility="All" RowHeaderWidth="40"
                     x:DataType="ent:Purchase"
                     AutoGenerateColumns="False"
                     IsReadOnly="True"
@@ -123,7 +123,7 @@
             <TextBlock x:Name="InvoiceDueText" FontSize="16" FontWeight="Bold" Foreground="#DC2626" HorizontalAlignment="Right"/>
           </StackPanel>
 
-          <DataGrid x:Name="ItemsGrid" HeadersVisibility="All" RowHeaderWidth="40"
+          <DataGrid VerticalScrollBarVisibility="Auto" x:Name="ItemsGrid" HeadersVisibility="All" RowHeaderWidth="40"
                     x:DataType="ent:PurchaseItem"
                     AutoGenerateColumns="False"
                     IsReadOnly="True"

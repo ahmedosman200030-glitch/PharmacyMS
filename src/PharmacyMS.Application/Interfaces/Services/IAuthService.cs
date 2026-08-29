@@ -9,4 +9,8 @@ public interface IAuthService
     Task<string?> GetSecurityQuestionAsync(string username);
     Task<bool> ResetPasswordWithSecurityAnswerAsync(string username, string answer, string newPassword);
     Task SetSecurityQuestionAsync(int userId, string question, string answer);
+
+    Task<bool> UserExistsAsync(string username);
+    Task<string> GenerateRecoveryCodeAsync(int userId, string pharmacyName, string email);
+    Task<bool> ResetPasswordWithRecoveryCodeAsync(string username, string recoveryCode, string newPassword);
 }

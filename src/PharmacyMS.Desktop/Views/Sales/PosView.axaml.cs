@@ -89,6 +89,7 @@ public partial class PosView : UserControl
             if (CustomerCombo.ItemsSource is System.Collections.ObjectModel.ObservableCollection<Customer> c && c.Count > 0)
                 CustomerCombo.SelectedIndex = 0;
             RefreshTotals();
+                if (_vm.Cart.Count > 0) CartGrid.ScrollIntoView(_vm.Cart[_vm.Cart.Count - 1], null);
         };
 
         SearchBox.PropertyChanged += (_, e) =>
@@ -105,6 +106,7 @@ public partial class PosView : UserControl
                 else
                     ShowStatus("");
                 RefreshTotals();
+                if (_vm.Cart.Count > 0) CartGrid.ScrollIntoView(_vm.Cart[_vm.Cart.Count - 1], null);
             }
             else
             {
@@ -118,6 +120,7 @@ public partial class PosView : UserControl
             {
                 _vm.RemoveFromCart(line);
                 RefreshTotals();
+                if (_vm.Cart.Count > 0) CartGrid.ScrollIntoView(_vm.Cart[_vm.Cart.Count - 1], null);
             }
         };
 
@@ -134,6 +137,7 @@ public partial class PosView : UserControl
                 case "RemoveBtn": _vm.RemoveFromCart(line); break;
             }
             RefreshTotals();
+                if (_vm.Cart.Count > 0) CartGrid.ScrollIntoView(_vm.Cart[_vm.Cart.Count - 1], null);
             // Force grid to refresh — ObservableCollection won't fire for property changes on existing items
             var items = _vm.Cart.ToList();
             CartGrid.ItemsSource = null;
@@ -148,6 +152,7 @@ public partial class PosView : UserControl
             {
                 if (decimal.TryParse(AmountReceivedBox.Text, out var a)) _vm.AmountReceived = a;
                 RefreshTotals();
+                if (_vm.Cart.Count > 0) CartGrid.ScrollIntoView(_vm.Cart[_vm.Cart.Count - 1], null);
             }
         };
 
@@ -212,6 +217,7 @@ public partial class PosView : UserControl
             NotesBox.IsVisible = false;
             PayCash.IsChecked = true;
             RefreshTotals();
+                if (_vm.Cart.Count > 0) CartGrid.ScrollIntoView(_vm.Cart[_vm.Cart.Count - 1], null);
         };
 
         HoldSaleButton.Click += (_, _) =>
@@ -220,6 +226,7 @@ public partial class PosView : UserControl
             _vm.HoldCurrentSale(label);
             AmountReceivedBox.Text = "0";
             RefreshTotals();
+                if (_vm.Cart.Count > 0) CartGrid.ScrollIntoView(_vm.Cart[_vm.Cart.Count - 1], null);
             ShowStatus($"Sale held as \"{label}\".");
         };
 
@@ -228,10 +235,11 @@ public partial class PosView : UserControl
             if (_vm.HeldSales.Count == 0) { ShowStatus("No held sales."); return; }
             _vm.RecallHeldSale(_vm.HeldSales.Last());
             RefreshTotals();
+                if (_vm.Cart.Count > 0) CartGrid.ScrollIntoView(_vm.Cart[_vm.Cart.Count - 1], null);
             ShowStatus("");
         };
 
-        CalculatorButton.Click += (_, _) => ShowStatus("Calculator not wired up yet.");
+        CalculatorButton.Click += (_, _) => new CalculatorWindow().Show();
         PrintReceiptButton.Click += async (_, _) =>
         {
             if (_vm.Cart.Count == 0) { ShowStatus("Cart is empty — complete or add items first."); return; }
@@ -330,6 +338,7 @@ public partial class PosView : UserControl
                 await _vm.LoadAsync();
                 RunFilter();
                 RefreshTotals();
+                if (_vm.Cart.Count > 0) CartGrid.ScrollIntoView(_vm.Cart[_vm.Cart.Count - 1], null);
                 return;
             }
 
@@ -349,6 +358,7 @@ public partial class PosView : UserControl
             CreditCustomerCombo.IsVisible = false;
             BuildCategoryButtons();
             RefreshTotals();
+                if (_vm.Cart.Count > 0) CartGrid.ScrollIntoView(_vm.Cart[_vm.Cart.Count - 1], null);
             ShowStatus("Sale completed.");
 
             try
@@ -398,6 +408,7 @@ public partial class PosView : UserControl
         var settingsService = Program.Services.GetRequiredService<IAppSettingsService>();
         _slshRate = await settingsService.GetSlshExchangeRateAsync();
         RefreshTotals();
+                if (_vm.Cart.Count > 0) CartGrid.ScrollIntoView(_vm.Cart[_vm.Cart.Count - 1], null);
     }
 
     private void RefreshTotals()

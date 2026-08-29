@@ -134,7 +134,7 @@
             </StackPanel>
           </Border>
           <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
-            <DataGrid x:Name="DailySalesGrid" x:DataType="dto:DailySalesSummaryRow" AutoGenerateColumns="False" IsReadOnly="True"
+            <DataGrid VerticalScrollBarVisibility="Auto" x:Name="DailySalesGrid" x:DataType="dto:DailySalesSummaryRow" AutoGenerateColumns="False" IsReadOnly="True"
                       HeadersVisibility="All" RowHeaderWidth="40"
                       GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
               <DataGrid.Columns>
@@ -160,7 +160,7 @@
             </StackPanel>
           </Border>
           <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
-            <DataGrid x:Name="PnLGrid" x:DataType="dto:PurchaseVsSalesRow" AutoGenerateColumns="False" IsReadOnly="True"
+            <DataGrid VerticalScrollBarVisibility="Auto" x:Name="PnLGrid" x:DataType="dto:PurchaseVsSalesRow" AutoGenerateColumns="False" IsReadOnly="True"
                       HeadersVisibility="All" RowHeaderWidth="40"
                       GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
               <DataGrid.Columns>
@@ -201,7 +201,7 @@
             </Border>
           </StackPanel>
           <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
-            <DataGrid x:Name="InventoryGrid" x:DataType="dto:InventoryValuationRow" AutoGenerateColumns="False" IsReadOnly="True"
+            <DataGrid VerticalScrollBarVisibility="Auto" x:Name="InventoryGrid" x:DataType="dto:InventoryValuationRow" AutoGenerateColumns="False" IsReadOnly="True"
                       HeadersVisibility="All" RowHeaderWidth="40"
                       GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
               <DataGrid.Columns>
@@ -229,7 +229,7 @@
             </StackPanel>
           </Border>
           <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
-            <DataGrid x:Name="PaymentGrid" x:DataType="dto:PaymentMethodBreakdownRow" AutoGenerateColumns="False" IsReadOnly="True"
+            <DataGrid VerticalScrollBarVisibility="Auto" x:Name="PaymentGrid" x:DataType="dto:PaymentMethodBreakdownRow" AutoGenerateColumns="False" IsReadOnly="True"
                       HeadersVisibility="All" RowHeaderWidth="40"
                       GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
               <DataGrid.Columns>
@@ -252,7 +252,7 @@
             </StackPanel>
           </Border>
           <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
-            <DataGrid x:Name="TaxGrid" x:DataType="dto:TaxReportRow" AutoGenerateColumns="False" IsReadOnly="True"
+            <DataGrid VerticalScrollBarVisibility="Auto" x:Name="TaxGrid" x:DataType="dto:TaxReportRow" AutoGenerateColumns="False" IsReadOnly="True"
                       HeadersVisibility="All" RowHeaderWidth="40"
                       GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
               <DataGrid.Columns>
@@ -277,7 +277,7 @@
           </Border>
           <Button DockPanel.Dock="Top" x:Name="LoadSuppliersBtn" Content="🔄 Load Suppliers" Height="34" Background="#DC2626" Foreground="White" CornerRadius="6" Padding="14,0" HorizontalAlignment="Left" Margin="0,0,0,10"/>
           <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
-            <DataGrid x:Name="SupplierGrid" x:DataType="dto:SupplierPaymentRow" AutoGenerateColumns="False" IsReadOnly="True"
+            <DataGrid VerticalScrollBarVisibility="Auto" x:Name="SupplierGrid" x:DataType="dto:SupplierPaymentRow" AutoGenerateColumns="False" IsReadOnly="True"
                       HeadersVisibility="All" RowHeaderWidth="40"
                       GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
               <DataGrid.Columns>
@@ -304,7 +304,7 @@
             </StackPanel>
           </Border>
           <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
-            <DataGrid x:Name="TopGrid" x:DataType="dto:TopSellingMedicine" AutoGenerateColumns="False" IsReadOnly="True"
+            <DataGrid VerticalScrollBarVisibility="Auto" x:Name="TopGrid" x:DataType="dto:TopSellingMedicine" AutoGenerateColumns="False" IsReadOnly="True"
                       HeadersVisibility="All" RowHeaderWidth="40"
                       GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
               <DataGrid.Columns>
@@ -334,7 +334,7 @@
             <Button x:Name="ReconExportPdfButton" Content="⬇ PDF" Height="34" Background="#1E293B" Foreground="White" CornerRadius="6" Padding="14,0"/>
           </StackPanel>
           <Border Background="White" CornerRadius="10" Padding="6" BoxShadow="0 1 4 0 #22000000">
-            <DataGrid x:Name="ReconGrid" x:DataType="dto:MonthlyStockReconciliationRow" AutoGenerateColumns="False" IsReadOnly="True"
+            <DataGrid VerticalScrollBarVisibility="Auto" x:Name="ReconGrid" x:DataType="dto:MonthlyStockReconciliationRow" AutoGenerateColumns="False" IsReadOnly="True"
                       HeadersVisibility="All" RowHeaderWidth="40"
                       GridLinesVisibility="Horizontal" Background="White" RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
               <DataGrid.Columns>

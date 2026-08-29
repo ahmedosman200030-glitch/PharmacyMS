@@ -1,0 +1,27 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PharmacyMS.Desktop.Views.Settings.RecoveryCodeDisplayWindow"
+        Title="Your Recovery Code" Width="420" Height="300"
+        CanResize="False" WindowStartupLocation="CenterOwner" Background="#F8FAFC">
+  <StackPanel Margin="28" Spacing="12">
+    <TextBlock Text="Your Recovery Code" FontSize="18" FontWeight="Bold" Foreground="#0F172A"/>
+    <TextBlock Text="Save this somewhere safe. You will need it if you forget your password. It will not be shown again."
+               FontSize="12.5" Foreground="#64748B" TextWrapping="Wrap"/>
+
+    <Border Background="#0F2A43" CornerRadius="8" Padding="18">
+      <TextBox x:Name="CodeBox" Text="" IsReadOnly="True" FontFamily="Consolas,Menlo,monospace"
+               FontSize="18" FontWeight="Bold" Foreground="White" Background="Transparent"
+               BorderThickness="0" HorizontalContentAlignment="Center" TextAlignment="Center"/>
+    </Border>
+
+    <Button x:Name="CopyButton" Content="Copy to Clipboard" Height="40"
+            Background="#DC2626" Foreground="White" CornerRadius="8"
+            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+    <TextBlock x:Name="CopiedText" Text="Copied!" FontSize="12" Foreground="#16A34A"
+               IsVisible="False" HorizontalAlignment="Center"/>
+
+    <Button x:Name="DoneButton" Content="I've Saved It — Close" Height="38" Margin="0,4,0,0"
+            Background="Transparent" Foreground="#64748B" CornerRadius="6"
+            HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+  </StackPanel>
+</Window>

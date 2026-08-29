@@ -7,7 +7,8 @@ public partial class CustomerFormWindow : Window
 {
     private readonly Customer _customer;
 
-    public CustomerFormWindow(Customer? existing = null)
+    public CustomerFormWindow() : this(null) { }
+    public CustomerFormWindow(Customer? existing)
     {
         InitializeComponent();
 

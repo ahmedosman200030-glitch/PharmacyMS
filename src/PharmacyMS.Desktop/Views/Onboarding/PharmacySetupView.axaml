@@ -1,0 +1,353 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:material="using:Material.Icons.Avalonia"
+             x:Class="PharmacyMS.Desktop.Views.Onboarding.PharmacySetupView">
+
+  <Grid ColumnDefinitions="420,*">
+
+    <!-- ============= LEFT PANEL ============= -->
+    <Grid Grid.Column="0" RowDefinitions="*,Auto,300" ClipToBounds="True">
+
+      <!-- Layer 0: pharmacy photo, faint behind a white wash -->
+      <Image Grid.Row="0" Grid.RowSpan="3"
+             Source="avares://PharmacyMS.Desktop/Assets/pharmacy-aisle-bg.png"
+             Stretch="UniformToFill" Opacity="0.5"/>
+      <Rectangle Grid.Row="0" Grid.RowSpan="3" Fill="White" Opacity="0.82"/>
+
+      <!-- Logo mark: bigger now so the real icon reads bold and crisp -->
+      <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Bottom"
+                  Spacing="16" Margin="0,0,0,28">
+
+        <Border Width="140" Height="140" CornerRadius="70"
+                Background="White" BoxShadow="0 8 28 0 #33000000"
+                HorizontalAlignment="Center">
+          <Image Source="avares://PharmacyMS.Desktop/Assets/pharmapro-icon.png"
+                 Width="122" Height="122"/>
+        </Border>
+
+        <TextBlock HorizontalAlignment="Center" FontSize="30" FontWeight="Bold" Foreground="#1A1A1A">
+          <Run Text="Pharma" FontWeight="Bold"/>
+          <Run Text="Pro" FontWeight="Bold" Foreground="#D32F2F"/>
+        </TextBlock>
+        <TextBlock Text="Pharmacy Management System"
+                   HorizontalAlignment="Center" FontSize="13" Foreground="#555555"/>
+        <TextBlock Text="Smart Pharmacy. Stronger Business."
+                   HorizontalAlignment="Center" FontSize="12"
+                   FontStyle="Italic" Foreground="#D32F2F"/>
+      </StackPanel>
+
+      <!-- Wave zone -->
+      <Canvas Grid.Row="2" Height="300" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+        <Path Fill="#D32F2F">
+          <Path.Data>
+            M0,60 C60,15 140,55 420,5 L420,300 L0,300 Z
+          </Path.Data>
+        </Path>
+        <Path Fill="#FFFFFF" Opacity="0.08">
+          <Path.Data>
+            M0,90 C90,45 200,90 420,35 L420,300 L0,300 Z
+          </Path.Data>
+        </Path>
+      </Canvas>
+
+      <!-- Security badge + progress dots, white on the red wave -->
+      <StackPanel Grid.Row="2" Spacing="18" HorizontalAlignment="Center"
+                  VerticalAlignment="Top" Margin="0,90,0,0">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+          <material:MaterialIcon Kind="ShieldCheckOutline" Width="16" Height="16" Foreground="White"/>
+          <TextBlock Text="Your data is safe and secure with PharmaPro."
+                     FontSize="12" Foreground="White" VerticalAlignment="Center"
+                     TextWrapping="Wrap" MaxWidth="240" TextAlignment="Center"/>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+          <Border Width="24" Height="8" CornerRadius="4" Background="White"/>
+          <Ellipse Width="8" Height="8" Fill="#FFCDD2"/>
+          <Ellipse Width="8" Height="8" Fill="#FFCDD2"/>
+          <Ellipse Width="8" Height="8" Fill="#FFCDD2"/>
+        </StackPanel>
+      </StackPanel>
+    </Grid>
+
+    <!-- ============= RIGHT PANEL ============= -->
+    <Grid Grid.Column="1" RowDefinitions="*,Auto" Background="White">
+
+      <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="52,48,52,24" Spacing="0" MaxWidth="640">
+
+          <!-- Header: bigger logo to the left of the title block -->
+          <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,18">
+            <Image Grid.Column="0" Source="avares://PharmacyMS.Desktop/Assets/pharmapro-icon.png"
+                   Width="64" Height="64" VerticalAlignment="Center" Margin="0,0,16,0"/>
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+              <TextBlock Text="Let's set up your pharmacy"
+                         FontSize="24" FontWeight="Bold" Foreground="#1A1A1A"/>
+              <TextBlock Text="Please provide your pharmacy information. This will help us personalize your experience."
+                         FontSize="13" Foreground="#777777" TextWrapping="Wrap"/>
+            </StackPanel>
+          </Grid>
+
+          <Rectangle Height="1" Fill="#EEEEEE" Margin="0,0,0,22"/>
+
+          <!-- Error banner (hidden until code-behind shows it) -->
+          <Border Name="ErrorBanner" IsVisible="False"
+                  Background="#FFEBEE" BorderBrush="#EF9A9A" BorderThickness="1"
+                  CornerRadius="8" Padding="14,10" Margin="0,0,0,16">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <material:MaterialIcon Kind="AlertCircleOutline" Width="16" Height="16" Foreground="#B71C1C" VerticalAlignment="Center"/>
+              <TextBlock Name="ErrorText" Text=""
+                         FontSize="12" Foreground="#B71C1C"
+                         VerticalAlignment="Center" TextWrapping="Wrap"/>
+            </StackPanel>
+          </Border>
+
+          <!-- Pharmacy Name: label on its own row; icon and input share a row
+               at the SAME height, so alignment is exact, not approximate. -->
+          <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="40,*" Margin="0,0,0,16">
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="0,0,0,6">
+              <TextBlock Text="Pharmacy Name" FontSize="13" FontWeight="SemiBold" Foreground="#333"/>
+              <TextBlock Text="*" Foreground="#D32F2F" FontSize="13"/>
+            </StackPanel>
+            <Border Grid.Row="1" Grid.Column="0" Width="40" Height="42" CornerRadius="10"
+                    Background="#FCE4EC" Margin="0,0,12,0">
+              <material:MaterialIcon Kind="StorefrontOutline" Width="18" Height="18" Foreground="#D32F2F"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBox Grid.Row="1" Grid.Column="1" Name="PharmacyNameBox" Watermark="Enter pharmacy name" Height="42"
+                     CornerRadius="8" BorderBrush="#DDDDDD" Padding="12,0" FontSize="13" VerticalContentAlignment="Center"/>
+          </Grid>
+
+          <!-- Owner Name -->
+          <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="40,*" Margin="0,0,0,16">
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="0,0,0,6">
+              <TextBlock Text="Owner Name" FontSize="13" FontWeight="SemiBold" Foreground="#333"/>
+              <TextBlock Text="*" Foreground="#D32F2F" FontSize="13"/>
+            </StackPanel>
+            <Border Grid.Row="1" Grid.Column="0" Width="40" Height="42" CornerRadius="10"
+                    Background="#FCE4EC" Margin="0,0,12,0">
+              <material:MaterialIcon Kind="AccountOutline" Width="18" Height="18" Foreground="#D32F2F"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBox Grid.Row="1" Grid.Column="1" Name="OwnerNameBox" Watermark="Enter owner name" Height="42"
+                     CornerRadius="8" BorderBrush="#DDDDDD" Padding="12,0" FontSize="13" VerticalContentAlignment="Center"/>
+          </Grid>
+
+          <!-- Phone Number: textbox left, country dropdown right, icon locked to that row's height -->
+          <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="40,*" Margin="0,0,0,16">
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="0,0,0,6">
+              <TextBlock Text="Phone Number" FontSize="13" FontWeight="SemiBold" Foreground="#333"/>
+              <TextBlock Text="*" Foreground="#D32F2F" FontSize="13"/>
+            </StackPanel>
+            <Border Grid.Row="1" Grid.Column="0" Width="40" Height="42" CornerRadius="10"
+                    Background="#FCE4EC" Margin="0,0,12,0">
+              <material:MaterialIcon Kind="PhoneOutline" Width="18" Height="18" Foreground="#D32F2F"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <Grid Grid.Row="1" Grid.Column="1" ColumnDefinitions="*,Auto">
+              <TextBox Grid.Column="0" Name="PhoneNumberBox"
+                       Watermark="Enter phone number" Height="42"
+                       CornerRadius="8,0,0,8" BorderBrush="#DDDDDD"
+                       Padding="12,0" FontSize="13" VerticalContentAlignment="Center"
+                       TextChanged="OnPhoneTextChanged"/>
+              <ComboBox Grid.Column="1" Name="CountryCodePicker"
+                        Height="42" MinWidth="120"
+                        CornerRadius="0,8,8,0" BorderBrush="#DDDDDD"
+                        FontSize="13"
+                        HorizontalContentAlignment="Left"
+                        VerticalContentAlignment="Center"
+                        SelectedIndex="0">
+                <ComboBoxItem Tag="252">🇸🇴 +252</ComboBoxItem>
+                <ComboBoxItem Tag="93">🇦🇫 +93</ComboBoxItem>
+                <ComboBoxItem Tag="355">🇦🇱 +355</ComboBoxItem>
+                <ComboBoxItem Tag="213">🇩🇿 +213</ComboBoxItem>
+                <ComboBoxItem Tag="244">🇦🇴 +244</ComboBoxItem>
+                <ComboBoxItem Tag="54">🇦🇷 +54</ComboBoxItem>
+                <ComboBoxItem Tag="374">🇦🇲 +374</ComboBoxItem>
+                <ComboBoxItem Tag="61">🇦🇺 +61</ComboBoxItem>
+                <ComboBoxItem Tag="43">🇦🇹 +43</ComboBoxItem>
+                <ComboBoxItem Tag="973">🇧🇭 +973</ComboBoxItem>
+                <ComboBoxItem Tag="880">🇧🇩 +880</ComboBoxItem>
+                <ComboBoxItem Tag="32">🇧🇪 +32</ComboBoxItem>
+                <ComboBoxItem Tag="229">🇧🇯 +229</ComboBoxItem>
+                <ComboBoxItem Tag="591">🇧🇴 +591</ComboBoxItem>
+                <ComboBoxItem Tag="55">🇧🇷 +55</ComboBoxItem>
+                <ComboBoxItem Tag="226">🇧🇫 +226</ComboBoxItem>
+                <ComboBoxItem Tag="257">🇧🇮 +257</ComboBoxItem>
+                <ComboBoxItem Tag="237">🇨🇲 +237</ComboBoxItem>
+                <ComboBoxItem Tag="1">🇨🇦 +1</ComboBoxItem>
+                <ComboBoxItem Tag="235">🇹🇩 +235</ComboBoxItem>
+                <ComboBoxItem Tag="56">🇨🇱 +56</ComboBoxItem>
+                <ComboBoxItem Tag="86">🇨🇳 +86</ComboBoxItem>
+                <ComboBoxItem Tag="57">🇨🇴 +57</ComboBoxItem>
+                <ComboBoxItem Tag="242">🇨🇬 +242</ComboBoxItem>
+                <ComboBoxItem Tag="506">🇨🇷 +506</ComboBoxItem>
+                <ComboBoxItem Tag="385">🇭🇷 +385</ComboBoxItem>
+                <ComboBoxItem Tag="53">🇨🇺 +53</ComboBoxItem>
+                <ComboBoxItem Tag="357">🇨🇾 +357</ComboBoxItem>
+                <ComboBoxItem Tag="420">🇨🇿 +420</ComboBoxItem>
+                <ComboBoxItem Tag="45">🇩🇰 +45</ComboBoxItem>
+                <ComboBoxItem Tag="253">🇩🇯 +253</ComboBoxItem>
+                <ComboBoxItem Tag="593">🇪🇨 +593</ComboBoxItem>
+                <ComboBoxItem Tag="20">🇪🇬 +20</ComboBoxItem>
+                <ComboBoxItem Tag="503">🇸🇻 +503</ComboBoxItem>
+                <ComboBoxItem Tag="291">🇪🇷 +291</ComboBoxItem>
+                <ComboBoxItem Tag="251">🇪🇹 +251</ComboBoxItem>
+                <ComboBoxItem Tag="358">🇫🇮 +358</ComboBoxItem>
+                <ComboBoxItem Tag="33">🇫🇷 +33</ComboBoxItem>
+                <ComboBoxItem Tag="241">🇬🇦 +241</ComboBoxItem>
+                <ComboBoxItem Tag="220">🇬🇲 +220</ComboBoxItem>
+                <ComboBoxItem Tag="995">🇬🇪 +995</ComboBoxItem>
+                <ComboBoxItem Tag="49">🇩🇪 +49</ComboBoxItem>
+                <ComboBoxItem Tag="233">🇬🇭 +233</ComboBoxItem>
+                <ComboBoxItem Tag="30">🇬🇷 +30</ComboBoxItem>
+                <ComboBoxItem Tag="502">🇬🇹 +502</ComboBoxItem>
+                <ComboBoxItem Tag="224">🇬🇳 +224</ComboBoxItem>
+                <ComboBoxItem Tag="504">🇭🇳 +504</ComboBoxItem>
+                <ComboBoxItem Tag="36">🇭🇺 +36</ComboBoxItem>
+                <ComboBoxItem Tag="91">🇮🇳 +91</ComboBoxItem>
+                <ComboBoxItem Tag="62">🇮🇩 +62</ComboBoxItem>
+                <ComboBoxItem Tag="98">🇮🇷 +98</ComboBoxItem>
+                <ComboBoxItem Tag="964">🇮🇶 +964</ComboBoxItem>
+                <ComboBoxItem Tag="353">🇮🇪 +353</ComboBoxItem>
+                <ComboBoxItem Tag="972">🇮🇱 +972</ComboBoxItem>
+                <ComboBoxItem Tag="39">🇮🇹 +39</ComboBoxItem>
+                <ComboBoxItem Tag="81">🇯🇵 +81</ComboBoxItem>
+                <ComboBoxItem Tag="962">🇯🇴 +962</ComboBoxItem>
+                <ComboBoxItem Tag="7">🇰🇿 +7</ComboBoxItem>
+                <ComboBoxItem Tag="254">🇰🇪 +254</ComboBoxItem>
+                <ComboBoxItem Tag="965">🇰🇼 +965</ComboBoxItem>
+                <ComboBoxItem Tag="961">🇱🇧 +961</ComboBoxItem>
+                <ComboBoxItem Tag="231">🇱🇷 +231</ComboBoxItem>
+                <ComboBoxItem Tag="218">🇱🇾 +218</ComboBoxItem>
+                <ComboBoxItem Tag="261">🇲🇬 +261</ComboBoxItem>
+                <ComboBoxItem Tag="265">🇲🇼 +265</ComboBoxItem>
+                <ComboBoxItem Tag="60">🇲🇾 +60</ComboBoxItem>
+                <ComboBoxItem Tag="223">🇲🇱 +223</ComboBoxItem>
+                <ComboBoxItem Tag="222">🇲🇷 +222</ComboBoxItem>
+                <ComboBoxItem Tag="52">🇲🇽 +52</ComboBoxItem>
+                <ComboBoxItem Tag="212">🇲🇦 +212</ComboBoxItem>
+                <ComboBoxItem Tag="258">🇲🇿 +258</ComboBoxItem>
+                <ComboBoxItem Tag="95">🇲🇲 +95</ComboBoxItem>
+                <ComboBoxItem Tag="264">🇳🇦 +264</ComboBoxItem>
+                <ComboBoxItem Tag="977">🇳🇵 +977</ComboBoxItem>
+                <ComboBoxItem Tag="31">🇳🇱 +31</ComboBoxItem>
+                <ComboBoxItem Tag="64">🇳🇿 +64</ComboBoxItem>
+                <ComboBoxItem Tag="227">🇳🇪 +227</ComboBoxItem>
+                <ComboBoxItem Tag="234">🇳🇬 +234</ComboBoxItem>
+                <ComboBoxItem Tag="47">🇳🇴 +47</ComboBoxItem>
+                <ComboBoxItem Tag="968">🇴🇲 +968</ComboBoxItem>
+                <ComboBoxItem Tag="92">🇵🇰 +92</ComboBoxItem>
+                <ComboBoxItem Tag="970">🇵🇸 +970</ComboBoxItem>
+                <ComboBoxItem Tag="51">🇵🇪 +51</ComboBoxItem>
+                <ComboBoxItem Tag="63">🇵🇭 +63</ComboBoxItem>
+                <ComboBoxItem Tag="48">🇵🇱 +48</ComboBoxItem>
+                <ComboBoxItem Tag="351">🇵🇹 +351</ComboBoxItem>
+                <ComboBoxItem Tag="974">🇶🇦 +974</ComboBoxItem>
+                <ComboBoxItem Tag="40">🇷🇴 +40</ComboBoxItem>
+                <ComboBoxItem Tag="7">🇷🇺 +7</ComboBoxItem>
+                <ComboBoxItem Tag="250">🇷🇼 +250</ComboBoxItem>
+                <ComboBoxItem Tag="966">🇸🇦 +966</ComboBoxItem>
+                <ComboBoxItem Tag="221">🇸🇳 +221</ComboBoxItem>
+                <ComboBoxItem Tag="232">🇸🇱 +232</ComboBoxItem>
+                <ComboBoxItem Tag="65">🇸🇬 +65</ComboBoxItem>
+                <ComboBoxItem Tag="27">🇿🇦 +27</ComboBoxItem>
+                <ComboBoxItem Tag="211">🇸🇸 +211</ComboBoxItem>
+                <ComboBoxItem Tag="34">🇪🇸 +34</ComboBoxItem>
+                <ComboBoxItem Tag="94">🇱🇰 +94</ComboBoxItem>
+                <ComboBoxItem Tag="249">🇸🇩 +249</ComboBoxItem>
+                <ComboBoxItem Tag="46">🇸🇪 +46</ComboBoxItem>
+                <ComboBoxItem Tag="41">🇨🇭 +41</ComboBoxItem>
+                <ComboBoxItem Tag="963">🇸🇾 +963</ComboBoxItem>
+                <ComboBoxItem Tag="255">🇹🇿 +255</ComboBoxItem>
+                <ComboBoxItem Tag="66">🇹🇭 +66</ComboBoxItem>
+                <ComboBoxItem Tag="228">🇹🇬 +228</ComboBoxItem>
+                <ComboBoxItem Tag="216">🇹🇳 +216</ComboBoxItem>
+                <ComboBoxItem Tag="90">🇹🇷 +90</ComboBoxItem>
+                <ComboBoxItem Tag="256">🇺🇬 +256</ComboBoxItem>
+                <ComboBoxItem Tag="380">🇺🇦 +380</ComboBoxItem>
+                <ComboBoxItem Tag="971">🇦🇪 +971</ComboBoxItem>
+                <ComboBoxItem Tag="44">🇬🇧 +44</ComboBoxItem>
+                <ComboBoxItem Tag="1">🇺🇸 +1</ComboBoxItem>
+                <ComboBoxItem Tag="998">🇺🇿 +998</ComboBoxItem>
+                <ComboBoxItem Tag="58">🇻🇪 +58</ComboBoxItem>
+                <ComboBoxItem Tag="84">🇻🇳 +84</ComboBoxItem>
+                <ComboBoxItem Tag="967">🇾🇪 +967</ComboBoxItem>
+                <ComboBoxItem Tag="260">🇿🇲 +260</ComboBoxItem>
+                <ComboBoxItem Tag="263">🇿🇼 +263</ComboBoxItem>
+              </ComboBox>
+            </Grid>
+          </Grid>
+
+          <!-- Address -->
+          <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="40,*" Margin="0,0,0,16">
+            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="4" Margin="0,0,0,6">
+              <TextBlock Text="Address" FontSize="13" FontWeight="SemiBold" Foreground="#333"/>
+              <TextBlock Text="*" Foreground="#D32F2F" FontSize="13"/>
+            </StackPanel>
+            <Border Grid.Row="1" Grid.Column="0" Width="40" Height="42" CornerRadius="10"
+                    Background="#FCE4EC" Margin="0,0,12,0">
+              <material:MaterialIcon Kind="MapMarkerOutline" Width="18" Height="18" Foreground="#D32F2F"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBox Grid.Row="1" Grid.Column="1" Name="AddressBox" Watermark="Enter pharmacy address" Height="42"
+                     CornerRadius="8" BorderBrush="#DDDDDD" Padding="12,0" FontSize="13" VerticalContentAlignment="Center"/>
+          </Grid>
+
+          <!-- Email -->
+          <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="40,*" Margin="0,0,0,20">
+            <TextBlock Grid.Row="0" Grid.Column="1" Text="Email" FontSize="13" FontWeight="SemiBold"
+                       Foreground="#333" Margin="0,0,0,6"/>
+            <Border Grid.Row="1" Grid.Column="0" Width="40" Height="42" CornerRadius="10"
+                    Background="#FCE4EC" Margin="0,0,12,0">
+              <material:MaterialIcon Kind="EmailOutline" Width="18" Height="18" Foreground="#D32F2F"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBox Grid.Row="1" Grid.Column="1" Name="EmailBox" Watermark="Enter email address" Height="42"
+                     CornerRadius="8" BorderBrush="#DDDDDD" Padding="12,0" FontSize="13" VerticalContentAlignment="Center"/>
+          </Grid>
+
+          <!-- Info banner -->
+          <Border Background="#FCE4EC" CornerRadius="8"
+                  Padding="14,10" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <material:MaterialIcon Kind="InformationOutline" Width="16" Height="16" Foreground="#D32F2F" VerticalAlignment="Center"/>
+              <TextBlock Text="You can change this information later from Settings."
+                         FontSize="12" Foreground="#B71C1C"
+                         VerticalAlignment="Center" TextWrapping="Wrap"/>
+            </StackPanel>
+          </Border>
+
+        </StackPanel>
+      </ScrollViewer>
+
+      <!-- Footer: Back / Continue -->
+      <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto" Margin="52,0,52,32">
+
+        <Button Name="BackButton" Grid.Column="0"
+                Background="White" Foreground="#333333"
+                BorderBrush="#DDDDDD" BorderThickness="1"
+                CornerRadius="10" Height="46" Padding="22,0"
+                FontSize="14" FontWeight="SemiBold" Cursor="Hand"
+                Click="OnBackClick">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <material:MaterialIcon Kind="ArrowLeft" Width="16" Height="16" VerticalAlignment="Center"/>
+            <TextBlock Text="Back" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+
+        <Button Name="ContinueButton" Grid.Column="2"
+                Background="#D32F2F" Foreground="White"
+                CornerRadius="10" Height="46" Padding="28,0"
+                FontSize="14" FontWeight="SemiBold" Cursor="Hand"
+                Click="OnContinueClick">
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Name="ContinueText" Text="Continue" VerticalAlignment="Center"/>
+            <material:MaterialIcon Kind="ArrowRight" Width="16" Height="16" VerticalAlignment="Center"/>
+          </StackPanel>
+        </Button>
+
+      </Grid>
+    </Grid>
+
+  </Grid>
+</UserControl>

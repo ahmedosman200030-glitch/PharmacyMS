@@ -8,7 +8,14 @@
 
   <UserControl.Styles>
     <Style Selector="Border.card">
-      <Setter Property="Background" Value="White"/>
+      <Setter Property="Background">
+        <Setter.Value>
+          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+            <GradientStop Color="#FFFFFF" Offset="0"/>
+            <GradientStop Color="#FBFCFF" Offset="1"/>
+          </LinearGradientBrush>
+        </Setter.Value>
+      </Setter>
       <Setter Property="CornerRadius" Value="16"/>
       <Setter Property="Padding" Value="16"/>
       <Setter Property="BoxShadow" Value="0 1 6 0 #14000000"/>
@@ -44,41 +51,40 @@
     </Grid>
 
     <Grid ColumnDefinitions="*,*,*,*">
-      <Border Grid.Column="0" Classes="card" Margin="0,0,10,0">
+      <Border Grid.Column="0" Classes="card" Background="#EFF6FF" ClipToBounds="True" BorderBrush="#BFDBFE" BorderThickness="1.2" CornerRadius="16" Margin="0,0,10,0">
         <StackPanel Spacing="8" HorizontalAlignment="Center">
           <Border Classes="stat-icon" Background="#F5F3FF" HorizontalAlignment="Center">
-            <Ellipse Width="20" Height="20" Stroke="#8B5CF6" StrokeThickness="2"/>
+            <TextBlock Text="✓" FontSize="22" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
           </Border>
           <TextBlock Text="TOTAL PAYABLES" Classes="stat-label" HorizontalAlignment="Center"/>
           <TextBlock x:Name="TotalPayablesText" Text="$0.00" Classes="stat-value" HorizontalAlignment="Center"/>
           <TextBlock x:Name="TotalPayablesSubText" Text="" FontSize="11" Foreground="#8B5CF6" HorizontalAlignment="Center"/>
         </StackPanel>
       </Border>
-      <Border Grid.Column="1" Classes="card" Margin="0,0,10,0">
+      <Border Grid.Column="1" Classes="card" Background="#F0FDF4" ClipToBounds="True" BorderBrush="#BBF7D0" BorderThickness="1.2" CornerRadius="16" Margin="0,0,10,0">
         <StackPanel Spacing="8" HorizontalAlignment="Center">
           <Border Classes="stat-icon" Background="#ECFDF5" HorizontalAlignment="Center">
-            <Path Data="M12 20 L12 4 M12 4 L6 10 M12 4 L18 10" Stroke="#10B981" StrokeThickness="2.2"
-                  StrokeLineCap="Round" StrokeJoin="Round" Width="18" Height="18" Stretch="Uniform"/>
+            <TextBlock Text="📊" FontSize="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
           </Border>
           <TextBlock Text="TOTAL PAID" Classes="stat-label" HorizontalAlignment="Center"/>
           <TextBlock x:Name="TotalPaidText" Text="$0.00" Classes="stat-value" HorizontalAlignment="Center"/>
           <TextBlock Text="This Month" FontSize="11" Foreground="#10B981" HorizontalAlignment="Center"/>
         </StackPanel>
       </Border>
-      <Border Grid.Column="2" Classes="card" Margin="0,0,10,0">
+      <Border Grid.Column="2" Classes="card" Background="#FFFBEB" ClipToBounds="True" BorderBrush="#FDE68A" BorderThickness="1.2" CornerRadius="16" Margin="0,0,10,0">
         <StackPanel Spacing="8" HorizontalAlignment="Center">
-          <Border Classes="stat-icon" Background="#FFF7ED" HorizontalAlignment="Center">
-            <Path Data="M4 4 L16 4 L16 16 L4 16 Z" Stroke="#F59E0B" StrokeThickness="1.8" Width="18" Height="18" Stretch="Uniform"/>
+          <Border Width="52" Height="52" CornerRadius="14" Background="#D97706" HorizontalAlignment="Center">
+            <TextBlock Text="📊" FontSize="20" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
           </Border>
           <TextBlock Text="OUTSTANDING AMOUNT" Classes="stat-label" HorizontalAlignment="Center"/>
           <TextBlock x:Name="OutstandingText" Text="$0.00" Classes="stat-value" HorizontalAlignment="Center"/>
           <TextBlock x:Name="OutstandingSubText" Text="" FontSize="11" Foreground="#F59E0B" HorizontalAlignment="Center"/>
         </StackPanel>
       </Border>
-      <Border Grid.Column="3" Classes="card" Padding="16">
+      <Border Grid.Column="3" Classes="card" Background="#FAF5FF" ClipToBounds="True" BorderBrush="#E9D5FF" BorderThickness="1.2" CornerRadius="16" Padding="16">
         <StackPanel Spacing="8" HorizontalAlignment="Center">
-          <Border Classes="stat-icon" Background="#EFF6FF" HorizontalAlignment="Center">
-            <Ellipse Width="20" Height="20" Stroke="#3B82F6" StrokeThickness="2"/>
+          <Border Width="52" Height="52" CornerRadius="14" Background="#2563EB" HorizontalAlignment="Center">
+            <TextBlock Text="✓" FontSize="22" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold"/>
           </Border>
           <TextBlock Text="AGING 90+ DAYS" Classes="stat-label" HorizontalAlignment="Center"/>
           <TextBlock x:Name="AgingOver90Text" Text="$0.00" Classes="stat-value" HorizontalAlignment="Center"/>
@@ -100,7 +106,7 @@
 
     <Border Classes="card" Padding="16">
       <StackPanel Spacing="10">
-        <DataGrid x:Name="RowsGrid" HeadersVisibility="Column"
+        <DataGrid x:Name="RowsGrid" MaxHeight="320" VerticalScrollBarVisibility="Auto" HeadersVisibility="Column"
                   AutoGenerateColumns="False" IsReadOnly="True"
                   GridLinesVisibility="Horizontal"
                   x:CompileBindings="False">
@@ -147,19 +153,19 @@
     </Border>
 
     <Grid ColumnDefinitions="*,*,*">
-      <Border Grid.Column="0" Classes="card" Margin="0,0,10,0">
+      <Border Grid.Column="0" Classes="card" Background="#EFF6FF" ClipToBounds="True" BorderBrush="#BFDBFE" BorderThickness="1.2" CornerRadius="16" Margin="0,0,10,0">
         <DockPanel>
           <TextBlock DockPanel.Dock="Top" Text="Aging Summary" FontSize="14" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,0,0,10"/>
           <Canvas x:Name="DonutCanvas" Height="160"/>
         </DockPanel>
       </Border>
-      <Border Grid.Column="1" Classes="card" Margin="0,0,10,0">
+      <Border Grid.Column="1" Classes="card" Background="#F0FDF4" ClipToBounds="True" BorderBrush="#BBF7D0" BorderThickness="1.2" CornerRadius="16" Margin="0,0,10,0">
         <DockPanel>
           <TextBlock DockPanel.Dock="Top" Text="Receivables Trend" FontSize="14" FontWeight="SemiBold" Foreground="#0F172A" Margin="0,0,0,10"/>
           <Canvas x:Name="TrendCanvas" Height="160"/>
         </DockPanel>
       </Border>
-      <Border Grid.Column="2" Classes="card" Padding="16">
+      <Border Grid.Column="2" Classes="card" Background="#FFFBEB" ClipToBounds="True" BorderBrush="#FDE68A" BorderThickness="1.2" CornerRadius="16" Padding="16">
         <StackPanel Spacing="10">
           <TextBlock Text="Top Suppliers (Outstanding)" FontSize="14" FontWeight="SemiBold" Foreground="#0F172A"/>
           <StackPanel x:Name="TopListPanel" Spacing="8"/>

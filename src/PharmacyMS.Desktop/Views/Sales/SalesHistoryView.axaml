@@ -15,7 +15,7 @@
     <Border Background="White" CornerRadius="10" Padding="10" BoxShadow="0 1 4 0 #22000000">
       <DockPanel>
         <TextBlock DockPanel.Dock="Top" Text="Sales History" FontSize="16" FontWeight="Bold" Foreground="#0F172A" Margin="4,0,0,10"/>
-        <DataGrid x:Name="SalesGrid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="ent:Sale" AutoGenerateColumns="False" IsReadOnly="True"
+        <DataGrid VerticalScrollBarVisibility="Auto" x:Name="SalesGrid" HeadersVisibility="All" RowHeaderWidth="40" x:DataType="ent:Sale" AutoGenerateColumns="False" IsReadOnly="True"
                   GridLinesVisibility="Horizontal" Background="White" Foreground="#334155"
                   RowBackground="White" HorizontalGridLinesBrush="#E2E8F0">
           <DataGrid.Columns>

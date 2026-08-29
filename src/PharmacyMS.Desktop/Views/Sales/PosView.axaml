@@ -44,7 +44,7 @@
 
       <!-- LEFT: category sidebar -->
       <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="10" Margin="0,0,10,0" BoxShadow="0 1 4 0 #22000000">
-        <StackPanel x:Name="CategoryPanel" Spacing="6"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel x:Name="CategoryPanel" Spacing="6"/></ScrollViewer>
       </Border>
 
       <!-- CENTER: catalog + cart -->
@@ -64,7 +64,7 @@
                 <DataGrid.Columns>
                   <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="190"/>
                   <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="110"/>
-                  <DataGridTextColumn Header="Price" Binding="{Binding UnitPrice}" Width="70"/>
+                  <DataGridTextColumn Header="Price" Binding="{Binding UnitPrice, StringFormat=${0:F2}}" Width="70"/>
                   <DataGridTextColumn Header="Stock" Binding="{Binding QuantityInStock}" Width="70"/>
                 </DataGrid.Columns>
               </DataGrid>
@@ -97,7 +97,7 @@
                       </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                   </DataGridTemplateColumn>
-                  <DataGridTextColumn Header="Price" Binding="{Binding UnitPrice}" Width="60"/>
+                  <DataGridTextColumn Header="Price" Binding="{Binding UnitPrice, StringFormat=${0:F2}}" Width="60"/>
                   <DataGridTemplateColumn Header="Disc %" Width="80">
                     <DataGridTemplateColumn.CellTemplate>
                       <DataTemplate x:DataType="vm:CartLine">
@@ -109,7 +109,7 @@
                       </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                   </DataGridTemplateColumn>
-                  <DataGridTextColumn Header="Total" Binding="{Binding LineTotal}" Width="70"/>
+                  <DataGridTextColumn Header="Total" Binding="{Binding LineTotal, StringFormat=${0:F2}}" Width="70"/>
                   <DataGridTemplateColumn Header="" Width="30">
                     <DataGridTemplateColumn.CellTemplate>
                       <DataTemplate x:DataType="vm:CartLine">

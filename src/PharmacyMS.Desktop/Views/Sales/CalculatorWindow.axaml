@@ -1,0 +1,69 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PharmacyMS.Desktop.Views.Sales.CalculatorWindow"
+        Title="Calculator"
+        Width="320" SizeToContent="Height"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="#F8FAFC">
+
+  <StackPanel Spacing="0">
+
+    <Border Background="#E8F5E9" Padding="14,12,14,10">
+      <StackPanel>
+        <TextBlock x:Name="ExprText" Text="" FontSize="12" Foreground="#78909C" TextAlignment="Right" TextWrapping="Wrap"/>
+        <TextBlock x:Name="ResultText" Text="0" FontSize="34" FontWeight="Bold" Foreground="#1A2A3A" TextAlignment="Right"/>
+      </StackPanel>
+    </Border>
+
+    <StackPanel Margin="8,8,8,8" Spacing="2">
+
+      <Grid ColumnDefinitions="*,*,*,*,*">
+        <Grid.Styles><Style Selector="Button"><Setter Property="Height" Value="40"/><Setter Property="FontSize" Value="12"/><Setter Property="Background" Value="#F1F5F9"/><Setter Property="Foreground" Value="#64748B"/><Setter Property="CornerRadius" Value="6"/><Setter Property="HorizontalContentAlignment" Value="Center"/></Style></Grid.Styles>
+        <Button Grid.Column="0" Name="BtnMC" Content="MC" Margin="0,0,2,0"/>
+        <Button Grid.Column="1" Name="BtnMR" Content="MR" Margin="0,0,2,0"/>
+        <Button Grid.Column="2" Name="BtnMPlus" Content="M+" Margin="0,0,2,0"/>
+        <Button Grid.Column="3" Name="BtnMMinus" Content="M−" Margin="0,0,2,0"/>
+        <Button Grid.Column="4" Name="BtnMS" Content="MS"/>
+      </Grid>
+
+      <Grid ColumnDefinitions="*,*,*,*" Margin="0,2,0,0">
+        <Grid.Styles><Style Selector="Button"><Setter Property="Height" Value="44"/><Setter Property="FontSize" Value="15"/><Setter Property="CornerRadius" Value="7"/><Setter Property="HorizontalContentAlignment" Value="Center"/></Style></Grid.Styles>
+        <Button Grid.Column="0" Name="BtnPercent" Content="%" Background="#F1F5F9" Foreground="#334155" Margin="0,0,2,0"/>
+        <Button Grid.Column="1" Name="BtnCE" Content="CE" Background="#FEF2F2" Foreground="#E53935" Margin="0,0,2,0"/>
+        <Button Grid.Column="2" Name="BtnC" Content="C" Background="#FEF2F2" Foreground="#E53935" Margin="0,0,2,0"/>
+        <Button Grid.Column="3" Name="BtnBack" Content="⌫" Background="#FEF2F2" Foreground="#E53935"/>
+      </Grid>
+
+      <Grid ColumnDefinitions="*,46" Margin="0,2,0,0">
+        <Grid Grid.Column="0" RowDefinitions="44,44,44,44" ColumnDefinitions="*,*,*,*">
+          <Grid.Styles><Style Selector="Button"><Setter Property="FontSize" Value="15"/><Setter Property="CornerRadius" Value="7"/><Setter Property="HorizontalContentAlignment" Value="Center"/><Setter Property="Margin" Value="0,0,2,2"/></Style></Grid.Styles>
+          <Button Grid.Row="0" Grid.Column="0" Name="Btn7" Content="7" Background="White" Foreground="#1A2A3A"/>
+          <Button Grid.Row="0" Grid.Column="1" Name="Btn8" Content="8" Background="White" Foreground="#1A2A3A"/>
+          <Button Grid.Row="0" Grid.Column="2" Name="Btn9" Content="9" Background="White" Foreground="#1A2A3A"/>
+          <Button Grid.Row="0" Grid.Column="3" Name="BtnDiv" Content="÷" Background="White" Foreground="#0277BD"/>
+
+          <Button Grid.Row="1" Grid.Column="0" Name="Btn4" Content="4" Background="White" Foreground="#1A2A3A"/>
+          <Button Grid.Row="1" Grid.Column="1" Name="Btn5" Content="5" Background="White" Foreground="#1A2A3A"/>
+          <Button Grid.Row="1" Grid.Column="2" Name="Btn6" Content="6" Background="White" Foreground="#1A2A3A"/>
+          <Button Grid.Row="1" Grid.Column="3" Name="BtnMul" Content="×" Background="White" Foreground="#0277BD"/>
+
+          <Button Grid.Row="2" Grid.Column="0" Name="Btn1" Content="1" Background="White" Foreground="#1A2A3A"/>
+          <Button Grid.Row="2" Grid.Column="1" Name="Btn2" Content="2" Background="White" Foreground="#1A2A3A"/>
+          <Button Grid.Row="2" Grid.Column="2" Name="Btn3" Content="3" Background="White" Foreground="#1A2A3A"/>
+          <Button Grid.Row="2" Grid.Column="3" Name="BtnSub" Content="−" Background="White" Foreground="#0277BD"/>
+
+          <Button Grid.Row="3" Grid.Column="0" Name="BtnSign" Content="+/−" Background="White" Foreground="#1A2A3A"/>
+          <Button Grid.Row="3" Grid.Column="1" Name="Btn0" Content="0" Background="White" Foreground="#1A2A3A"/>
+          <Button Grid.Row="3" Grid.Column="2" Name="BtnDot" Content="." Background="White" Foreground="#1A2A3A"/>
+          <Button Grid.Row="3" Grid.Column="3" Name="BtnAdd" Content="+" Background="White" Foreground="#0277BD"/>
+        </Grid>
+
+        <Button Grid.Column="1" Name="BtnEquals" Content="=" FontSize="24" FontWeight="Bold"
+                Background="#1565C0" Foreground="White" CornerRadius="7"
+                VerticalAlignment="Stretch" HorizontalContentAlignment="Center" Margin="2,0,0,0"/>
+      </Grid>
+
+    </StackPanel>
+  </StackPanel>
+</Window>

@@ -147,7 +147,7 @@
           <TextBlock Text="Last 50 changes across all medicines" Foreground="#6B7688" FontSize="12" Margin="0,2,0,0"/>
         </StackPanel>
 
-        <DataGrid x:Name="HistoryGrid" HeadersVisibility="All" RowHeaderWidth="40"
+        <DataGrid VerticalScrollBarVisibility="Auto" x:Name="HistoryGrid" HeadersVisibility="All" RowHeaderWidth="40"
                   x:DataType="ent:StockAdjustment"
                   AutoGenerateColumns="False"
                   IsReadOnly="True"

@@ -44,9 +44,29 @@ public class DatabaseInitializer
                 LastLogin TEXT,
                 SecurityQuestion TEXT,
                 SecurityAnswerHash TEXT,
+                RecoveryCodeHash TEXT,
+                Email TEXT,
                 AvatarPath TEXT,
                 Permissions INTEGER NOT NULL DEFAULT 0
             );");
+
+        try
+        {
+            await conn.ExecuteAsync($@"ALTER TABLE {T("Users")} ADD COLUMN RecoveryCodeHash TEXT;");
+        }
+        catch
+        {
+            // Column already exists on this DB -- safe to ignore.
+        }
+
+        try
+        {
+            await conn.ExecuteAsync($@"ALTER TABLE {T("Users")} ADD COLUMN Email TEXT;");
+        }
+        catch
+        {
+            // Column already exists on this DB -- safe to ignore.
+        }
 
         await conn.ExecuteAsync($@"
             CREATE TABLE IF NOT EXISTS {T("Medicines")} (

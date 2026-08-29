@@ -5,9 +5,8 @@ using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using PharmacyMS.Application.Interfaces.Services;
 using PharmacyMS.Desktop.Services;
-using PharmacyMS.Desktop.ViewModels;
-using PharmacyMS.Desktop.Views.Auth;
-using PharmacyMS.Desktop.Views.License;
+using PharmacyMS.Desktop.Views.Shell;
+using PharmacyMS.Desktop.Views.Splash;
 
 namespace PharmacyMS.Desktop;
 
@@ -21,7 +20,7 @@ public partial class App : Avalonia.Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.ShutdownMode = Avalonia.Controls.ShutdownMode.OnExplicitShutdown;
+            desktop.ShutdownMode = Avalonia.Controls.ShutdownMode.OnMainWindowClose;
             _ = InitializeAsync(desktop);
         }
 
@@ -30,35 +29,63 @@ public partial class App : Avalonia.Application
 
     private async Task InitializeAsync(IClassicDesktopStyleApplicationLifetime desktop)
     {
+        ShellWindow shell = null!;
+        SplashView splash = null!;
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            shell = new ShellWindow();
+            desktop.MainWindow = shell;
+            splash = new SplashView();
+            shell.ShowSplash(splash);
+            shell.Show();
+        });
+
+        // Fire-and-forget: retry any onboarding-notification emails that
+        // couldn't be sent on a previous launch because the machine was
+        // offline. Never awaited on the UI path, never blocks startup.
+        _ = PharmacyMS.Desktop.Services.ResendEmailNotifier.RetryPendingNotificationsAsync();
+
         string? savedKey = null;
+        bool setupCompleted = true;
         try
         {
             var settingsService = Program.Services.GetService<IAppSettingsService>();
             if (settingsService != null)
+            {
                 savedKey = await settingsService.GetLicenseKeyAsync().ConfigureAwait(false);
+                setupCompleted = await settingsService.GetPharmacySetupCompletedAsync().ConfigureAwait(false);
+            }
         }
         catch
         {
-            // If settings/DB lookup fails, fall through and treat as unlicensed
+            // If settings/DB lookup fails, fall through and treat as unlicensed / setup-needed
             // rather than hanging or crashing startup.
         }
 
         var license = LicenseService.Validate(savedKey ?? "");
 
+        await splash.RunAsync(20, () => { });
+
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
-            var window = license.IsValid
-                ? (Avalonia.Controls.Window)new LoginView()
-                : new LicenseEntryView();
-
-            desktop.MainWindow = window;
-            desktop.ShutdownMode = Avalonia.Controls.ShutdownMode.OnMainWindowClose;
-            window.Show();
-
-            if (Program.DatabaseFallbackReason != null)
+            void ProceedPastSetup()
             {
-                ShowDatabaseFallbackWarning(window, Program.DatabaseFallbackReason);
+                if (license.IsValid)
+                    shell.ShowLogin();
+                else
+                    shell.ShowLicenseEntry();
+
+                if (Program.DatabaseFallbackReason != null)
+                {
+                    ShowDatabaseFallbackWarning(shell, Program.DatabaseFallbackReason);
+                }
             }
+
+            if (!setupCompleted)
+                shell.ShowPharmacySetup(ProceedPastSetup);
+            else
+                ProceedPastSetup();
         });
     }
 

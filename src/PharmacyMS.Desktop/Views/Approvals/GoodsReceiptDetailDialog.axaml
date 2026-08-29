@@ -39,7 +39,7 @@
     </Border>
 
     <TextBlock Text="Items" FontSize="13" FontWeight="SemiBold" Foreground="#0F172A"/>
-    <DataGrid x:Name="ItemsGrid" HeadersVisibility="Column"
+    <DataGrid VerticalScrollBarVisibility="Auto" x:Name="ItemsGrid" HeadersVisibility="Column"
               x:DataType="ent:GoodsReceiptItem" AutoGenerateColumns="False" IsReadOnly="True"
               GridLinesVisibility="Horizontal" MaxHeight="220">
       <DataGrid.Columns>

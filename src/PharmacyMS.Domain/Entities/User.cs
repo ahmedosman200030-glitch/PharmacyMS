@@ -15,6 +15,8 @@ public class User
     public DateTime? LastLogin { get; set; }
     public string? SecurityQuestion { get; set; }
     public string? SecurityAnswerHash { get; set; }
+    public string? RecoveryCodeHash { get; set; }
+    public string? Email { get; set; }
     public string? AvatarPath { get; set; }
     public Permission Permissions { get; set; } = Permission.None;
 }
