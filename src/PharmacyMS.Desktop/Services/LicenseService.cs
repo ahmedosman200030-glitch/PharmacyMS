@@ -40,9 +40,12 @@ public static class LicenseService
         }
         else
         {
-            // Legacy format: PMS-{expiryYYYYMMDD}-{sig} - works for either plan
-            payload = parts[1];
-            providedSig = parts[2];
+            // Legacy format: PMS-{expiryYYYYMMDD}-{sig}. Previously treated as
+            // valid for either plan; now deliberately rejected so any client
+            // still on an old-format key is forced back to the Plans screen
+            // to pick Monthly/Annual and activate a new plan-locked key.
+            return new LicenseInfo(false, null,
+                "Your license needs to be renewed. Please choose a plan to continue.");
         }
 
         using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(Secret));
