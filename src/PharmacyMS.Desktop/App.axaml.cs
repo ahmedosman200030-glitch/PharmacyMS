@@ -74,7 +74,7 @@ public partial class App : Avalonia.Application
                 if (license.IsValid)
                     shell.ShowLogin();
                 else
-                    shell.ShowLicenseEntry();
+                    shell.ShowPlans();
 
                 if (Program.DatabaseFallbackReason != null)
                 {

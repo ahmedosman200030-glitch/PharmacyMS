@@ -26,7 +26,7 @@ public partial class LicenseEntryView : UserControl
     private ComboBox _durationBox = null!;
     private ComboBox _usersBox = null!;
 
-    public LicenseEntryView(Action onActivated, Action? onBack = null, bool preferMonthly = false)
+    public LicenseEntryView(Action onActivated, Action? onBack = null)
     {
         AvaloniaXamlLoader.Load(this);
         _onActivated = onActivated;
@@ -45,11 +45,8 @@ public partial class LicenseEntryView : UserControl
         _durationBox      = this.FindControl<ComboBox>("DurationBox")!;
         _usersBox         = this.FindControl<ComboBox>("UsersBox")!;
 
-        _durationBox.SelectedIndex = preferMonthly ? 0 : 1; // 0 = Monthly, 1 = Annual
+        _durationBox.SelectedIndex = 1; // Annual default
         _usersBox.SelectedIndex = 0;    // 1 User default
-
-        // Live preview: show computed dates as soon as a valid key is typed
-        _licenseKeyBox.TextChanged += OnLicenseKeyChanged;
 
         _ = LoadPharmacyNameAsync();
     }
@@ -71,48 +68,17 @@ public partial class LicenseEntryView : UserControl
         _onBack?.Invoke();
     }
 
-    private void OnLicenseKeyChanged(object? sender, TextChangedEventArgs e)
-    {
-        var key = _licenseKeyBox.Text ?? "";
-        if (string.IsNullOrWhiteSpace(key))
-        {
-            _activationDateText.Text = "-";
-            _expiryDateText.Text = "-";
-            SetStatus("Not Activated", false);
-            return;
-        }
-
-        var result = LicenseService.Validate(key, GetSelectedPlanName());
-        if (!result.IsValid)
-        {
-            _activationDateText.Text = "-";
-            _expiryDateText.Text = "-";
-            SetStatus("Not Activated", false);
-            return;
-        }
-
-        // Valid key typed - preview the dates before the user even clicks Activate
-        _errorText.IsVisible = false;
-        _activationDateText.Text = DateTime.Now.ToString("dd MMM yyyy");
-        _expiryDateText.Text = result.ExpiryDate.HasValue
-            ? result.ExpiryDate.Value.ToString("dd MMM yyyy")
-            : "-";
-        SetStatus("Valid - Ready to Activate", true);
-    }
-
     private async void OnActivateClick(object? sender, RoutedEventArgs e)
     {
         _errorText.IsVisible = false;
         var key = _licenseKeyBox.Text ?? "";
-        var result = LicenseService.Validate(key, GetSelectedPlanName());
+        var result = LicenseService.Validate(key);
 
         if (!result.IsValid)
         {
             _errorText.Text = result.ErrorMessage ?? "Invalid license.";
             _errorText.IsVisible = true;
             SetStatus("Not Activated", false);
-            _activationDateText.Text = "-";
-            _expiryDateText.Text = "-";
             return;
         }
 
@@ -129,14 +95,8 @@ public partial class LicenseEntryView : UserControl
         if (_settingsService != null)
             await _settingsService.SetLicenseKeyAsync(key.Trim());
 
-        // Let the user actually see the activated state (dates + green badge)
-        // before we navigate away to the next step.
-        await Task.Delay(1200);
-
         _onActivated();
     }
-
-    private string GetSelectedPlanName() => _durationBox.SelectedIndex == 0 ? "Monthly" : "Annual";
 
     private void SetStatus(string text, bool active)
     {
