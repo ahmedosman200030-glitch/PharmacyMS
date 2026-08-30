@@ -52,10 +52,22 @@ public partial class ShellWindow : Window
     // Plan choice is shown before license entry. All three buttons currently
     // just proceed to license entry - hook up real trial/monthly/annual
     // logic here once that's decided.
-    public void ShowPlans() => RootContent.Content = new PlansView(
-        onSelectTrial: StartTrial,
-        onSelectMonthly: () => ShowLicenseEntry(preferMonthly: true),
-        onSelectAnnual: () => ShowLicenseEntry(preferMonthly: false));
+    public async void ShowPlans()
+    {
+        var settingsService = Program.Services?.GetService<IAppSettingsService>();
+        var trialUsed = false;
+        if (settingsService != null)
+        {
+            try { trialUsed = await settingsService.GetTrialUsedAsync(); }
+            catch { /* default to not-used if the lookup fails */ }
+        }
+
+        RootContent.Content = new PlansView(
+            onSelectTrial: StartTrial,
+            onSelectMonthly: () => ShowLicenseEntry(preferMonthly: true),
+            onSelectAnnual: () => ShowLicenseEntry(preferMonthly: false),
+            trialAlreadyUsed: trialUsed);
+    }
 
     // No license form for the trial - mint a real 30-day key and go straight in.
     // When it expires, the normal startup check will route back to ShowPlans().
@@ -64,7 +76,10 @@ public partial class ShellWindow : Window
         var trialKey = LicenseService.GenerateTrialLicenseKey();
         var settingsService = Program.Services?.GetService<IAppSettingsService>();
         if (settingsService != null)
+        {
             await settingsService.SetLicenseKeyAsync(trialKey);
+            await settingsService.SetTrialUsedAsync();
+        }
 
         ShowLogin();
     }

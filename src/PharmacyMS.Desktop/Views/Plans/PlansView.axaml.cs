@@ -13,12 +13,28 @@ public partial class PlansView : UserControl
     private readonly Action? _onSelectMonthly;
     private readonly Action? _onSelectAnnual;
 
-    public PlansView(Action? onSelectTrial = null, Action? onSelectMonthly = null, Action? onSelectAnnual = null)
+    public PlansView(Action? onSelectTrial = null, Action? onSelectMonthly = null,
+        Action? onSelectAnnual = null, bool trialAlreadyUsed = false)
     {
         AvaloniaXamlLoader.Load(this);
         _onSelectTrial = onSelectTrial;
         _onSelectMonthly = onSelectMonthly;
         _onSelectAnnual = onSelectAnnual;
+
+        if (trialAlreadyUsed)
+        {
+            var trialButton = this.FindControl<Button>("StartTrialButton");
+            var footnote = this.FindControl<TextBlock>("TrialFootnoteText");
+            if (trialButton != null)
+            {
+                trialButton.IsEnabled = false;
+                trialButton.Content = "Trial Already Used";
+            }
+            if (footnote != null)
+            {
+                footnote.Text = "You've already used your free trial. Choose a plan below.";
+            }
+        }
     }
 
     private void OnStartTrialClick(object? sender, RoutedEventArgs e)

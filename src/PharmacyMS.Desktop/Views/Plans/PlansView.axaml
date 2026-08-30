@@ -150,10 +150,10 @@
                 </StackPanel>
               </StackPanel>
 
-              <Button Content="Start Free Trial" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+              <Button x:Name="StartTrialButton" Content="Start Free Trial" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                       Padding="0,12" Background="#FEE2E2" Foreground="#B91C1C" FontWeight="SemiBold" FontSize="13"
                       CornerRadius="8" BorderThickness="0" Click="OnStartTrialClick"/>
-              <TextBlock Text="No commitment. Cancel anytime." FontSize="10.5" Foreground="#94A3B8" HorizontalAlignment="Center" Margin="0,8,0,0"/>
+              <TextBlock x:Name="TrialFootnoteText" Text="No commitment. Cancel anytime." FontSize="10.5" Foreground="#94A3B8" HorizontalAlignment="Center" Margin="0,8,0,0"/>
             </StackPanel>
           </Border>
 

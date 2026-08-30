@@ -33,7 +33,7 @@ public static class LicenseService
         {
             // New format: PMS-{expiryYYYYMMDD}-{planCode}-{sig}
             planCode = parts[2].ToUpperInvariant();
-            if (planCode != "M" && planCode != "A")
+            if (planCode != "M" && planCode != "A" && planCode != "T")
                 return new LicenseInfo(false, null, "Invalid license key format.");
             payload = $"{parts[1]}-{planCode}";
             providedSig = parts[3];
@@ -78,6 +78,7 @@ public static class LicenseService
     {
         "M" => "Monthly",
         "A" => "Annual",
+        "T" => "Trial",
         _ => null
     };
 
@@ -108,12 +109,13 @@ public static class LicenseService
     public static string GenerateTrialLicenseKey(int days = 30)
     {
         var expiry = DateTime.UtcNow.Date.AddDays(days);
-        var payload = expiry.ToString("yyyyMMdd");
+        var datePart = expiry.ToString("yyyyMMdd");
+        var payload = $"{datePart}-T";
 
         using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(Secret));
         var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(payload));
         var sig = Convert.ToHexString(hash)[..8];
 
-        return $"PMS-{payload}-{sig}";
+        return $"PMS-{datePart}-T-{sig}";
     }
 }

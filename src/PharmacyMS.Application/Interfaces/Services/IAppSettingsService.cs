@@ -42,4 +42,7 @@ public interface IAppSettingsService
 
     Task<bool> GetPharmacySetupCompletedAsync();
     Task SetPharmacySetupCompletedAsync();
+
+    Task<bool> GetTrialUsedAsync();
+    Task SetTrialUsedAsync();
 }

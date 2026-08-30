@@ -21,6 +21,7 @@ public class AppSettingsService : IAppSettingsService
     private const string PhoneNumberKey = "PhoneNumber";
     private const string PharmacyAddressKey = "PharmacyAddress";
     private const string PharmacySetupCompletedKey = "PharmacySetupCompleted";
+    private const string TrialUsedKey = "TrialUsed";
 
     private readonly AppDbContext _context;
     public AppSettingsService(AppDbContext context) => _context = context;
@@ -92,4 +93,11 @@ public class AppSettingsService : IAppSettingsService
         return value == "true";
     }
     public Task SetPharmacySetupCompletedAsync() => SetRawAsync(PharmacySetupCompletedKey, "true");
+
+    public async Task<bool> GetTrialUsedAsync()
+    {
+        var value = await GetRawAsync(TrialUsedKey);
+        return value == "true";
+    }
+    public Task SetTrialUsedAsync() => SetRawAsync(TrialUsedKey, "true");
 }
