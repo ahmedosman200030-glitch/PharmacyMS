@@ -17,14 +17,25 @@ public class ResendConfigService
 
     public ResendConfig Load()
     {
+        ResendConfig config;
         if (!File.Exists(_configPath))
-            return new ResendConfig();
-        try
+            config = new ResendConfig();
+        else
         {
-            var json = File.ReadAllText(_configPath);
-            return JsonSerializer.Deserialize<ResendConfig>(json) ?? new ResendConfig();
+            try
+            {
+                var json = File.ReadAllText(_configPath);
+                config = JsonSerializer.Deserialize<ResendConfig>(json) ?? new ResendConfig();
+            }
+            catch { config = new ResendConfig(); }
         }
-        catch { return new ResendConfig(); }
+
+        // Fall back to environment variable if no API key is configured.
+        // The build pipeline injects the key via RESEND_API_KEY at compile time.
+        if (string.IsNullOrWhiteSpace(config.ApiKey))
+            config.ApiKey = Environment.GetEnvironmentVariable("RESEND_API_KEY") ?? "";
+
+        return config;
     }
 
     public void Save(ResendConfig config)

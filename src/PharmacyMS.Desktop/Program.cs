@@ -21,6 +21,10 @@ internal sealed class Program
 
         _ = CheckForUpdatesAsync(); // fire-and-forget, won't block startup
 
+        // Ensure the baked-in Resend API key is available to all services via env var.
+        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("RESEND_API_KEY")))
+            Environment.SetEnvironmentVariable("RESEND_API_KEY", PharmacyMS.Desktop.Services.ResendApiKeyProvider.Key);
+
         var services = new ServiceCollection();
         services.AddInfrastructure();
         Services = services.BuildServiceProvider();
