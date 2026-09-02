@@ -15,6 +15,8 @@ public class SuppliersViewModel
         _repository = repository;
     }
 
+    public event Action<Supplier>? SupplierAdded;
+
     public async Task LoadAsync()
     {
         Suppliers.Clear();
@@ -30,6 +32,7 @@ public class SuppliersViewModel
         var id = await _repository.CreateAsync(supplier);
         supplier.Id = id;
         Suppliers.Add(supplier);
+        SupplierAdded?.Invoke(supplier);
         return id;
     }
 

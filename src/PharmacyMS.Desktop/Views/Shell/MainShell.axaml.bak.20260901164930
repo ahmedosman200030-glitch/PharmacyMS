@@ -1,27 +1,10 @@
 <UserControl xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         xmlns:vm="using:PharmacyMS.Desktop.ViewModels"
         x:Class="PharmacyMS.Desktop.Views.Shell.MainShell"
 
         FontFamily="Segoe UI, Inter, sans-serif"
         Background="{DynamicResource BrandBackgroundBrush}">
-  <UserControl.Styles>
-    <Style Selector="Button.notifRowModern">
-      <Setter Property="Background" Value="Transparent"/>
-      <Setter Property="BorderThickness" Value="0"/>
-      <Setter Property="Padding" Value="10,9"/>
-      <Setter Property="CornerRadius" Value="9"/>
-      <Setter Property="Margin" Value="0,1"/>
-    </Style>
-    <Style Selector="Button.notifRowModern:pointerover">
-      <Setter Property="Background" Value="#F8FAFC"/>
-    </Style>
-    <Style Selector="Border.notifRowStatic">
-      <Setter Property="Margin" Value="0,1"/>
-    </Style>
-  </UserControl.Styles>
-
   
 
   <Panel>
@@ -83,7 +66,7 @@
         <!-- Logout -->
         <Button DockPanel.Dock="Bottom"
                 x:Name="LogoutButton"
-                Content="→  Log Out"
+                Content="⏻  Log Out"
                 Margin="16,0,16,20"
                 Height="40"
                 Background="#1E293B"
@@ -452,7 +435,7 @@
                      FontSize="16" FontWeight="Bold" Foreground="#0F172A" VerticalAlignment="Center"/>
 
           <Grid Grid.Column="1" Width="360" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBox x:Name="GlobalSearchBox" Watermark="Search medicines, invoices, customers..."
+            <TextBox x:Name="GlobalSearchBox" Watermark="🔍 Search medicines, invoices, customers..."
                      Padding="10,6" CornerRadius="8" Background="#F1F5F9" BorderThickness="0"/>
             <Popup x:Name="SearchResultsPopup" PlacementTarget="{Binding #GlobalSearchBox}"
                    Placement="Bottom" IsLightDismissEnabled="True" Width="360">
@@ -486,7 +469,7 @@
                         <!-- Notification bell -->
             <Button x:Name="NotifButton" Background="Transparent" Padding="4" Cursor="Hand">
               <Panel>
-                <mi:MaterialIcon Kind="Bell" Width="22" Height="22" Foreground="#0F172A"/>
+                <TextBlock Text="🔔" FontSize="18"/>
                 <Border x:Name="NotifBadge" Background="#EF4444" CornerRadius="8"
                         Width="16" Height="16" HorizontalAlignment="Right" VerticalAlignment="Top"
                         Margin="0,-4,-4,0" IsVisible="False">
@@ -518,7 +501,7 @@
                           <Button x:Name="NotifExpiredButton" Classes="notifRowModern" HorizontalAlignment="Stretch" IsVisible="False">
                             <Grid ColumnDefinitions="Auto,*,Auto">
                               <Border Grid.Column="0" Width="36" Height="36" CornerRadius="9" Background="#FEE2E2" VerticalAlignment="Top">
-                                <TextBlock Text="⚠ï¸" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="⚠️" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                               </Border>
                               <StackPanel Grid.Column="1" Spacing="1" Margin="12,0,8,0" VerticalAlignment="Center">
                                 <TextBlock Text="Expired Medicines" FontSize="13" FontWeight="SemiBold" Foreground="#0F172A"/>
@@ -624,15 +607,14 @@
                           </Button>
 
                           <Border x:Name="NotifRevenueRow" Classes="notifRowStatic" Padding="10,10" CornerRadius="9">
-                            <Grid ColumnDefinitions="Auto,*,Auto">
+                            <Grid ColumnDefinitions="Auto,*">
                               <Border Grid.Column="0" Width="36" Height="36" CornerRadius="9" Background="#DCFCE7" VerticalAlignment="Top">
-                                <mi:MaterialIcon Kind="CashMultiple" Width="20" Height="20" Foreground="#15803D" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="💰" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                               </Border>
-                              <StackPanel Grid.Column="1" Spacing="1" Margin="12,0,8,0" VerticalAlignment="Center">
+                              <StackPanel Grid.Column="1" Spacing="1" Margin="12,0,0,0" VerticalAlignment="Center">
                                 <TextBlock Text="Today's Sales" FontSize="13" FontWeight="SemiBold" Foreground="#0F172A"/>
                                 <TextBlock x:Name="NotifRevenueText" Text="$0.00" FontSize="11.5" Foreground="#64748B"/>
                               </StackPanel>
-                              <TextBlock x:Name="NotifRevenueTimeText" Grid.Column="2" Text="" FontSize="10" Foreground="#94A3B8" VerticalAlignment="Top" HorizontalAlignment="Right"/>
                             </Grid>
                           </Border>
 
@@ -654,28 +636,10 @@
                             </Grid>
                           </Button>
 
-                          <Button x:Name="NotifNewSupplierButton" Classes="notifRowModern" HorizontalAlignment="Stretch" IsVisible="False">
-                            <Grid ColumnDefinitions="Auto,*,Auto">
-                              <Border Grid.Column="0" Width="36" Height="36" CornerRadius="9" Background="#DBEAFE" VerticalAlignment="Top">
-                                <mi:MaterialIcon Kind="Domain" Width="20" Height="20" Foreground="#1D4ED8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                              </Border>
-                              <StackPanel Grid.Column="1" Spacing="1" Margin="12,0,8,0" VerticalAlignment="Center">
-                                <TextBlock Text="New Supplier" FontSize="13" FontWeight="SemiBold" Foreground="#0F172A"/>
-                                <TextBlock x:Name="NotifNewSupplierText" Text="0 new suppliers added today" FontSize="11.5" Foreground="#64748B" TextWrapping="Wrap"/>
-                              </StackPanel>
-                              <StackPanel Grid.Column="2" Spacing="4" HorizontalAlignment="Right">
-                                <TextBlock x:Name="NotifNewSupplierTimeText" Text="" FontSize="10" Foreground="#94A3B8" HorizontalAlignment="Right"/>
-                                <Border Background="#3B82F6" CornerRadius="10" Padding="7,2" HorizontalAlignment="Right">
-                                  <TextBlock x:Name="NotifNewSupplierCountBadge" Text="0" FontSize="10.5" FontWeight="Bold" Foreground="White"/>
-                                </Border>
-                              </StackPanel>
-                            </Grid>
-                          </Button>
-
-                          <Border x:Name="NotifBackupRow" Classes="notifRowStatic" Padding="10,10" CornerRadius="9" IsVisible="False">
+                          <Border x:Name="NotifBackupRow" Classes="notifRowStatic" Padding="10,10" CornerRadius="9">
                             <Grid ColumnDefinitions="Auto,*">
                               <Border Grid.Column="0" Width="36" Height="36" CornerRadius="9" Background="#CCFBF1" VerticalAlignment="Top">
-                                <TextBlock Text="🗄ï¸" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Text="🗄️" FontSize="15" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                               </Border>
                               <StackPanel Grid.Column="1" Spacing="1" Margin="12,0,0,0" VerticalAlignment="Center">
                                 <TextBlock Text="Backup Reminder" FontSize="13" FontWeight="SemiBold" Foreground="#0F172A"/>
@@ -774,7 +738,7 @@
                     <Separator Margin="0,0,0,6"/>
                     <Button x:Name="MenuPreferencesButton" Content="⚙  Preferences" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Background="Transparent" Padding="8,6"/>
                     <Separator Margin="0,4"/>
-                    <Button x:Name="MenuLogoutButton" Content="→  Logout" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Background="Transparent" Foreground="#EF4444" Padding="8,6"/>
+                    <Button x:Name="MenuLogoutButton" Content="⏻  Logout" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Background="Transparent" Foreground="#EF4444" Padding="8,6"/>
                   </StackPanel>
                 </Flyout>
               </Button.Flyout>

@@ -9,6 +9,7 @@ using PharmacyMS.Desktop.Views.License;
 using PharmacyMS.Desktop.Views.Plans;
 using PharmacyMS.Desktop.Views.Onboarding;
 using PharmacyMS.Desktop.Views.Splash;
+using PharmacyMS.Desktop.Views.Startup;
 
 namespace PharmacyMS.Desktop.Views.Shell;
 
@@ -42,6 +43,9 @@ public partial class ShellWindow : Window
     }
 
     public void ShowSplash(SplashView splash) => RootContent.Content = splash;
+
+    public void ShowServerUnreachable(string reason, Func<Task> onRetry) =>
+        RootContent.Content = new ServerUnreachableView(reason, onRetry);
 
     public void ShowPharmacySetup(Action onComplete) => RootContent.Content = new PharmacySetupView(onComplete);
 

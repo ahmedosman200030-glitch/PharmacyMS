@@ -8,6 +8,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Media;
+using Microsoft.Extensions.DependencyInjection;
+using PharmacyMS.Application.Interfaces.Repositories;
 using PharmacyMS.Desktop.ViewModels;
 
 namespace PharmacyMS.Desktop.Views.Dashboard;
@@ -103,6 +105,7 @@ public partial class DashboardView : UserControl
 
         DrawSalesChart();
         DrawPaymentDonut();
+        await LoadDashboardNotificationsAsync();
 
         decimal totalPayments = 0;
         foreach (var p in _vm.PaymentBreakdown) totalPayments += p.Amount;
@@ -462,4 +465,87 @@ public partial class DashboardView : UserControl
         var ic = CultureInfo.InvariantCulture;
         return $"M {x1.ToString("F2", ic)},{y1.ToString("F2", ic)} A {r.ToString("F2", ic)},{r.ToString("F2", ic)} 0 {largeArc} 1 {x2.ToString("F2", ic)},{y2.ToString("F2", ic)}";
     }
+
+    private async Task LoadDashboardNotificationsAsync()
+    {
+        try
+        {
+            var medicineRepo = Program.Services.GetRequiredService<IMedicineRepository>();
+            var allMedicines = (await medicineRepo.GetAllAsync()).ToList();
+
+            var expiredCount = allMedicines.Count(m => m.ExpiryDate.HasValue && m.ExpiryDate.Value.Date < DateTime.Today);
+            var outOfStockCount = allMedicines.Count(m => m.QuantityInStock == 0);
+            var lowStockCount = allMedicines.Count(m => m.QuantityInStock > 0 && m.QuantityInStock <= m.ReorderLevel);
+            var expiringCount = allMedicines.Count(m =>
+                m.ExpiryDate.HasValue &&
+                m.ExpiryDate.Value.Date >= DateTime.Today &&
+                m.ExpiryDate.Value.Date <= DateTime.Today.AddDays(30));
+
+            var rows = new List<DashNotifRow>();
+
+            if (lowStockCount > 0)
+                rows.Add(new DashNotifRow
+                {
+                    Icon = "\U0001F4E6", IconBg = "#FEF3C7",
+                    Title = "Low Stock Alert",
+                    Subtitle = $"{lowStockCount} product{(lowStockCount == 1 ? "" : "s")} running low on stock.",
+                    BadgeText = lowStockCount.ToString(), BadgeBg = "#FEF3C7", BadgeFg = "#D97706", HasBadge = true
+                });
+
+            if (expiringCount > 0)
+                rows.Add(new DashNotifRow
+                {
+                    Icon = "\u23F3", IconBg = "#FEF3C7",
+                    Title = "Expiry Alert",
+                    Subtitle = $"{expiringCount} product{(expiringCount == 1 ? "" : "s")} will expire within 30 days.",
+                    BadgeText = expiringCount.ToString(), BadgeBg = "#FEF3C7", BadgeFg = "#D97706", HasBadge = true
+                });
+
+            if (expiredCount > 0)
+                rows.Add(new DashNotifRow
+                {
+                    Icon = "\u26A0", IconBg = "#FEE2E2",
+                    Title = "Expired Medicines",
+                    Subtitle = $"{expiredCount} product{(expiredCount == 1 ? "" : "s")} have already expired.",
+                    BadgeText = expiredCount.ToString(), BadgeBg = "#FEE2E2", BadgeFg = "#DC2626", HasBadge = true
+                });
+
+            if (outOfStockCount > 0)
+                rows.Add(new DashNotifRow
+                {
+                    Icon = "\uD83D\uDEAB", IconBg = "#FEE2E2",
+                    Title = "Out of Stock",
+                    Subtitle = $"{outOfStockCount} product{(outOfStockCount == 1 ? "" : "s")} are out of stock.",
+                    BadgeText = outOfStockCount.ToString(), BadgeBg = "#FEE2E2", BadgeFg = "#DC2626", HasBadge = true
+                });
+
+            if (_vm.NewCustomersToday > 0)
+                rows.Add(new DashNotifRow
+                {
+                    Icon = "\uD83D\uDC65", IconBg = "#EDE9FE",
+                    Title = "New Customer Registered",
+                    Subtitle = $"{_vm.NewCustomersToday} new customer{(_vm.NewCustomersToday == 1 ? "" : "s")} today.",
+                    BadgeText = _vm.NewCustomersToday.ToString(), BadgeBg = "#EDE9FE", BadgeFg = "#7C3AED", HasBadge = true
+                });
+
+            DashboardNotifList.ItemsSource = rows;
+            DashNotifEmptyText.IsVisible = rows.Count == 0;
+        }
+        catch
+        {
+            // dashboard notifications are non-critical; fail silently
+        }
+    }
+}
+
+public class DashNotifRow
+{
+    public string Icon { get; set; } = "";
+    public string IconBg { get; set; } = "#F1F5F9";
+    public string Title { get; set; } = "";
+    public string Subtitle { get; set; } = "";
+    public string BadgeText { get; set; } = "";
+    public string BadgeBg { get; set; } = "#F1F5F9";
+    public string BadgeFg { get; set; } = "#334155";
+    public bool HasBadge { get; set; }
 }

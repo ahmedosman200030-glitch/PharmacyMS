@@ -226,6 +226,8 @@ public class PosViewModel
     public async Task<decimal> GetOutstandingBalanceAsync(int customerId)
         => customerId > 0 ? await _customerRepo.GetOutstandingBalanceAsync(customerId) : 0m;
 
+    public event Action<Sale>? SaleCompleted;
+
     public async Task<Sale> CheckoutAsync()
     {
         if (IsCreditSale && !string.IsNullOrWhiteSpace(CreditCustomerName)
@@ -262,6 +264,7 @@ public class PosViewModel
         var id = await _saleRepo.CreateSaleAsync(sale);
         sale.Id = id;
         _soundService.Play(SoundEvent.TransactionSuccess);
+        SaleCompleted?.Invoke(sale);
         ClearCart();
         await LoadAsync();
         return sale;

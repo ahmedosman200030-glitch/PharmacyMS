@@ -116,6 +116,9 @@ public partial class SettingsView : UserControl
         CloudSslModeCombo.ItemsSource = new[] { "Require", "Disable", "Prefer" };
         CloudSslModeCombo.SelectedIndex = 0;
 
+        DbModeCombo.ItemsSource = new[] { "Offline (this PC only)", "Local Network (share with other PCs)", "Cloud (Supabase/Postgres)" };
+        DbModeCombo.SelectionChanged += (_, _) => UpdateDbModeUi();
+
         SoundChecklistToggle.Click += (_, _) => SoundChecklistPopup.IsOpen = !SoundChecklistPopup.IsOpen;
 
         foreach (var check in _soundChecks.Keys)
@@ -515,7 +518,12 @@ public partial class SettingsView : UserControl
     private void LoadCloudSyncFields()
     {
         var cfg = new DbConfigService().Load();
-        UseCloudDbCheck.IsChecked = cfg.Provider == DbProvider.Postgres;
+        DbModeCombo.SelectedIndex = cfg.NetworkMode switch
+        {
+            DbNetworkMode.LocalNetwork => 1,
+            DbNetworkMode.Cloud => 2,
+            _ => 0
+        };
 
         if (!string.IsNullOrWhiteSpace(cfg.PostgresConnectionString))
         {
@@ -534,7 +542,33 @@ public partial class SettingsView : UserControl
                 // malformed/legacy connection string — leave fields blank for the user to re-enter
             }
         }
+
+        UpdateDbModeUi();
     }
+
+    private void UpdateDbModeUi()
+    {
+        var mode = GetSelectedNetworkMode();
+        var showPostgresFields = mode != DbNetworkMode.Offline;
+        PostgresFieldsGrid.IsVisible = showPostgresFields;
+        TestCloudConnectionButton.IsVisible = showPostgresFields;
+        MigrateToCloudButton.IsVisible = showPostgresFields;
+
+        DbModeHintText.Text = mode switch
+        {
+            DbNetworkMode.Offline => "This PC keeps its own local database. No other PC can see this data.",
+            DbNetworkMode.LocalNetwork => "Connect to a PostgreSQL server on your local network (e.g. the pharmacy's main PC). Use its LAN IP address as Host, and set SSL Mode to Disable unless you have configured SSL yourself.",
+            DbNetworkMode.Cloud => "Connect to a hosted Supabase/Postgres database over the internet.",
+            _ => ""
+        };
+    }
+
+    private DbNetworkMode GetSelectedNetworkMode() => DbModeCombo.SelectedIndex switch
+    {
+        1 => DbNetworkMode.LocalNetwork,
+        2 => DbNetworkMode.Cloud,
+        _ => DbNetworkMode.Offline
+    };
 
     private string BuildCloudConnectionString()
     {
@@ -559,7 +593,9 @@ public partial class SettingsView : UserControl
         CloudSyncStatusText.Text = "Testing connection...";
 
         var host = CloudHostBox.Text?.Trim() ?? "";
-        if (host.StartsWith("db.", StringComparison.OrdinalIgnoreCase) && host.Contains(".supabase.co"))
+        var isCloudMode = GetSelectedNetworkMode() == DbNetworkMode.Cloud;
+
+        if (isCloudMode && host.StartsWith("db.", StringComparison.OrdinalIgnoreCase) && host.Contains(".supabase.co"))
         {
             CloudSyncStatusText.Foreground = Avalonia.Media.Brush.Parse("#DC2626");
             CloudSyncStatusText.Text = "This looks like the direct-connection host, which usually won't resolve. " +
@@ -571,7 +607,7 @@ public partial class SettingsView : UserControl
         }
 
         var username = CloudUsernameBox.Text?.Trim() ?? "";
-        if (username == "postgres" && host.Contains(".pooler.supabase.com"))
+        if (isCloudMode && username == "postgres" && host.Contains(".pooler.supabase.com"))
         {
             CloudSyncStatusText.Foreground = Avalonia.Media.Brush.Parse("#DC2626");
             CloudSyncStatusText.Text = "When using the pooler host, Username must be postgres.<project-ref>, not just postgres.";
@@ -605,10 +641,12 @@ public partial class SettingsView : UserControl
         SaveCloudSyncButton.IsEnabled = false;
         try
         {
+            var mode = GetSelectedNetworkMode();
             var cfg = new DbConfig
             {
-                Provider = UseCloudDbCheck.IsChecked == true ? DbProvider.Postgres : DbProvider.Sqlite,
-                PostgresConnectionString = BuildCloudConnectionString()
+                Provider = mode == DbNetworkMode.Offline ? DbProvider.Sqlite : DbProvider.Postgres,
+                NetworkMode = mode,
+                PostgresConnectionString = mode == DbNetworkMode.Offline ? null : BuildCloudConnectionString()
             };
 
             new DbConfigService().Save(cfg);

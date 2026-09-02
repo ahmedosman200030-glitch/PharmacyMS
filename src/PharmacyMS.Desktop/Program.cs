@@ -1,4 +1,6 @@
 using Avalonia;
+using Avalonia.Media;
+using Avalonia.Media.Fonts;
 using Microsoft.Extensions.DependencyInjection;
 using PharmacyMS.Infrastructure.DependencyInjection;
 using Velopack;
@@ -10,9 +12,11 @@ internal sealed class Program
 {
     public static IServiceProvider Services { get; private set; } = null!;
 
-    // Set when the app had to fall back from Postgres to local SQLite at startup.
-    // App.axaml.cs checks this after the window is shown and warns the user.
-    public static string? DatabaseFallbackReason { get; private set; }
+    // Set when Postgres (Local Network or Cloud mode) can't be reached at startup.
+    // The app does NOT fall back to local SQLite in this case - App.axaml.cs shows
+    // a blocking "Server Unreachable" screen instead, with a Retry button that
+    // calls TryReconnectAsync().
+    public static string? DatabaseUnreachableReason { get; private set; }
 
     [STAThread]
     public static void Main(string[] args)
@@ -25,6 +29,17 @@ internal sealed class Program
         if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("RESEND_API_KEY")))
             Environment.SetEnvironmentVariable("RESEND_API_KEY", PharmacyMS.Desktop.Services.ResendApiKeyProvider.Key);
 
+        InitializeDatabase();
+
+        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+    }
+
+    // Builds the DI container and attempts to initialize the database.
+    // For Postgres (Local Network / Cloud), failure does NOT fall back to SQLite -
+    // it sets DatabaseUnreachableReason and leaves Services pointed at the
+    // (uninitialized) Postgres context, so the UI can show a blocking retry screen.
+    private static void InitializeDatabase()
+    {
         var services = new ServiceCollection();
         services.AddInfrastructure();
         Services = services.BuildServiceProvider();
@@ -33,28 +48,32 @@ internal sealed class Program
         try
         {
             initializer.InitializeAsync().GetAwaiter().GetResult();
+            DatabaseUnreachableReason = null;
         }
         catch (Exception ex)
         {
             var dbContext = Services.GetRequiredService<PharmacyMS.Infrastructure.Data.AppDbContext>();
             if (dbContext.IsPostgres)
             {
-                Console.WriteLine($"[Startup] Postgres unavailable ({ex.Message}), falling back to SQLite.");
-                DatabaseFallbackReason = ex.Message;
-
-                var fallbackServices = new ServiceCollection();
-                fallbackServices.AddInfrastructure(PharmacyMS.Infrastructure.Data.AppDbContext.DefaultSqliteConnectionString());
-                Services = fallbackServices.BuildServiceProvider();
-                var fallbackInit = Services.GetRequiredService<PharmacyMS.Infrastructure.Data.DatabaseInitializer>();
-                fallbackInit.InitializeAsync().GetAwaiter().GetResult();
+                Console.WriteLine($"[Startup] Postgres unavailable ({ex.Message}). Showing Server Unreachable screen.");
+                DatabaseUnreachableReason = ex.Message;
             }
             else
             {
                 throw;
             }
         }
+    }
 
-        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+    // Called from the "Server Unreachable" screen's Retry button.
+    // Rebuilds the DI container and tries the Postgres connection again.
+    public static async Task<bool> TryReconnectAsync()
+    {
+        return await Task.Run(() =>
+        {
+            InitializeDatabase();
+            return DatabaseUnreachableReason == null;
+        });
     }
 
     private static async Task CheckForUpdatesAsync()
@@ -66,5 +85,12 @@ internal sealed class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
+            .With(new FontManagerOptions
+            {
+                FontFallbacks = new List<FontFallback>
+                {
+                    new FontFallback { FontFamily = new FontFamily("Apple Color Emoji") }
+                }
+            })
             .LogToTrace();
 }

@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="PharmacyMS.Desktop.Views.Startup.ServerUnreachableView"
+        Background="#0F172A">
+
+  <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+    <Border Background="White" CornerRadius="14" Padding="36" Width="460" BoxShadow="0 8 32 0 #44000000">
+      <StackPanel Spacing="18" HorizontalAlignment="Center">
+
+        <TextBlock Text="⚠" FontSize="42" HorizontalAlignment="Center"/>
+
+        <TextBlock Text="Can't Reach the Pharmacy Server"
+                   FontSize="19" FontWeight="Bold" Foreground="#0F172A"
+                   TextAlignment="Center" TextWrapping="Wrap"/>
+
+        <TextBlock Text="This PC couldn't connect to the pharmacy database server. Make sure the Server PC is powered on and connected to the same network, then try again."
+                   FontSize="13" Foreground="#64748B" TextAlignment="Center" TextWrapping="Wrap"/>
+
+        <Border Background="#F8FAFC" CornerRadius="8" Padding="12" HorizontalAlignment="Stretch">
+          <TextBlock x:Name="ReasonText" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap"/>
+        </Border>
+
+        <Button x:Name="RetryButton" Content="Retry Connection" Height="42" Width="220"
+                Background="#DC2626" Foreground="White" CornerRadius="8" FontWeight="SemiBold"
+                HorizontalAlignment="Center"/>
+
+        <TextBlock x:Name="StatusText" FontSize="12" Foreground="#DC2626" TextAlignment="Center"
+                   TextWrapping="Wrap" IsVisible="False"/>
+
+      </StackPanel>
+    </Border>
+  </Grid>
+
+</UserControl>

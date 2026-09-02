@@ -31,7 +31,7 @@
 
           <Button x:Name="NavGeneral" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
             <StackPanel Orientation="Horizontal" Spacing="10">
-              <TextBlock Text="⚙️" FontSize="16"/>
+              <TextBlock Text="⚙" FontSize="16"/>
               <StackPanel Spacing="1">
                 <TextBlock Text="General" FontSize="13" FontWeight="SemiBold"/>
                 <TextBlock Text="App name, logo, currency" FontSize="10.5" Foreground="#94A3B8"/>
@@ -71,7 +71,7 @@
 
           <Button x:Name="NavDatabase" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
             <StackPanel Orientation="Horizontal" Spacing="10">
-              <TextBlock Text="🗄️" FontSize="16"/>
+              <TextBlock Text="DB" FontSize="16"/>
               <StackPanel Spacing="1">
                 <TextBlock Text="Database" FontSize="13" FontWeight="SemiBold"/>
                 <TextBlock Text="Backup &amp; restore" FontSize="10.5" Foreground="#94A3B8"/>
@@ -81,10 +81,10 @@
 
           <Button x:Name="NavCloudSync" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
             <StackPanel Orientation="Horizontal" Spacing="10">
-              <TextBlock Text="☁️" FontSize="16"/>
+              <TextBlock Text="☁" FontSize="16"/>
               <StackPanel Spacing="1">
-                <TextBlock Text="Cloud Sync" FontSize="13" FontWeight="SemiBold"/>
-                <TextBlock Text="Connect to Supabase/Postgres" FontSize="10.5" Foreground="#94A3B8"/>
+                <TextBlock Text="Database Mode" FontSize="13" FontWeight="SemiBold"/>
+                <TextBlock Text="Offline, Local Network, or Cloud" FontSize="10.5" Foreground="#94A3B8"/>
               </StackPanel>
             </StackPanel>
           </Button>
@@ -111,7 +111,7 @@
 
           <Button x:Name="NavAbout" Classes="navitem" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left">
             <StackPanel Orientation="Horizontal" Spacing="10">
-              <TextBlock Text="ℹ️" FontSize="16"/>
+              <TextBlock Text="ℹ" FontSize="16"/>
               <StackPanel Spacing="1">
                 <TextBlock Text="About" FontSize="13" FontWeight="SemiBold"/>
                 <TextBlock Text="Version info" FontSize="10.5" Foreground="#94A3B8"/>
@@ -316,23 +316,27 @@
           <!-- Cloud Sync -->
           <Border x:Name="PanelCloudSync" Background="White" CornerRadius="10" Padding="24" BoxShadow="0 1 4 0 #22000000" IsVisible="False">
             <StackPanel Spacing="16">
-              <TextBlock Text="Cloud Sync" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
-              <TextBlock Text="Connect this PC to a shared Supabase/Postgres database instead of the local SQLite file." FontSize="12" Foreground="#64748B" TextWrapping="Wrap"/>
+              <TextBlock Text="Database Mode" FontSize="16" FontWeight="Bold" Foreground="#0F172A"/>
+              <TextBlock Text="Choose how this PC connects to your pharmacy data: stay fully offline, share data with other PCs over your local network, or sync to the cloud." FontSize="12" Foreground="#64748B" TextWrapping="Wrap"/>
 
-              <CheckBox x:Name="UseCloudDbCheck" Content="Use Cloud Database (Postgres)" FontSize="13"/>
+              <StackPanel Spacing="6">
+                <TextBlock Text="Mode" FontSize="12" Foreground="#64748B"/>
+                <ComboBox x:Name="DbModeCombo" Height="38" HorizontalAlignment="Stretch"/>
+                <TextBlock x:Name="DbModeHintText" FontSize="11" Foreground="#94A3B8" TextWrapping="Wrap"/>
+              </StackPanel>
 
-              <Grid ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto,Auto" RowSpacing="14">
+              <Grid x:Name="PostgresFieldsGrid" ColumnDefinitions="*,*" ColumnSpacing="16" RowDefinitions="Auto,Auto,Auto" RowSpacing="14">
                 <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
                   <TextBlock Text="Host" FontSize="12" Foreground="#64748B"/>
                   <TextBox x:Name="CloudHostBox" Height="38" Watermark="aws-0-&lt;region&gt;.pooler.supabase.com (NOT db.xxxx.supabase.co)"/>
                 </StackPanel>
                 <StackPanel Grid.Row="0" Grid.Column="1" Spacing="6">
                   <TextBlock Text="Port" FontSize="12" Foreground="#64748B"/>
-                  <TextBox x:Name="CloudPortBox" Height="38" Watermark="5432"/>
+                  <TextBox x:Name="CloudPortBox" Height="38" Text="5432"/>
                 </StackPanel>
                 <StackPanel Grid.Row="1" Grid.Column="0" Spacing="6">
                   <TextBlock Text="Database" FontSize="12" Foreground="#64748B"/>
-                  <TextBox x:Name="CloudDatabaseBox" Height="38" Watermark="postgres"/>
+                  <TextBox x:Name="CloudDatabaseBox" Height="38" Text="pharmacyms"/>
                 </StackPanel>
                 <StackPanel Grid.Row="1" Grid.Column="1" Spacing="6">
                   <TextBlock Text="Username" FontSize="12" Foreground="#64748B"/>
@@ -461,7 +465,7 @@
               </StackPanel>
 
               <StackPanel Spacing="10">
-                <TextBlock Text="🛠️ System Information" FontSize="15" FontWeight="Bold" Foreground="#0F172A"/>
+                <TextBlock Text="System Information" FontSize="15" FontWeight="Bold" Foreground="#0F172A"/>
                 <Border Background="#F8FAFC" CornerRadius="8" Padding="16">
                   <StackPanel Spacing="7">
                     <Grid ColumnDefinitions="170,*"><TextBlock Grid.Column="0" Text="Application Version" FontSize="12" Foreground="#64748B"/><TextBlock Name="SettingsAppVersionText" Grid.Column="1" Text="2.0.0" FontSize="12" Foreground="#334155"/></Grid>

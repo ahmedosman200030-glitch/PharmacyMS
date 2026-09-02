@@ -115,7 +115,7 @@ public partial class MainShell : UserControl
 
         // Load Dashboard by default, highlighted
         SetActive(DashboardButton);
-        PageTitleText.Text ="Dashboard";
+        PageTitleText.Text = "Dashboard";
         ShowDashboard();
 
         LogoutButton.Click += (_, _) => DoLogout();
@@ -124,23 +124,23 @@ public partial class MainShell : UserControl
         MenuPreferencesButton.Click += (_, _) =>
         {
             SetActive(SettingsButton);
-            PageTitleText.Text ="Settings";
+            PageTitleText.Text = "Settings";
             OpenSettings();
         };
 
         SettingsQuickButton.Click += (_, _) =>
         {
             SetActive(SettingsButton);
-            PageTitleText.Text ="Settings";
+            PageTitleText.Text = "Settings";
             OpenSettings();
         };
 
-        DashboardButton.Click += (_, _) => { SetActive(DashboardButton); PageTitleText.Text ="Dashboard"; ShowDashboard(); };
+        DashboardButton.Click += (_, _) => { SetActive(DashboardButton); PageTitleText.Text = "Dashboard"; ShowDashboard(); };
 
         InventoryButton.Click += (_, _) =>
         {
             SetActive(InventoryButton);
-            PageTitleText.Text ="Inventory";
+            PageTitleText.Text = "Inventory";
             var repo = Program.Services.GetRequiredService<IMedicineRepository>();
             var vm = new InventoryViewModel(repo);
             MainContent.Content = new PharmacyMS.Desktop.Views.Inventory.InventoryView(vm);
@@ -150,7 +150,7 @@ public partial class MainShell : UserControl
         CategoriesButton.Click += (_, _) =>
         {
             SetActive(CategoriesButton);
-            PageTitleText.Text ="Categories";
+            PageTitleText.Text = "Categories";
             var repo = Program.Services.GetRequiredService<ICategoryRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.CategoriesViewModel(repo);
             MainContent.Content = new PharmacyMS.Desktop.Views.Categories.CategoriesView(vm);
@@ -159,10 +159,9 @@ public partial class MainShell : UserControl
         SuppliersButton.Click += (_, _) =>
         {
             SetActive(SuppliersButton);
-            PageTitleText.Text ="Suppliers";
+            PageTitleText.Text = "Suppliers";
             var repo = Program.Services.GetRequiredService<ISupplierRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.SuppliersViewModel(repo);
-            vm.SupplierAdded += supplier => ShowToast("", $"Supplier added: {supplier.Name}","#2563EB");
             MainContent.Content = new PharmacyMS.Desktop.Views.Suppliers.SuppliersView(vm);
         };
 
@@ -175,7 +174,7 @@ public partial class MainShell : UserControl
         NewPurchaseButton.Click += (_, _) =>
         {
             SetActive(NewPurchaseButton);
-            PageTitleText.Text ="Purchase Orders";
+            PageTitleText.Text = "Purchase Orders";
             var medicineRepo = Program.Services.GetRequiredService<IMedicineRepository>();
             var orderRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseOrderRepository>();
             var supplierRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.ISupplierRepository>();
@@ -187,7 +186,7 @@ public partial class MainShell : UserControl
         ReceivedGoodsButton.Click += (_, _) =>
         {
             SetActive(ReceivedGoodsButton);
-            PageTitleText.Text ="Received";
+            PageTitleText.Text = "Received";
             var orderRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseOrderRepository>();
             var receiptRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IGoodsReceiptRepository>();
             var purchaseRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseRepository>();
@@ -198,7 +197,7 @@ public partial class MainShell : UserControl
         PurchaseHistoryButton.Click += (_, _) =>
         {
             SetActive(PurchaseHistoryButton);
-            PageTitleText.Text ="Supplier Bills";
+            PageTitleText.Text = "Supplier Bills";
             var purchaseRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.PurchaseHistoryViewModel(purchaseRepo);
             MainContent.Content = new PharmacyMS.Desktop.Views.Purchases.PurchaseHistoryView(vm);
@@ -207,7 +206,7 @@ public partial class MainShell : UserControl
         PurchaseInvoicesButton.Click += (_, _) =>
         {
             SetActive(PurchaseInvoicesButton);
-            PageTitleText.Text ="Supplier Payments";
+            PageTitleText.Text = "Supplier Payments";
             var purchaseRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.PurchaseInvoiceViewModel(purchaseRepo);
             MainContent.Content = new PharmacyMS.Desktop.Views.Purchases.PurchaseInvoiceView(vm);
@@ -216,7 +215,7 @@ public partial class MainShell : UserControl
         PurchaseReportsButton.Click += (_, _) =>
         {
             SetActive(PurchaseReportsButton);
-            PageTitleText.Text ="Purchase Reports";
+            PageTitleText.Text = "Purchase Reports";
             var purchaseRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.PurchaseReportsViewModel(purchaseRepo);
             MainContent.Content = new PharmacyMS.Desktop.Views.Purchases.PurchaseReportsView(vm);
@@ -231,7 +230,7 @@ public partial class MainShell : UserControl
         SalesReturnButton.Click += (_, _) =>
         {
             SetActive(SalesReturnButton);
-            PageTitleText.Text ="Sales Returns";
+            PageTitleText.Text = "Sales Returns";
             var saleRepo = Program.Services.GetRequiredService<ISaleRepository>();
             var returnRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.ISaleReturnRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.SalesReturnViewModel(saleRepo, returnRepo);
@@ -241,14 +240,13 @@ public partial class MainShell : UserControl
         PointOfSaleButton.Click += (_, _) =>
         {
             SetActive(PointOfSaleButton);
-            PageTitleText.Text ="Sales / POS";
+            PageTitleText.Text = "Sales / POS";
             var medicineRepo = Program.Services.GetRequiredService<IMedicineRepository>();
             var saleRepo = Program.Services.GetRequiredService<ISaleRepository>();
             var settingsService = Program.Services.GetRequiredService<IAppSettingsService>();
             var customerRepo = Program.Services.GetRequiredService<ICustomerRepository>();
             var soundService = Program.Services.GetRequiredService<ISoundService>();
             var vm = new PosViewModel(medicineRepo, saleRepo, settingsService, customerRepo, soundService);
-            vm.SaleCompleted += sale => ShowToast("", $"Sale completed — {sale.TotalAmount:C}","#16A34A");
             MainContent.Content = new PharmacyMS.Desktop.Views.Sales.PosView(vm);
         };
 
@@ -257,21 +255,20 @@ public partial class MainShell : UserControl
             _posExpanded = true;
             PosSubPanel.IsVisible = true;
             SetActive(PointOfSaleButton);
-            PageTitleText.Text ="Sales / POS";
+            PageTitleText.Text = "Sales / POS";
             var medicineRepo = Program.Services.GetRequiredService<IMedicineRepository>();
             var saleRepo = Program.Services.GetRequiredService<ISaleRepository>();
             var settingsService = Program.Services.GetRequiredService<IAppSettingsService>();
             var customerRepo = Program.Services.GetRequiredService<ICustomerRepository>();
             var soundService = Program.Services.GetRequiredService<ISoundService>();
             var vm = new PosViewModel(medicineRepo, saleRepo, settingsService, customerRepo, soundService);
-            vm.SaleCompleted += sale => ShowToast("", $"Sale completed — {sale.TotalAmount:C}","#16A34A");
             MainContent.Content = new PharmacyMS.Desktop.Views.Sales.PosView(vm);
         };
 
         DailyClosingButton.Click += async (_, _) =>
         {
             SetActive(DailyClosingButton);
-            PageTitleText.Text ="Daily Closing";
+            PageTitleText.Text = "Daily Closing";
             var saleRepo2 = Program.Services.GetRequiredService<ISaleRepository>();
             var closingRepo = Program.Services.GetRequiredService<IDailyClosingRepository>();
             var vm2 = new PharmacyMS.Desktop.ViewModels.DailyClosingViewModel(saleRepo2, closingRepo);
@@ -283,7 +280,7 @@ public partial class MainShell : UserControl
         CustomersButton.Click += (_, _) =>
         {
             SetActive(CustomersButton);
-            PageTitleText.Text ="Customers";
+            PageTitleText.Text = "Customers";
             var repo = Program.Services.GetRequiredService<ICustomerRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.CustomersViewModel(repo);
             MainContent.Content = new PharmacyMS.Desktop.Views.Customers.CustomersView(vm);
@@ -299,7 +296,7 @@ public partial class MainShell : UserControl
         void OpenAccounting(int tab = 0)
         {
             SetActive(AccountingButton);
-            PageTitleText.Text ="Accounting";
+            PageTitleText.Text = "Accounting";
             var saleRepo = Program.Services.GetRequiredService<ISaleRepository>();
             var purchaseRepo = Program.Services.GetRequiredService<IPurchaseRepository>();
             var expenseRepo = Program.Services.GetRequiredService<IExpenseRepository>();
@@ -315,7 +312,7 @@ public partial class MainShell : UserControl
         AccIncomeButton.Click += (_, _) =>
         {
             SetActive(AccIncomeButton);
-            PageTitleText.Text ="Income";
+            PageTitleText.Text = "Income";
             var saleRepoForIncome = Program.Services.GetRequiredService<ISaleRepository>();
             var otherIncomeRepoForIncome = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IOtherIncomeRepository>();
             var incomeVm = new PharmacyMS.Desktop.ViewModels.IncomeViewModel(saleRepoForIncome, otherIncomeRepoForIncome);
@@ -324,7 +321,7 @@ public partial class MainShell : UserControl
         AccExpensesButton.Click += (_, _) =>
         {
             SetActive(AccExpensesButton);
-            PageTitleText.Text ="Expenses";
+            PageTitleText.Text = "Expenses";
             var expenseRepo = Program.Services.GetRequiredService<IExpenseRepository>();
             var pendingExpenseRepo = Program.Services.GetRequiredService<IPendingExpenseRepository>();
             var expensesVm = new PharmacyMS.Desktop.ViewModels.ExpensesViewModel(expenseRepo, pendingExpenseRepo);
@@ -333,7 +330,7 @@ public partial class MainShell : UserControl
         AccReceivablesButton.Click += (_, _) =>
         {
             SetActive(AccReceivablesButton);
-            PageTitleText.Text ="Receivables";
+            PageTitleText.Text = "Receivables";
             var saleRepoForRec = Program.Services.GetRequiredService<ISaleRepository>();
             var customerRepoForRec = Program.Services.GetRequiredService<ICustomerRepository>();
             var pendingSalePaymentRepo = Program.Services.GetRequiredService<IPendingSalePaymentRepository>();
@@ -343,7 +340,7 @@ public partial class MainShell : UserControl
         AccPayablesButton.Click += (_, _) =>
         {
             SetActive(AccPayablesButton);
-            PageTitleText.Text ="Payables";
+            PageTitleText.Text = "Payables";
             var purchaseRepoForPay = Program.Services.GetRequiredService<IPurchaseRepository>();
             var supplierRepoForPay = Program.Services.GetRequiredService<ISupplierRepository>();
             var payVm = new PharmacyMS.Desktop.ViewModels.PayablesViewModel(purchaseRepoForPay, supplierRepoForPay);
@@ -352,7 +349,7 @@ public partial class MainShell : UserControl
         AccCashFlowButton.Click += async (_, _) =>
         {
             SetActive(AccCashFlowButton);
-            PageTitleText.Text ="Cash Flow";
+            PageTitleText.Text = "Cash Flow";
             var saleRepoForCF = Program.Services.GetRequiredService<ISaleRepository>();
             var purchaseRepoForCF = Program.Services.GetRequiredService<IPurchaseRepository>();
             var expenseRepoForCF = Program.Services.GetRequiredService<IExpenseRepository>();
@@ -362,7 +359,7 @@ public partial class MainShell : UserControl
         AccPLButton.Click += async (_, _) =>
         {
             SetActive(AccPLButton);
-            PageTitleText.Text ="Profit & Loss";
+            PageTitleText.Text = "Profit & Loss";
             var saleRepoForPL = Program.Services.GetRequiredService<ISaleRepository>();
             var purchaseRepoForPL = Program.Services.GetRequiredService<IPurchaseRepository>();
             var expenseRepoForPL = Program.Services.GetRequiredService<IExpenseRepository>();
@@ -374,7 +371,7 @@ public partial class MainShell : UserControl
         AccReportsButton.Click += (_, _) =>
         {
             SetActive(AccReportsButton);
-            PageTitleText.Text ="Financial Reports";
+            PageTitleText.Text = "Financial Reports";
             var accRepo = Program.Services.GetRequiredService<IReportRepository>();
             var accReportsVm = new PharmacyMS.Desktop.ViewModels.ReportsViewModel(accRepo);
             var accBrandingService = Program.Services.GetRequiredService<IBrandingService>();
@@ -384,7 +381,7 @@ public partial class MainShell : UserControl
         SalesHistoryButton.Click += (_, _) =>
         {
             SetActive(SalesHistoryButton);
-            PageTitleText.Text ="Sales History";
+            PageTitleText.Text = "Sales History";
             var saleRepo = Program.Services.GetRequiredService<ISaleRepository>();
             var customerRepo = Program.Services.GetRequiredService<ICustomerRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.SalesHistoryViewModel(saleRepo, customerRepo);
@@ -395,7 +392,7 @@ public partial class MainShell : UserControl
         CreditSalesButton.Click += (_, _) =>
         {
             SetActive(CreditSalesButton);
-            PageTitleText.Text ="Credit Sales";
+            PageTitleText.Text = "Credit Sales";
             var saleRepo = Program.Services.GetRequiredService<ISaleRepository>();
             var customerRepo2 = Program.Services.GetRequiredService<ICustomerRepository>();
             var pendingPayRepo = Program.Services.GetRequiredService<IPendingSalePaymentRepository>();
@@ -413,7 +410,7 @@ public partial class MainShell : UserControl
         AllUsersButton.Click += (_, _) =>
         {
             SetActive(AllUsersButton);
-            PageTitleText.Text ="Users";
+            PageTitleText.Text = "Users";
             var repo = Program.Services.GetRequiredService<IUserRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.UsersViewModel(repo);
             MainContent.Content = new PharmacyMS.Desktop.Views.Users.UsersView(vm);
@@ -422,14 +419,14 @@ public partial class MainShell : UserControl
         UserActivityButton.Click += (_, _) =>
         {
             SetActive(UserActivityButton);
-            PageTitleText.Text ="User Activity";
+            PageTitleText.Text = "User Activity";
             MainContent.Content = new PharmacyMS.Desktop.Views.Reports.UserActivityView();
         };
 
         PendingApprovalsButton.Click += async (_, _) =>
         {
             SetActive(PendingApprovalsButton);
-            PageTitleText.Text ="Pending Approvals";
+            PageTitleText.Text = "Pending Approvals";
             var customerRepo = Program.Services.GetRequiredService<ICustomerRepository>();
             var supplierRepo = Program.Services.GetRequiredService<ISupplierRepository>();
             var purchaseRepo = Program.Services.GetRequiredService<IPurchaseRepository>();
@@ -445,7 +442,7 @@ public partial class MainShell : UserControl
         MyStatusButton.Click += async (_, _) =>
         {
             SetActive(MyStatusButton);
-            PageTitleText.Text ="My Status";
+            PageTitleText.Text = "My Status";
             var myPaymentRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPendingSalePaymentRepository>();
             var myExpenseRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPendingExpenseRepository>();
             var myReceiptRepo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IGoodsReceiptRepository>();
@@ -458,7 +455,7 @@ public partial class MainShell : UserControl
         SettingsButton.Click += (_, _) =>
         {
             SetActive(SettingsButton);
-            PageTitleText.Text ="Settings";
+            PageTitleText.Text = "Settings";
             OpenSettings();
         };
 
@@ -485,13 +482,13 @@ public partial class MainShell : UserControl
             {
                 results.Add(new PharmacyMS.Desktop.ViewModels.SearchResultItem
                 {
-                    Icon ="",
+                    Icon = "💊",
                     Title = m.Name,
-                    Subtitle ="Medicine — Stock: "+ m.QuantityInStock,
+                    Subtitle = "Medicine — Stock: " + m.QuantityInStock,
                     NavigateCommand = new PharmacyMS.Desktop.ViewModels.RelayCommand(() =>
                     {
                         SearchResultsPopup.IsOpen = false;
-                        GlobalSearchBox.Text ="";
+                        GlobalSearchBox.Text = "";
                         NavigateToInventory(null);
                         return Task.CompletedTask;
                     })
@@ -504,13 +501,13 @@ public partial class MainShell : UserControl
             {
                 results.Add(new PharmacyMS.Desktop.ViewModels.SearchResultItem
                 {
-                    Icon ="",
+                    Icon = "👤",
                     Title = c.Name,
-                    Subtitle ="Customer"+ (string.IsNullOrWhiteSpace(c.Phone) ? "": "—"+ c.Phone),
+                    Subtitle = "Customer" + (string.IsNullOrWhiteSpace(c.Phone) ? "" : " — " + c.Phone),
                     NavigateCommand = new PharmacyMS.Desktop.ViewModels.RelayCommand(() =>
                     {
                         SearchResultsPopup.IsOpen = false;
-                        GlobalSearchBox.Text ="";
+                        GlobalSearchBox.Text = "";
                         CustomersButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
                         return Task.CompletedTask;
                     })
@@ -527,13 +524,13 @@ public partial class MainShell : UserControl
             {
                 results.Add(new PharmacyMS.Desktop.ViewModels.SearchResultItem
                 {
-                    Icon ="",
+                    Icon = "🧾",
                     Title = s.InvoiceNumber,
-                    Subtitle ="Invoice —"+ s.CustomerName +"— $"+ s.TotalAmount.ToString("0.00"),
+                    Subtitle = "Invoice — " + s.CustomerName + " — $" + s.TotalAmount.ToString("0.00"),
                     NavigateCommand = new PharmacyMS.Desktop.ViewModels.RelayCommand(() =>
                     {
                         SearchResultsPopup.IsOpen = false;
-                        GlobalSearchBox.Text ="";
+                        GlobalSearchBox.Text = "";
                         SalesHistoryButton.RaiseEvent(new Avalonia.Interactivity.RoutedEventArgs(Avalonia.Controls.Button.ClickEvent));
                         return Task.CompletedTask;
                     })
@@ -544,9 +541,9 @@ public partial class MainShell : UserControl
             {
                 results.Add(new PharmacyMS.Desktop.ViewModels.SearchResultItem
                 {
-                    Icon ="",
-                    Title ="No results found",
-                    Subtitle ="Try a different search term",
+                    Icon = "🚫",
+                    Title = "No results found",
+                    Subtitle = "Try a different search term",
                     NavigateCommand = new PharmacyMS.Desktop.ViewModels.RelayCommand(() => Task.CompletedTask)
                 });
             }
@@ -606,7 +603,7 @@ public partial class MainShell : UserControl
             CornerRadius = new Avalonia.CornerRadius(6),
             Padding = new Avalonia.Thickness(10, 6),
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
-            Child = new TextBlock { Text ="Coming soon", FontSize = 12, Foreground = new SolidColorBrush(Color.Parse("#92400E")) }
+            Child = new TextBlock { Text = "🚧 Coming soon", FontSize = 12, Foreground = new SolidColorBrush(Color.Parse("#92400E")) }
         });
         border.Child = stack;
         return border;
@@ -642,7 +639,7 @@ public partial class MainShell : UserControl
 
         var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {
-            Title ="Select Profile Photo",
+            Title = "Select Profile Photo",
             AllowMultiple = false,
             FileTypeFilter = new[] { FilePickerFileTypes.ImageAll }
         });
@@ -650,7 +647,8 @@ public partial class MainShell : UserControl
         if (files.Count == 0) return;
 
         var folder = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),"PharmaPro","Avatars");
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "PharmaPro", "Avatars");
         Directory.CreateDirectory(folder);
 
         var ext = Path.GetExtension(files[0].Name);
@@ -715,9 +713,7 @@ public partial class MainShell : UserControl
             var expiring = expiringSoonMeds.Count;
 
             var allCustomers = (await customerRepo.GetAllAsync()).ToList();
-            var newCustomersList = allCustomers.Where(c => c.CreatedAt.Date == DateTime.Today).ToList();
-            var newCustomersToday = newCustomersList.Count;
-            var mostRecentCustomer = newCustomersList.OrderByDescending(c => c.CreatedAt).FirstOrDefault();
+            var newCustomersToday = allCustomers.Count(c => c.CreatedAt.Date == DateTime.Today);
 
             var notifPurchaseRepo = Program.Services.GetRequiredService<IPurchaseRepository>();
             var allPurchasesForNotif = (await notifPurchaseRepo.GetAllAsync()).ToList();
@@ -731,43 +727,7 @@ public partial class MainShell : UserControl
             var newOrdersCount = newOrdersToday.Count;
             var mostRecentOrder = newOrdersToday.OrderByDescending(o => o.CreatedAt).FirstOrDefault();
 
-            var allSalesForNotif = (await saleRepo.GetAllAsync()).ToList();
-            var todaySalesForNotif = allSalesForNotif.Where(s => s.CreatedAt.Date == DateTime.Today).ToList();
-            var mostRecentSale = todaySalesForNotif.OrderByDescending(s => s.CreatedAt).FirstOrDefault();
-
-            var notifSupplierRepo = Program.Services.GetRequiredService<ISupplierRepository>();
-            var allSuppliersForNotif = (await notifSupplierRepo.GetAllAsync()).ToList();
-            var newSuppliersToday = allSuppliersForNotif.Where(s => s.CreatedAt.Date == DateTime.Today).ToList();
-            var newSupplierCount = newSuppliersToday.Count;
-            var mostRecentSupplier = newSuppliersToday.OrderByDescending(s => s.CreatedAt).FirstOrDefault();
-
-            var backupService = Program.Services.GetRequiredService<IDatabaseBackupService>();
-            DateTime? lastBackupAt = null;
-            try
-            {
-                var dbInfo = backupService.GetDatabaseInfo();
-                var backupsFolder = Path.Combine(Path.GetDirectoryName(dbInfo.Path)!,"Backups");
-                if (Directory.Exists(backupsFolder))
-                {
-                    var newest = new DirectoryInfo(backupsFolder)
-                        .GetFiles("pharmacyms-backup-*.db")
-                        .OrderByDescending(f => f.LastWriteTime)
-                        .FirstOrDefault();
-                    if (newest != null) lastBackupAt = newest.LastWriteTime;
-                }
-            }
-            catch
-            {
-                // backup folder not resolvable (e.g. cloud DB) — treat as no reminder
-            }
-
-            var backupDue = lastBackupAt == null || (DateTime.Now - lastBackupAt.Value).TotalHours >= 12;
-            // Only nag if we could actually resolve a local DB path (skip silently for cloud/Postgres)
-            bool backupReminderApplicable;
-            try { backupReminderApplicable = !string.IsNullOrEmpty(backupService.GetDatabaseInfo().Path) && backupDue && lastBackupAt != null || (lastBackupAt == null); }
-            catch { backupReminderApplicable = false; }
-
-            var total = expiredCount + outOfStockCount + lowStock + expiring + duePaymentCount + newOrdersCount + (backupReminderApplicable && backupDue ? 1 : 0);
+            var total = expiredCount + outOfStockCount + lowStock + expiring + duePaymentCount + newOrdersCount;
 
             // --- Detect newly-appeared alerts and show toasts (skip on first load after app start) ---
             var currentKeys = new HashSet<string>();
@@ -789,11 +749,11 @@ public partial class MainShell : UserControl
 
                     var (icon, label, color) = kind switch
                     {
-                        "expired" => ("", $"{med.Name} has expired", "#EF4444"),
-                        "outofstock" => ("", $"{med.Name} is out of stock", "#EF4444"),
-                        "lowstock" => ("", $"{med.Name} is low on stock", "#F59E0B"),
-                        "expiring" => ("", $"{med.Name} expires soon", "#F59E0B"),
-                        _ => ("", med.Name, "#64748B")
+                        "expired" => ("⚠", $"{med.Name} has expired", "#EF4444"),
+                        "outofstock" => ("⚠", $"{med.Name} is out of stock", "#EF4444"),
+                        "lowstock" => ("📦", $"{med.Name} is low on stock", "#F59E0B"),
+                        "expiring" => ("⏳", $"{med.Name} expires soon", "#F59E0B"),
+                        _ => ("🔔", med.Name, "#64748B")
                     };
                     ShowToast(icon, label, color);
                 }
@@ -803,7 +763,7 @@ public partial class MainShell : UserControl
 
             NotifCountText.Text = total.ToString();
             NotifBadge.IsVisible = total > 0;
-            NotifHeaderText.Text = $"Notifications ({total})";
+            NotifHeaderText.Text = $"🔔 Notifications ({total})";
 
             // Pending receiving badge (Purchase Orders awaiting receipt)
             var orderRepoForBadge = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseOrderRepository>();
@@ -829,15 +789,15 @@ public partial class MainShell : UserControl
                 ApprovalsBadge.IsVisible = pendingTotal > 0;
             }
 
-            NotifExpiredText.Text = $"{expiredCount} medicines have expired";
+            NotifExpiredText.Text = $"⚠ {expiredCount} medicines have expired";
             NotifExpiredButton.IsVisible = expiredCount > 0;
             NotifExpiredCountBadge.Text = expiredCount.ToString();
 
-            NotifOutOfStockText.Text = $"{outOfStockCount} medicines are out of stock";
+            NotifOutOfStockText.Text = $"⚠ {outOfStockCount} medicines are out of stock";
             NotifOutOfStockButton.IsVisible = outOfStockCount > 0;
             NotifOutOfStockCountBadge.Text = outOfStockCount.ToString();
 
-            NotifLowStockText.Text = $"{lowStock} medicines are low stock";
+            NotifLowStockText.Text = $"📦 {lowStock} medicines are low stock";
             NotifLowStockButton.IsVisible = lowStock > 0;
             NotifLowStockCountBadge.Text = lowStock.ToString();
 
@@ -845,38 +805,26 @@ public partial class MainShell : UserControl
             NotifExpiringButton.IsVisible = expiring > 0;
             NotifExpiringCountBadge.Text = expiring.ToString();
 
-            NotifRevenueText.Text = $"Today's sales: ${statsVm.TodayRevenue:F2}";
-            NotifRevenueTimeText.Text = mostRecentSale != null ? GetTimeAgo(mostRecentSale.CreatedAt) : "";
+            NotifRevenueText.Text = $"💰 Today's sales: ${statsVm.TodayRevenue:F2}";
 
-            NotifNewCustomersText.Text = $"{newCustomersToday} new customer{(newCustomersToday == 1 ? "": "s")} today";
+            NotifNewCustomersText.Text = $"👥 {newCustomersToday} new customer{(newCustomersToday == 1 ? "" : "s")} today";
             NotifNewCustomersButton.IsVisible = newCustomersToday > 0;
             NotifNewCustomersCountBadge.Text = newCustomersToday.ToString();
-            NotifNewCustomersTimeText.Text = mostRecentCustomer != null ? GetTimeAgo(mostRecentCustomer.CreatedAt) : "";
+            NotifNewCustomersTimeText.Text = "";
 
-            NotifDuePaymentText.Text = $"{duePaymentCount} due payment{(duePaymentCount == 1 ? "": "s")} to suppliers";
+            NotifDuePaymentText.Text = $"🧾 {duePaymentCount} due payment{(duePaymentCount == 1 ? "" : "s")} to suppliers";
             NotifDuePaymentButton.IsVisible = duePaymentCount > 0;
             NotifDuePaymentCountBadge.Text = duePaymentCount.ToString();
             NotifDuePaymentTimeText.Text = mostRecentDue != null ? GetTimeAgo(mostRecentDue.CreatedAt) : "";
 
-            NotifNewPurchaseText.Text = $"{newOrdersCount} new purchase order{(newOrdersCount == 1 ? "": "s")} created today";
+            NotifNewPurchaseText.Text = $"🧺 {newOrdersCount} new purchase order{(newOrdersCount == 1 ? "" : "s")} created today";
             NotifNewPurchaseButton.IsVisible = newOrdersCount > 0;
             NotifNewPurchaseCountBadge.Text = newOrdersCount.ToString();
             NotifNewPurchaseTimeText.Text = mostRecentOrder != null ? GetTimeAgo(mostRecentOrder.CreatedAt) : "";
 
-            NotifNewSupplierText.Text = $"{newSupplierCount} new supplier{(newSupplierCount == 1 ? "": "s")} added today";
-            NotifNewSupplierButton.IsVisible = newSupplierCount > 0;
-            NotifNewSupplierCountBadge.Text = newSupplierCount.ToString();
-            NotifNewSupplierTimeText.Text = mostRecentSupplier != null ? GetTimeAgo(mostRecentSupplier.CreatedAt) : "";
-
-            NotifBackupRow.IsVisible = backupReminderApplicable && backupDue;
-            NotifBackupText.Text = lastBackupAt == null
-                ? "No backup found — please back up your data": $"Last backup {GetTimeAgo(lastBackupAt.Value)} — please back up again";
-
             NotifEmptyText.IsVisible = total == 0;
 
             WireNotificationClickHandlers();
-            WireNotifReadState();
-            UpdateNotifBadgeCount();
         }
         catch
         {
@@ -908,7 +856,7 @@ public partial class MainShell : UserControl
         NotifNewCustomersButton.Click += (_, _) =>
         {
             SetActive(CustomersButton);
-            PageTitleText.Text ="Customers";
+            PageTitleText.Text = "Customers";
             var repo = Program.Services.GetRequiredService<ICustomerRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.CustomersViewModel(repo);
             MainContent.Content = new PharmacyMS.Desktop.Views.Customers.CustomersView(vm);
@@ -916,7 +864,7 @@ public partial class MainShell : UserControl
         NotifDuePaymentButton.Click += (_, _) =>
         {
             SetActive(AccountingButton);
-            PageTitleText.Text ="Payables";
+            PageTitleText.Text = "Payables";
             var repo = Program.Services.GetRequiredService<IPurchaseRepository>();
             var supplierRepoForPayables = Program.Services.GetRequiredService<ISupplierRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.PayablesViewModel(repo, supplierRepoForPayables);
@@ -927,14 +875,6 @@ public partial class MainShell : UserControl
             var repo = Program.Services.GetRequiredService<PharmacyMS.Application.Interfaces.Repositories.IPurchaseOrderRepository>();
             var vm = new PharmacyMS.Desktop.ViewModels.PurchaseOrderListViewModel(repo);
             MainContent.Content = new PharmacyMS.Desktop.Views.Purchases.PurchaseOrderListView(vm);
-        };
-        NotifNewSupplierButton.Click += (_, _) =>
-        {
-            SetActive(SuppliersButton);
-            PageTitleText.Text ="Suppliers";
-            var supplierRepoForClick = Program.Services.GetRequiredService<ISupplierRepository>();
-            var supplierVmForClick = new PharmacyMS.Desktop.ViewModels.SuppliersViewModel(supplierRepoForClick);
-            MainContent.Content = new PharmacyMS.Desktop.Views.Suppliers.SuppliersView(supplierVmForClick);
         };
     }
 
@@ -991,7 +931,7 @@ public partial class MainShell : UserControl
     private void NavigateToInventory(StockStatus? status, bool expiringOnly = false)
     {
         SetActive(InventoryButton);
-        PageTitleText.Text ="Inventory";
+        PageTitleText.Text = "Inventory";
         var repo = Program.Services.GetRequiredService<IMedicineRepository>();
         var vm = new InventoryViewModel(repo);
         var view = new PharmacyMS.Desktop.Views.Inventory.InventoryView(vm);
@@ -1017,123 +957,4 @@ public partial class MainShell : UserControl
             DefaultLogoBorder.IsVisible = false;
         }
     }
-// ── Notification read-state ──────────────────────────────────────────────
-    // Keys are stable strings that identify each notification type.
-    // We persist dismissed keys to a local JSON file so they survive restarts,
-    // but reset automatically once the underlying condition changes
-    // (e.g. new expired medicines appear after a "mark all read").
-
-    private static readonly string _notifStatePath = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "PharmacyMS", "notif_dismissed.json");
-
-    private HashSet<string> _dismissedKeys = new();
-    private bool _notifReadStateWired;
-
-    private void LoadDismissedKeys()
-    {
-        try
-        {
-            if (File.Exists(_notifStatePath))
-            {
-                var json = File.ReadAllText(_notifStatePath);
-                var keys = System.Text.Json.JsonSerializer.Deserialize<List<string>>(json);
-                _dismissedKeys = keys != null ? new HashSet<string>(keys) : new HashSet<string>();
-            }
-        }
-        catch { _dismissedKeys = new HashSet<string>(); }
-    }
-
-    private void SaveDismissedKeys()
-    {
-        try
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(_notifStatePath)!);
-            var json = System.Text.Json.JsonSerializer.Serialize(_dismissedKeys.ToList());
-            File.WriteAllText(_notifStatePath, json);
-        }
-        catch { }
-    }
-
-    private void DismissNotification(string key, Button? button = null, Border? border = null)
-    {
-        _dismissedKeys.Add(key);
-        SaveDismissedKeys();
-        if (button != null) button.Opacity = 0.4;
-        if (border != null) border.Opacity = 0.4;
-        UpdateNotifBadgeCount();
-    }
-
-    private void UpdateNotifBadgeCount()
-    {
-        // Re-count visible+undismissed notifications
-        var pairs = new (Control ctrl, string key)[]
-        {
-            (NotifExpiredButton,     "expired"),
-            (NotifOutOfStockButton,  "outofstock"),
-            (NotifLowStockButton,    "lowstock"),
-            (NotifExpiringButton,    "expiring"),
-            (NotifDuePaymentButton,  "duepayment"),
-            (NotifNewPurchaseButton, "newpurchase"),
-            (NotifNewCustomersButton,"newcustomers"),
-            (NotifNewSupplierButton, "newsupplier"),
-            (NotifBackupRow,         "backup"),
-        };
-        int active = pairs.Count(p => p.ctrl.IsVisible && !_dismissedKeys.Contains(p.key));
-        NotifBadge.IsVisible = active > 0;
-        NotifCountText.Text = active.ToString();
-        NotifHeaderText.Text = $"Notifications ({active})";
-        MarkAllReadText.Text = active == 0 ? "All read" : "Mark all as read";
-    }
-
-    private void WireNotifReadState()
-    {
-        if (_notifReadStateWired) return;
-        _notifReadStateWired = true;
-
-        LoadDismissedKeys();
-
-        // Apply dismissed opacity on load
-        ApplyDismissedOpacity();
-
-        // Mark All As Read button
-        MarkAllReadButton.Click += (_, _) =>
-        {
-            var allKeys = new[] { "expired","outofstock","lowstock","expiring",
-                "duepayment","newpurchase","newcustomers","newsupplier","backup" };
-            foreach (var k in allKeys) _dismissedKeys.Add(k);
-            SaveDismissedKeys();
-            ApplyDismissedOpacity();
-            UpdateNotifBadgeCount();
-        };
-
-        // Individual dismiss on click (navigate + mark read)
-        NotifExpiredButton.Click     += (_, _) => { DismissNotification("expired",     NotifExpiredButton); };
-        NotifOutOfStockButton.Click  += (_, _) => { DismissNotification("outofstock",  NotifOutOfStockButton); };
-        NotifLowStockButton.Click    += (_, _) => { DismissNotification("lowstock",    NotifLowStockButton); };
-        NotifExpiringButton.Click    += (_, _) => { DismissNotification("expiring",    NotifExpiringButton); };
-        NotifDuePaymentButton.Click  += (_, _) => { DismissNotification("duepayment",  NotifDuePaymentButton); };
-        NotifNewPurchaseButton.Click += (_, _) => { DismissNotification("newpurchase", NotifNewPurchaseButton); };
-        NotifNewCustomersButton.Click+= (_, _) => { DismissNotification("newcustomers",NotifNewCustomersButton); };
-        NotifNewSupplierButton.Click += (_, _) => { DismissNotification("newsupplier", NotifNewSupplierButton); };
-    }
-
-    private void ApplyDismissedOpacity()
-    {
-        var pairs = new (Control ctrl, string key)[]
-        {
-            (NotifExpiredButton,     "expired"),
-            (NotifOutOfStockButton,  "outofstock"),
-            (NotifLowStockButton,    "lowstock"),
-            (NotifExpiringButton,    "expiring"),
-            (NotifDuePaymentButton,  "duepayment"),
-            (NotifNewPurchaseButton, "newpurchase"),
-            (NotifNewCustomersButton,"newcustomers"),
-            (NotifNewSupplierButton, "newsupplier"),
-            (NotifBackupRow,         "backup"),
-        };
-        foreach (var (ctrl, key) in pairs)
-            ctrl.Opacity = _dismissedKeys.Contains(key) ? 0.4 : 1.0;
-    }
-
 }

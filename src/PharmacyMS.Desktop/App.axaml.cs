@@ -46,6 +46,30 @@ public partial class App : Avalonia.Application
         // offline. Never awaited on the UI path, never blocks startup.
         _ = PharmacyMS.Desktop.Services.ResendEmailNotifier.RetryPendingNotificationsAsync();
 
+        await splash.RunAsync(20, () => { });
+
+        await ProceedFromSplashAsync(shell);
+    }
+
+    // Called after the splash animation, and again after a successful
+    // "Server Unreachable" retry. If the database still can't be reached,
+    // this blocks on the Server Unreachable screen instead of proceeding.
+    private async Task ProceedFromSplashAsync(ShellWindow shell)
+    {
+        if (Program.DatabaseUnreachableReason != null)
+        {
+            var reason = Program.DatabaseUnreachableReason;
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                shell.ShowServerUnreachable(reason, onRetry: async () =>
+                {
+                    await Program.TryReconnectAsync();
+                    await ProceedFromSplashAsync(shell);
+                });
+            });
+            return;
+        }
+
         string? savedKey = null;
         bool setupCompleted = true;
         try
@@ -65,8 +89,6 @@ public partial class App : Avalonia.Application
 
         var license = LicenseService.Validate(savedKey ?? "");
 
-        await splash.RunAsync(20, () => { });
-
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
             void ProceedPastSetup()
@@ -75,11 +97,6 @@ public partial class App : Avalonia.Application
                     shell.ShowLogin();
                 else
                     shell.ShowPlans();
-
-                if (Program.DatabaseFallbackReason != null)
-                {
-                    ShowDatabaseFallbackWarning(shell, Program.DatabaseFallbackReason);
-                }
             }
 
             if (!setupCompleted)
@@ -87,54 +104,6 @@ public partial class App : Avalonia.Application
             else
                 ProceedPastSetup();
         });
-    }
-
-    private void ShowDatabaseFallbackWarning(Avalonia.Controls.Window owner, string reason)
-    {
-        var dialog = new Avalonia.Controls.Window
-        {
-            Title = "Working Offline — Cloud Database Unreachable",
-            Width = 520,
-            Height = 260,
-            WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterOwner,
-            CanResize = false,
-            Content = new Avalonia.Controls.StackPanel
-            {
-                Margin = new Avalonia.Thickness(24),
-                Spacing = 12,
-                Children =
-                {
-                    new Avalonia.Controls.TextBlock
-                    {
-                        Text = "⚠ Could not connect to the cloud database (Supabase/Postgres).",
-                        FontWeight = Avalonia.Media.FontWeight.Bold,
-                        FontSize = 15,
-                        TextWrapping = Avalonia.Media.TextWrapping.Wrap
-                    },
-                    new Avalonia.Controls.TextBlock
-                    {
-                        Text = "This session is using the LOCAL database on this PC only. " +
-                               "Any sales, inventory changes, or other data you enter now will NOT be visible on other computers, " +
-                               "and will need to be manually reconciled later.",
-                        TextWrapping = Avalonia.Media.TextWrapping.Wrap
-                    },
-                    new Avalonia.Controls.TextBlock
-                    {
-                        Text = $"Reason: {reason}",
-                        FontSize = 11,
-                        Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#64748B")),
-                        TextWrapping = Avalonia.Media.TextWrapping.Wrap
-                    },
-                    new Avalonia.Controls.TextBlock
-                    {
-                        Text = "Check your internet connection, then go to Settings → Cloud Sync and click \"Save & Restart\" to try reconnecting.",
-                        TextWrapping = Avalonia.Media.TextWrapping.Wrap
-                    }
-                }
-            }
-        };
-
-        dialog.Show(owner);
     }
 
     private void OnUnhandledUiException(object? sender, Avalonia.Threading.DispatcherUnhandledExceptionEventArgs e)

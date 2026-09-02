@@ -23,7 +23,16 @@ public class DbConfigService
         try
         {
             var json = File.ReadAllText(_configPath);
-            return JsonSerializer.Deserialize<DbConfig>(json) ?? new DbConfig();
+            var cfg = JsonSerializer.Deserialize<DbConfig>(json) ?? new DbConfig();
+
+            // Migrate configs saved before NetworkMode existed: if they were
+            // already using Postgres, treat that as Cloud mode by default.
+            if (cfg.Provider == DbProvider.Postgres && cfg.NetworkMode == DbNetworkMode.Offline)
+            {
+                cfg.NetworkMode = DbNetworkMode.Cloud;
+            }
+
+            return cfg;
         }
         catch
         {
